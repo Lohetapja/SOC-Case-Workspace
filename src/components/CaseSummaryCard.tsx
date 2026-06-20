@@ -1,14 +1,18 @@
+import type { KeyboardEvent } from 'react'
 import type { SocCase } from '../types'
 import { severityLabels, sourceLabels, statusLabels, verdictLabels } from '../data/labels'
+import { cn } from '../utils/classNames'
 
 interface CaseSummaryCardProps {
   socCase: SocCase
+  /** When provided, the card becomes clickable to open the case. */
+  onOpen?: (id: string) => void
   /** When provided, a Delete action is shown. */
   onDelete?: (id: string) => void
 }
 
-/** Summary card for a case in the list. Presentation + an optional delete action. */
-export function CaseSummaryCard({ socCase, onDelete }: CaseSummaryCardProps) {
+/** Summary card for a case in the list. Clickable to open; delete is isolated. */
+export function CaseSummaryCard({ socCase, onOpen, onDelete }: CaseSummaryCardProps) {
   const stats = [
     { label: 'Entities', value: socCase.affectedEntities.length },
     { label: 'Evidence', value: socCase.evidence.length },
@@ -18,8 +22,23 @@ export function CaseSummaryCard({ socCase, onDelete }: CaseSummaryCardProps) {
     { label: 'ATT&CK', value: socCase.mitreMappings.length },
   ]
 
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!onOpen) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onOpen(socCase.id)
+    }
+  }
+
   return (
-    <article className="case-card">
+    <article
+      className={cn('case-card', onOpen && 'case-card--clickable')}
+      onClick={onOpen ? () => onOpen(socCase.id) : undefined}
+      onKeyDown={onOpen ? handleKeyDown : undefined}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      aria-label={onOpen ? `Open case: ${socCase.title}` : undefined}
+    >
       <div className="case-card__top">
         <h3 className="case-card__title">{socCase.title}</h3>
         <span className={`sev sev--${socCase.severity}`}>{severityLabels[socCase.severity]}</span>
@@ -42,9 +61,7 @@ export function CaseSummaryCard({ socCase, onDelete }: CaseSummaryCardProps) {
       </div>
 
       {socCase.closure && (
-        <p className="case-card__closure">
-          Closed — {verdictLabels[socCase.closure.verdict]}
-        </p>
+        <p className="case-card__closure">Closed — {verdictLabels[socCase.closure.verdict]}</p>
       )}
 
       {onDelete && (
@@ -52,7 +69,10 @@ export function CaseSummaryCard({ socCase, onDelete }: CaseSummaryCardProps) {
           <button
             type="button"
             className="btn-link-danger"
-            onClick={() => onDelete(socCase.id)}
+            onClick={(event) => {
+              event.stopPropagation()
+              onDelete(socCase.id)
+            }}
           >
             Delete
           </button>
