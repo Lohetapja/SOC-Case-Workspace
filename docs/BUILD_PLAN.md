@@ -36,20 +36,25 @@ case is still there. `npm run dev` works; README "Getting started" updated.
 
 ---
 
-## Milestone 2 — Case detail workspace  ☐
-**Goal:** Open a single case and edit its core fields.
-**Deliverables:**
-- Routing (or view-switching) into a case detail page.
-- Display + edit of case metadata.
-- Section placeholders for evidence, timeline, journal, ATT&CK, closure.
-**Acceptance:** Can navigate from list → detail → back; edits persist.
+## Milestone 2 — Case detail workspace  ☑
+**Done (read-only):** Clicking a case opens a detail workspace via shared
+`activeCaseId` state in `App` (no router). Header fields (title, status, severity,
+source, owner, created/updated) plus read-only sections for summary, affected
+entities, evidence, timeline, analyst questions, findings, MITRE mappings, and
+recommendations. "Back to Cases" returns to the list; an "Open Case Graph" link
+opens the graph for the same case. Cards are clickable except the Delete button.
+Inline editing of fields is intentionally deferred to a later milestone.
+**Goal:** Open a single case and view all of its sections.
 
 ---
 
-## Milestone 3 — Evidence board  ☐
+## Milestone 3 — Evidence board  ☑
+**Done:** The Evidence section in the case detail workspace is editable — list
+existing items, add via a small form (title, type, source, observed-at,
+description), and remove. Persisted through `useCases().updateCase` → localStorage;
+the case detail and Case Graph reflect the changes. Inline editing of existing
+items is deferred. Helpers: `createEvidenceItem`, `updateCase`.
 **Goal:** Attach evidence to a case.
-**Deliverables:** Add / edit / remove evidence items (type, value, source, note).
-**Acceptance:** Evidence persists per-case and survives reload.
 
 ---
 
@@ -89,6 +94,19 @@ case status reflects closure.
 **Goal:** Produce the deliverable.
 **Deliverables:** Generate Markdown combining all sections; copy + download.
 **Acceptance:** Exported report is coherent and includes every populated section.
+
+---
+
+## Milestone 9 — Case Graph view (read-only)  ☑
+*Added ahead of the later milestones as a visualization feature.*
+**Done:** An Obsidian-inspired, force-directed graph of a single case
+(`react-force-graph-2d`). Nodes for the case, affected entities, evidence,
+timeline events, findings, MITRE mappings, and recommendations; links reflect
+investigation relationships (case→records, evidence→finding, finding/evidence→
+MITRE, timeline→evidence, evidence→entity). Click-to-inspect detail panel, dark
+minimal styling, zoom/pan, read-only, and a case selector that defaults to the
+first stored case. Pure transform in `src/utils/caseGraph.ts`. Verified
+in-browser; `npm run build` passes.
 
 ---
 

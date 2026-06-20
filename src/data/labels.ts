@@ -3,6 +3,8 @@ import type {
   CaseStatus,
   ClassificationVerdict,
   Confidence,
+  EntityType,
+  EvidenceType,
   RecommendationPriority,
   Severity,
 } from '../types'
@@ -58,4 +60,31 @@ export const priorityLabels: Record<RecommendationPriority, string> = {
   low: 'Low',
   medium: 'Medium',
   high: 'High',
+}
+
+export const entityTypeLabels: Record<EntityType, string> = {
+  host: 'Host',
+  user: 'User',
+  mailbox: 'Mailbox',
+  cloud_account: 'Cloud account',
+  ip_address: 'IP address',
+  domain: 'Domain',
+  url: 'URL',
+  file: 'File',
+  file_hash: 'File hash',
+  process: 'Process',
+}
+
+export const evidenceTypeLabels: Record<EvidenceType, string> = {
+  log: 'Log',
+  process: 'Process',
+  network: 'Network',
+  file: 'File',
+  email: 'Email',
+  authentication: 'Authentication',
+  registry: 'Registry',
+  command: 'Command',
+  screenshot: 'Screenshot',
+  note: 'Note',
+  other: 'Other',
 }

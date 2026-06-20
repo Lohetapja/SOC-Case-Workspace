@@ -24,5 +24,17 @@ export function useCases() {
     setCases((prev) => prev.filter((socCase) => socCase.id !== id))
   }, [])
 
-  return { cases, addCase, removeCase }
+  /** Apply `updater` to one case and stamp `updatedAt`. The basis for editing
+   *  a case's sections (evidence, and later timeline, findings, etc.). */
+  const updateCase = useCallback((id: string, updater: (socCase: SocCase) => SocCase) => {
+    setCases((prev) =>
+      prev.map((socCase) =>
+        socCase.id === id
+          ? { ...updater(socCase), updatedAt: new Date().toISOString() }
+          : socCase,
+      ),
+    )
+  }, [])
+
+  return { cases, addCase, removeCase, updateCase }
 }

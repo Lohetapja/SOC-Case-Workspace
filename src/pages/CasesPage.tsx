@@ -1,15 +1,50 @@
 import { useState } from 'react'
 import { CaseSummaryCard } from '../components/CaseSummaryCard'
 import { CreateCaseForm } from '../components/CreateCaseForm'
+import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
+import { createEvidenceItem } from '../data/casesStore'
+
+interface CasesPageProps {
+  /** The currently opened case, or null to show the list. */
+  activeCaseId: string | null
+  onOpenCase: (id: string) => void
+  onCloseCase: () => void
+  onOpenGraph: (id: string) => void
+}
 
 /**
- * Cases view: a list of cases backed by localStorage, plus a create-case form.
- * Seeded from the synthetic demo cases on first run.
+ * Cases section. Shows the case list (with create + delete) or, when a case is
+ * active, its read-only detail workspace. Backed by localStorage.
  */
-export function CasesPage() {
-  const { cases, addCase, removeCase } = useCases()
+export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }: CasesPageProps) {
+  const { cases, addCase, removeCase, updateCase } = useCases()
   const [showForm, setShowForm] = useState(false)
+
+  const activeCase = activeCaseId ? cases.find((socCase) => socCase.id === activeCaseId) : undefined
+
+  if (activeCase) {
+    const caseId = activeCase.id
+    return (
+      <CaseDetailWorkspace
+        socCase={activeCase}
+        onBack={onCloseCase}
+        onOpenGraph={() => onOpenGraph(caseId)}
+        onAddEvidence={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            evidence: [...socCase.evidence, createEvidenceItem(input)],
+          }))
+        }
+        onRemoveEvidence={(evidenceId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            evidence: socCase.evidence.filter((item) => item.id !== evidenceId),
+          }))
+        }
+      />
+    )
+  }
 
   function handleDelete(id: string) {
     const target = cases.find((socCase) => socCase.id === id)
@@ -26,7 +61,7 @@ export function CasesPage() {
           <h1 className="page__title">Cases</h1>
           <p className="page__subtitle">
             {cases.length} {cases.length === 1 ? 'case' : 'cases'} · saved locally
-            in your browser.
+            in your browser. Click a case to open it.
           </p>
         </div>
         {!showForm && (
@@ -51,7 +86,12 @@ export function CasesPage() {
       ) : (
         <div className="case-list">
           {cases.map((socCase) => (
-            <CaseSummaryCard key={socCase.id} socCase={socCase} onDelete={handleDelete} />
+            <CaseSummaryCard
+              key={socCase.id}
+              socCase={socCase}
+              onOpen={onOpenCase}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}

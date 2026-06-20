@@ -36,9 +36,12 @@ This project makes that reasoning process explicit and reviewable:
 **Milestone 1 complete — case list, create form, and local persistence.** The
 Vite + React + TypeScript app scaffolds the layout and lists cases backed by
 `localStorage` (seeded with two synthetic demo cases on first run), with a
-create-case form and delete. The evidence, timeline, decision journal, MITRE
-mapping, and reports sections are still placeholders, built next. See
-[docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
+create-case form and delete. Clicking a case opens a **detail workspace** showing
+every section; the **Evidence** section is editable (add / remove, saved to
+localStorage), and a read-only **Case Graph** view (an Obsidian-inspired
+force-directed visualization of one case) reflects the changes. Editing for the
+timeline, decision journal, MITRE mapping, and reports sections is still to come.
+See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).
 

@@ -1,4 +1,11 @@
-import type { CaseSource, CaseStatus, Severity, SocCase } from '../types'
+import type {
+  CaseSource,
+  CaseStatus,
+  EvidenceItem,
+  EvidenceType,
+  Severity,
+  SocCase,
+} from '../types'
 import { readJSON, writeJSON } from '../utils/storage'
 import { demoCases } from './demoCases'
 
@@ -35,7 +42,7 @@ export interface NewCaseInput {
 export function createCase(input: NewCaseInput): SocCase {
   const now = new Date().toISOString()
   return {
-    id: generateCaseId(),
+    id: generateId('case'),
     title: input.title.trim(),
     summary: input.summary.trim(),
     source: input.source,
@@ -54,10 +61,42 @@ export function createCase(input: NewCaseInput): SocCase {
   }
 }
 
-function generateCaseId(): string {
+/** Fields collected from the add-evidence form. */
+export interface NewEvidenceInput {
+  title: string
+  type: EvidenceType
+  source: string
+  /** Raw value from a datetime-local input, or empty. */
+  observedAt: string
+  detail: string
+}
+
+/** Build an evidence item from form input. */
+export function createEvidenceItem(input: NewEvidenceInput): EvidenceItem {
+  return {
+    id: generateId('ev'),
+    type: input.type,
+    title: input.title.trim(),
+    detail: input.detail.trim(),
+    source: input.source.trim() || undefined,
+    observedAt: normalizeTimestamp(input.observedAt),
+  }
+}
+
+/** datetime-local has no timezone; treat the entered value as UTC (synthetic). */
+function normalizeTimestamp(value: string): string | undefined {
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+    return trimmed.length === 16 ? `${trimmed}:00Z` : `${trimmed}Z`
+  }
+  return trimmed
+}
+
+function generateId(prefix: string): string {
   const cryptoObj = globalThis.crypto
   if (cryptoObj && typeof cryptoObj.randomUUID === 'function') {
-    return `case-${cryptoObj.randomUUID()}`
+    return `${prefix}-${cryptoObj.randomUUID()}`
   }
-  return `case-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
 }
