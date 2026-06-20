@@ -2,6 +2,15 @@
 
 > Turn messy alerts into structured SOC cases.
 
+## Live demo
+
+**https://lohetapja.github.io/SOC-Case-Workspace/**
+
+Runs entirely in your browser (synthetic data only, no backend). Deployed from
+`main` to GitHub Pages via GitHub Actions.
+
+---
+
 **SOC Case Workspace** is an educational portfolio project that models how a
 Security Operations Center (SOC) analyst structures an investigation — from
 alert intake, through evidence and timeline reconstruction, to evidence-backed
