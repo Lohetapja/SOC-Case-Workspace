@@ -6,6 +6,7 @@ export * from './domain'
 export type SectionId =
   | 'overview'
   | 'cases'
+  | 'graph'
   | 'evidence'
   | 'timeline'
   | 'journal'

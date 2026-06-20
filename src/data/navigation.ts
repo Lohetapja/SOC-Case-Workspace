@@ -14,6 +14,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { id: 'overview', label: 'Overview', description: 'Project summary and starting point.' },
   { id: 'cases', label: 'Cases', description: 'Create and track investigations as structured cases.' },
+  { id: 'graph', label: 'Case Graph', description: 'Visualize one case as a relationship graph.' },
   { id: 'evidence', label: 'Evidence', description: 'Collect and annotate the evidence for a case.' },
   { id: 'timeline', label: 'Timeline', description: 'Reconstruct the sequence of events.' },
   { id: 'journal', label: 'Decision Journal', description: 'Record analyst questions and decisions.' },

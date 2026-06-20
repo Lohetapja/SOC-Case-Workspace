@@ -136,3 +136,24 @@ MVP. The id-based cross-references keep room to normalize later if needed.
 reserved documentation IP ranges (RFC 5737 TEST-NET), the reserved `.example`
 TLD with defanged indicators, the fictional "contoso" org, and placeholder file
 hashes. No real IOCs or customer data are present (reinforces ADR-0006).
+
+---
+
+## ADR-0009 — `react-force-graph-2d` for the Case Graph view
+**Date:** 2026-06-20 · **Status:** Accepted
+
+**Context:** The Case Graph view needs a force-directed, zoom/pan, click-to-select
+graph. Building this from scratch (canvas + a force simulation) is non-trivial and
+easy to get subtly wrong; the project values a small, maintainable implementation.
+
+**Decision:** Add `react-force-graph-2d` (the Canvas 2D build) rather than the
+heavier 3D/VR variants or a hand-rolled engine. A single pure function,
+`buildCaseGraph(socCase)` in `src/utils/caseGraph.ts`, adapts the existing domain
+model into `{ nodes, links }`; the component stays a thin, read-only wrapper.
+
+**Consequences:** First runtime dependency beyond React. It pulls in `force-graph`
+and `d3-force` transitively, growing the bundle (~360 kB raw / ~118 kB gzip) — an
+acceptable trade for a local, offline tool and far less code than a custom
+renderer. The graph is canvas-based and client-only, consistent with the
+frontend-only, no-network constraints. The 2D build (not 3D) keeps the dependency
+footprint and visual complexity modest. Still no backend or external API.
