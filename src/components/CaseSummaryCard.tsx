@@ -3,13 +3,12 @@ import { severityLabels, sourceLabels, statusLabels, verdictLabels } from '../da
 
 interface CaseSummaryCardProps {
   socCase: SocCase
+  /** When provided, a Delete action is shown. */
+  onDelete?: (id: string) => void
 }
 
-/**
- * Read-only summary of a case for the Cases preview. Presentation only — no
- * editing or persistence (that arrives with the case list & create form).
- */
-export function CaseSummaryCard({ socCase }: CaseSummaryCardProps) {
+/** Summary card for a case in the list. Presentation + an optional delete action. */
+export function CaseSummaryCard({ socCase, onDelete }: CaseSummaryCardProps) {
   const stats = [
     { label: 'Entities', value: socCase.affectedEntities.length },
     { label: 'Evidence', value: socCase.evidence.length },
@@ -46,6 +45,18 @@ export function CaseSummaryCard({ socCase }: CaseSummaryCardProps) {
         <p className="case-card__closure">
           Closed — {verdictLabels[socCase.closure.verdict]}
         </p>
+      )}
+
+      {onDelete && (
+        <div className="case-card__actions">
+          <button
+            type="button"
+            className="btn-link-danger"
+            onClick={() => onDelete(socCase.id)}
+          >
+            Delete
+          </button>
+        </div>
       )}
     </article>
   )

@@ -18,12 +18,13 @@ and internally consistent.
 
 ---
 
-## Milestone 1 — Project scaffold + Case list & create  ◐
-**Progress:** App skeleton done — Vite/React/TS scaffold, layout (header +
-sidebar + main), placeholder sections, and the "About this project" panel.
-Core data model (`src/types/domain.ts`) and two synthetic demo cases
-(`src/data/demoCases.ts`) added, with a read-only Cases preview.
-Still to do: `localStorage` helper and the case list + create-case form.
+## Milestone 1 — Project scaffold + Case list & create  ☑
+**Done:** Vite/React/TS scaffold + layout; core data model
+(`src/types/domain.ts`) and two synthetic demo cases (`src/data/demoCases.ts`);
+typed `localStorage` helper (`src/utils/storage.ts`) and case store
+(`src/data/casesStore.ts`) seeded from the demo data; `useCases` hook; case list,
+create-case form, and delete. Verified: `npm run build` passes and the dev server
+serves the app.
 **Goal:** A running app that can create and list cases, persisted locally.
 **Deliverables:**
 - Vite + React + TypeScript app scaffolded.

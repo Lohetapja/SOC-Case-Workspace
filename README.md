@@ -33,9 +33,11 @@ This project makes that reasoning process explicit and reviewable:
 
 ## Status
 
-**Milestone 1 — App skeleton (in progress).** The Vite + React + TypeScript app
-is scaffolded with the header, sidebar navigation, main area, and placeholder
-sections for every stage. No case logic is built yet. See
+**Milestone 1 complete — case list, create form, and local persistence.** The
+Vite + React + TypeScript app scaffolds the layout and lists cases backed by
+`localStorage` (seeded with two synthetic demo cases on first run), with a
+create-case form and delete. The evidence, timeline, decision journal, MITRE
+mapping, and reports sections are still placeholders, built next. See
 [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).
