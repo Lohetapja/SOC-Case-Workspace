@@ -5,6 +5,8 @@ import type {
   EvidenceType,
   Severity,
   SocCase,
+  TimelineEvent,
+  TimelinePhase,
 } from '../types'
 import { readJSON, writeJSON } from '../utils/storage'
 import { demoCases } from './demoCases'
@@ -80,6 +82,29 @@ export function createEvidenceItem(input: NewEvidenceInput): EvidenceItem {
     detail: input.detail.trim(),
     source: input.source.trim() || undefined,
     observedAt: normalizeTimestamp(input.observedAt),
+  }
+}
+
+/** Fields collected from the add-timeline-event form. */
+export interface NewTimelineEventInput {
+  title: string
+  /** Raw value from a datetime-local input. */
+  timestamp: string
+  phase: TimelinePhase
+  description: string
+  /** A single related evidence id, or empty for none. */
+  relatedEvidenceId: string
+}
+
+/** Build a timeline event from form input. */
+export function createTimelineEvent(input: NewTimelineEventInput): TimelineEvent {
+  return {
+    id: generateId('tl'),
+    timestamp: normalizeTimestamp(input.timestamp) ?? new Date().toISOString(),
+    title: input.title.trim(),
+    description: input.description.trim(),
+    phase: input.phase,
+    relatedEvidenceIds: input.relatedEvidenceId ? [input.relatedEvidenceId] : undefined,
   }
 }
 

@@ -7,6 +7,7 @@ import type {
   EvidenceType,
   RecommendationPriority,
   Severity,
+  TimelinePhase,
 } from '../types'
 
 /**
@@ -86,5 +87,13 @@ export const evidenceTypeLabels: Record<EvidenceType, string> = {
   command: 'Command',
   screenshot: 'Screenshot',
   note: 'Note',
+  other: 'Other',
+}
+
+export const timelinePhaseLabels: Record<TimelinePhase, string> = {
+  detection: 'Detection',
+  attacker_activity: 'Attacker activity',
+  analyst_action: 'Analyst action',
+  containment: 'Containment',
   other: 'Other',
 }

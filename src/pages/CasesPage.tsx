@@ -3,7 +3,7 @@ import { CaseSummaryCard } from '../components/CaseSummaryCard'
 import { CreateCaseForm } from '../components/CreateCaseForm'
 import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
-import { createEvidenceItem } from '../data/casesStore'
+import { createEvidenceItem, createTimelineEvent } from '../data/casesStore'
 
 interface CasesPageProps {
   /** The currently opened case, or null to show the list. */
@@ -40,6 +40,18 @@ export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }
           updateCase(caseId, (socCase) => ({
             ...socCase,
             evidence: socCase.evidence.filter((item) => item.id !== evidenceId),
+          }))
+        }
+        onAddTimelineEvent={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            timeline: [...socCase.timeline, createTimelineEvent(input)],
+          }))
+        }
+        onRemoveTimelineEvent={(eventId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            timeline: socCase.timeline.filter((event) => event.id !== eventId),
           }))
         }
       />

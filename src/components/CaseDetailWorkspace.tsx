@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { SocCase } from '../types'
-import type { NewEvidenceInput } from '../data/casesStore'
+import type { NewEvidenceInput, NewTimelineEventInput } from '../data/casesStore'
 import {
   confidenceLabels,
   entityTypeLabels,
@@ -12,6 +12,7 @@ import {
 } from '../data/labels'
 import { formatDateTime } from '../utils/format'
 import { EvidenceSection } from './EvidenceSection'
+import { TimelineSection } from './TimelineSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -19,6 +20,8 @@ interface CaseDetailWorkspaceProps {
   onOpenGraph: () => void
   onAddEvidence: (input: NewEvidenceInput) => void
   onRemoveEvidence: (evidenceId: string) => void
+  onAddTimelineEvent: (input: NewTimelineEventInput) => void
+  onRemoveTimelineEvent: (eventId: string) => void
 }
 
 function Section({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
@@ -47,9 +50,9 @@ export function CaseDetailWorkspace({
   onOpenGraph,
   onAddEvidence,
   onRemoveEvidence,
+  onAddTimelineEvent,
+  onRemoveTimelineEvent,
 }: CaseDetailWorkspaceProps) {
-  const timeline = [...socCase.timeline].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
-
   return (
     <div className="detail">
       <button type="button" className="btn btn--secondary detail__back" onClick={onBack}>
@@ -114,23 +117,12 @@ export function CaseDetailWorkspace({
         onRemove={onRemoveEvidence}
       />
 
-      <Section title="Timeline" count={timeline.length}>
-        {timeline.length === 0 ? (
-          <Empty />
-        ) : (
-          <ol className="detail-timeline">
-            {timeline.map((event) => (
-              <li key={event.id} className="detail-timeline__item">
-                <time className="detail-timeline__time">{formatDateTime(event.timestamp)}</time>
-                <div>
-                  <strong>{event.title}</strong>
-                  <p className="detail-text">{event.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        )}
-      </Section>
+      <TimelineSection
+        timeline={socCase.timeline}
+        evidence={socCase.evidence}
+        onAdd={onAddTimelineEvent}
+        onRemove={onRemoveTimelineEvent}
+      />
 
       <Section title="Analyst questions" count={socCase.analystQuestions.length}>
         {socCase.analystQuestions.length === 0 ? (

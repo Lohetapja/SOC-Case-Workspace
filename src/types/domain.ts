@@ -93,6 +93,14 @@ export interface EvidenceItem {
   relatedEntityIds?: string[]
 }
 
+/** Phase/category of a timeline event within the incident. */
+export type TimelinePhase =
+  | 'detection'
+  | 'attacker_activity'
+  | 'analyst_action'
+  | 'containment'
+  | 'other'
+
 /** A single point in the reconstructed sequence of events. */
 export interface TimelineEvent {
   id: string
@@ -100,6 +108,8 @@ export interface TimelineEvent {
   timestamp: string
   title: string
   description: string
+  /** Optional phase/category of the event. */
+  phase?: TimelinePhase
   /** Evidence that supports this event. */
   relatedEvidenceIds?: string[]
 }

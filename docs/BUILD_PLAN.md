@@ -58,11 +58,14 @@ items is deferred. Helpers: `createEvidenceItem`, `updateCase`.
 
 ---
 
-## Milestone 4 — Timeline builder  ☐
+## Milestone 4 — Timeline builder  ☑
+**Done:** The Timeline section in the case detail workspace is editable — events
+render sorted chronologically; add via a small form (title, timestamp, phase,
+description, optional related-evidence link) and remove. Persisted through
+`useCases().updateCase` → localStorage; the case detail and Case Graph reflect
+the changes. Added an optional `phase` field to `TimelineEvent`. Helpers:
+`createTimelineEvent`.
 **Goal:** Reconstruct the sequence of events.
-**Deliverables:** Add timeline events (timestamp, description, optional evidence
-link); display sorted chronologically.
-**Acceptance:** Events render in time order and persist.
 
 ---
 
