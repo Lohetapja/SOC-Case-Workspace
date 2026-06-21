@@ -20,4 +20,5 @@ export const navItems: NavItem[] = [
   { id: 'journal', label: 'Decision Journal', description: 'Record analyst questions and decisions.' },
   { id: 'mitre', label: 'MITRE Mapping', description: 'Map findings to ATT&CK techniques.' },
   { id: 'reports', label: 'Reports', description: 'Export the case as a Markdown report.' },
+  { id: 'settings', label: 'Settings', description: 'Back up, restore, or reset your local data.' },
 ]

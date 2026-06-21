@@ -1,4 +1,4 @@
-import { readJSON, writeJSON } from './storage'
+import { readJSON, removeKey, writeJSON } from './storage'
 
 /**
  * Per-case persistence of pinned Case Graph node positions, in localStorage.
@@ -40,4 +40,9 @@ export function clearCaseLayout(caseId: string): void {
     delete all[caseId]
     writeJSON(STORAGE_KEY, all)
   }
+}
+
+/** Remove all saved graph layouts (used by "Clear local data"). */
+export function clearAllGraphLayouts(): void {
+  removeKey(STORAGE_KEY)
 }

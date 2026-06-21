@@ -442,6 +442,17 @@ body {
   background: var(--accent-soft);
 }
 
+.btn--danger {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #ffffff;
+}
+
+.btn--danger:hover {
+  background: #991b1b;
+  border-color: #991b1b;
+}
+
 .btn-link-danger {
   padding: 0;
   border: 0;
@@ -1023,6 +1034,45 @@ body {
   flex-wrap: wrap;
   gap: 6px;
   margin: 8px 0 0;
+}
+
+/* ---- Data management (Settings) ---- */
+.data-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-action:first-child {
+  padding-top: 0;
+}
+
+.data-action:last-of-type {
+  border-bottom: 0;
+}
+
+.data-action__title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.data-action__help {
+  margin: 0;
+  max-width: 560px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.data-action__btn {
+  flex-shrink: 0;
+}
+
+.data-action__error {
+  margin-top: 14px;
 }
 
 /* ---- Markdown report export ---- */

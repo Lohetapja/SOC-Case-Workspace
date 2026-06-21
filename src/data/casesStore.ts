@@ -18,10 +18,13 @@ import type {
   TimelineEvent,
   TimelinePhase,
 } from '../types'
-import { readJSON, writeJSON } from '../utils/storage'
+import { readJSON, removeKey, writeJSON } from '../utils/storage'
 import { demoCases } from './demoCases'
 
 const STORAGE_KEY = 'soc-case-workspace:cases'
+
+/** Bump if the persisted/exported case shape changes incompatibly. */
+export const CASES_SCHEMA_VERSION = 1
 
 /**
  * Load cases from localStorage. On first run (no stored value yet) the store is
@@ -37,6 +40,72 @@ export function loadCases(): SocCase[] {
 
 export function persistCases(cases: SocCase[]): void {
   writeJSON(STORAGE_KEY, cases)
+}
+
+// ---- Backup / restore / reset (Data management) ----
+
+export interface CasesExport {
+  schemaVersion: number
+  exportedAt: string
+  cases: SocCase[]
+}
+
+/** Wrap the current cases in a versioned export envelope. */
+export function buildCasesExport(cases: SocCase[]): CasesExport {
+  return { schemaVersion: CASES_SCHEMA_VERSION, exportedAt: new Date().toISOString(), cases }
+}
+
+/** Download filename for an export, e.g. soc-case-workspace-cases-2026-06-21.json */
+export function casesExportFilename(): string {
+  return `soc-case-workspace-cases-${new Date().toISOString().slice(0, 10)}.json`
+}
+
+/**
+ * Validate parsed JSON and extract the cases. Accepts either an export envelope
+ * (`{ cases: [...] }`) or a bare array of cases. Throws a clear error otherwise.
+ */
+export function parseCasesImport(raw: unknown): SocCase[] {
+  const cases = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === 'object' && Array.isArray((raw as { cases?: unknown }).cases)
+      ? (raw as { cases: unknown[] }).cases
+      : null
+  if (!cases) {
+    throw new Error('Expected a JSON array of cases, or an object with a "cases" array.')
+  }
+  if (!cases.every(isValidCaseShape)) {
+    throw new Error('One or more cases are missing required fields (id, title, and the section arrays).')
+  }
+  return cases as SocCase[]
+}
+
+function isValidCaseShape(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Record<string, unknown>
+  const requiredArrays = [
+    'affectedEntities',
+    'evidence',
+    'timeline',
+    'analystQuestions',
+    'findings',
+    'mitreMappings',
+    'recommendations',
+  ]
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.title === 'string' &&
+    requiredArrays.every((key) => Array.isArray(candidate[key]))
+  )
+}
+
+/** Restore the original synthetic demo cases. */
+export function resetToDemoCases(): void {
+  writeJSON(STORAGE_KEY, demoCases)
+}
+
+/** Remove locally saved cases (next load re-seeds the demo cases). */
+export function clearStoredCases(): void {
+  removeKey(STORAGE_KEY)
 }
 
 /** Fields collected from the create-case form. */

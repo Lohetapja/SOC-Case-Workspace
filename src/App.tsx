@@ -10,6 +10,7 @@ import { TimelinePage } from './pages/TimelinePage'
 import { DecisionJournalPage } from './pages/DecisionJournalPage'
 import { MitreMappingPage } from './pages/MitreMappingPage'
 import { ReportsPage } from './pages/ReportsPage'
+import { SettingsPage } from './pages/SettingsPage'
 import type { SectionId } from './types'
 
 /**
@@ -63,6 +64,8 @@ export default function App() {
         return <MitreMappingPage />
       case 'reports':
         return <ReportsPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
+      case 'settings':
+        return <SettingsPage />
       default:
         return null
     }

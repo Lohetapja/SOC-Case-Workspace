@@ -158,11 +158,17 @@ in-browser; `npm run build` passes.
 
 ---
 
-## Post-MVP (not scheduled — parking lot)
-- Seed / demo synthetic cases for first-run experience.
-- Import/export cases as JSON (backup/sharing).
+## Post-MVP
+
+- ☑ **Data management (Settings)** — Export cases as a versioned JSON backup,
+  Import (validate + replace, with confirmation), Reset demo data, and Clear local
+  data. `src/pages/SettingsPage.tsx` + helpers in `src/data/casesStore.ts`.
+- ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
+
+### Parking lot (not scheduled)
 - Search & filter across cases.
 - Richer ATT&CK coverage and tactic grouping.
+- Editable Affected entities and Recommendations sections.
 - Only after the frontend workflow is proven: optional backend/database.
 
 > Anything in the parking lot is **out of scope** until the MVP (M1–M8) is

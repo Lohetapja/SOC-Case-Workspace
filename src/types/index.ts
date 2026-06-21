@@ -12,3 +12,4 @@ export type SectionId =
   | 'journal'
   | 'mitre'
   | 'reports'
+  | 'settings'
