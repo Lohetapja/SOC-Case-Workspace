@@ -13,6 +13,7 @@ export interface NavItem {
  */
 export const navItems: NavItem[] = [
   { id: 'overview', label: 'Overview', description: 'Project summary and starting point.' },
+  { id: 'samples', label: 'Sample Cases', description: 'Load a guided synthetic demo case to explore.' },
   { id: 'cases', label: 'Cases', description: 'Create and track investigations as structured cases.' },
   { id: 'graph', label: 'Case Graph', description: 'Visualize one case as a relationship graph.' },
   { id: 'evidence', label: 'Evidence', description: 'Collect and annotate the evidence for a case.' },

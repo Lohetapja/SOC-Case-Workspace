@@ -131,7 +131,7 @@ export function SettingsPage() {
           <div>
             <p className="data-action__title">Reset demo data</p>
             <p className="data-action__help">
-              Restore the two original synthetic demo cases. Useful for getting the live demo
+              Restore the original synthetic demo / sample cases. Useful for getting the live demo
               back to its starting state.
             </p>
           </div>

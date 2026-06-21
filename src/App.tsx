@@ -3,6 +3,7 @@ import { AppHeader } from './components/AppHeader'
 import { AppFooter } from './components/AppFooter'
 import { Sidebar } from './components/Sidebar'
 import { OverviewPage } from './pages/OverviewPage'
+import { SampleCasesPage } from './pages/SampleCasesPage'
 import { CasesPage } from './pages/CasesPage'
 import { CaseGraphPage } from './pages/CaseGraphPage'
 import { EvidencePage } from './pages/EvidencePage'
@@ -38,10 +39,17 @@ export default function App() {
     setSection('reports')
   }
 
+  function openCaseDetail(caseId: string) {
+    setActiveCaseId(caseId)
+    setSection('cases')
+  }
+
   function renderSection() {
     switch (section) {
       case 'overview':
         return <OverviewPage onNavigate={navigate} />
+      case 'samples':
+        return <SampleCasesPage onOpenCase={openCaseDetail} />
       case 'cases':
         return (
           <CasesPage

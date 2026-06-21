@@ -24,6 +24,19 @@ export function useCases() {
     setCases((prev) => prev.filter((socCase) => socCase.id !== id))
   }, [])
 
+  /** Add a pre-built case (e.g. a sample) unless one with the same id exists.
+   *  Returns whether it was added or already present. */
+  const addSampleCase = useCallback(
+    (sample: SocCase): 'added' | 'exists' => {
+      if (cases.some((socCase) => socCase.id === sample.id)) return 'exists'
+      setCases((prev) =>
+        prev.some((socCase) => socCase.id === sample.id) ? prev : [sample, ...prev],
+      )
+      return 'added'
+    },
+    [cases],
+  )
+
   /** Apply `updater` to one case and stamp `updatedAt`. The basis for editing
    *  a case's sections (evidence, and later timeline, findings, etc.). */
   const updateCase = useCallback((id: string, updater: (socCase: SocCase) => SocCase) => {
@@ -36,5 +49,5 @@ export function useCases() {
     )
   }, [])
 
-  return { cases, addCase, removeCase, updateCase }
+  return { cases, addCase, addSampleCase, removeCase, updateCase }
 }

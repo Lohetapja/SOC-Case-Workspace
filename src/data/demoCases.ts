@@ -274,6 +274,16 @@ const suspiciousPowerShell: SocCase = {
       priority: 'medium',
     },
   ],
+  closure: {
+    verdict: 'true_positive',
+    closureStatus: 'escalated',
+    rationale:
+      'Phishing-driven macro execution led to an encoded PowerShell download attempt; treated as a confirmed intrusion attempt pending payload confirmation.',
+    recommendedAction:
+      'Keep the host isolated, confirm whether a payload executed, and reset jordan.doe credentials.',
+    impactSummary:
+      'A single finance workstation is affected; no confirmed data loss yet. Escalated to incident response.',
+  },
   createdAt: '2026-06-18T09:35:00Z',
   updatedAt: '2026-06-19T14:20:00Z',
 }
@@ -490,5 +500,287 @@ const impossibleTravel: SocCase = {
   updatedAt: '2026-06-19T09:45:00Z',
 }
 
-/** The synthetic demo cases shipped with the app. */
-export const demoCases: SocCase[] = [suspiciousPowerShell, impossibleTravel]
+const malwareEdrAlert: SocCase = {
+  id: 'case-malware-edr',
+  title: 'EDR detected malicious file on a developer workstation',
+  summary:
+    'An EDR alert flagged a malicious executable on a developer workstation. The file executed, established a registry run-key persistence, and beaconed to a remote host. The host was isolated and reimaged; closed as a true positive.',
+  source: 'edr',
+  sourceDetail: 'EDR — endpoint detection & response',
+  severity: 'high',
+  status: 'closed',
+  owner: 'okafor.analyst',
+  affectedEntities: [
+    {
+      id: 'c3-ent-host',
+      type: 'host',
+      value: 'DEV-WS-221',
+      role: 'Infected developer workstation',
+    },
+    {
+      id: 'c3-ent-user',
+      type: 'user',
+      value: 'samir.haddad',
+      role: 'Logged-on user',
+    },
+    {
+      id: 'c3-ent-file',
+      type: 'file',
+      value: 'svchost-update.exe',
+      role: 'Malicious dropper (synthetic)',
+    },
+    {
+      id: 'c3-ent-proc',
+      type: 'process',
+      value: 'svchost-update.exe (PID 7820)',
+      role: 'Malicious process',
+    },
+    {
+      id: 'c3-ent-ip',
+      type: 'ip_address',
+      value: '203.0.113.200',
+      role: 'Suspected C2 (synthetic, TEST-NET-3)',
+    },
+    {
+      id: 'c3-ent-domain',
+      type: 'domain',
+      value: 'cdn-sync.fake-malware[.]example',
+      role: 'C2 domain (defanged, synthetic)',
+    },
+  ],
+  evidence: [
+    {
+      id: 'c3-ev-detection',
+      type: 'file',
+      title: 'EDR malware detection',
+      detail:
+        'EDR flagged svchost-update.exe as Trojan:Win32/Synthetic on DEV-WS-221; action: quarantine after execution.',
+      source: 'EDR detections',
+      observedAt: '2026-06-20T13:42:00Z',
+      analystNote: 'High-severity malware verdict on a non-system path executable masquerading as svchost.',
+      relatedEntityIds: ['c3-ent-host', 'c3-ent-file'],
+    },
+    {
+      id: 'c3-ev-hash',
+      type: 'file',
+      title: 'Malicious file hash',
+      detail:
+        'svchost-update.exe SHA-256: ff00ee11dd22cc33bb44aa5566778899001122334455667788990011223344ff (synthetic placeholder hash).',
+      source: 'EDR file inventory',
+      observedAt: '2026-06-20T13:42:30Z',
+      analystNote: 'Hash recorded for blocking and fleet-wide hunting; value is synthetic.',
+      relatedEntityIds: ['c3-ent-file'],
+    },
+    {
+      id: 'c3-ev-proctree',
+      type: 'process',
+      title: 'Execution and process tree',
+      detail:
+        'explorer.exe -> svchost-update.exe (PID 7820) executed from C:\\Users\\samir.haddad\\Downloads\\.',
+      source: 'EDR process telemetry',
+      observedAt: '2026-06-20T13:40:10Z',
+      analystNote: 'Executed from a user Downloads folder, not a system path — inconsistent with a real svchost.',
+      relatedEntityIds: ['c3-ent-host', 'c3-ent-proc'],
+    },
+    {
+      id: 'c3-ev-persistence',
+      type: 'registry',
+      title: 'Registry run-key persistence',
+      detail:
+        'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater set to the dropper path for persistence.',
+      source: 'EDR registry telemetry',
+      observedAt: '2026-06-20T13:40:25Z',
+      analystNote: 'Classic autostart persistence via a Run key.',
+      relatedEntityIds: ['c3-ent-host', 'c3-ent-proc'],
+    },
+    {
+      id: 'c3-ev-network',
+      type: 'network',
+      title: 'Outbound C2 beacon',
+      detail:
+        'svchost-update.exe -> 203.0.113.200:443 (cdn-sync.fake-malware[.]example), periodic ~1 KB beacons. (IP is synthetic TEST-NET-3.)',
+      source: 'EDR network telemetry',
+      observedAt: '2026-06-20T13:41:00Z',
+      analystNote: 'Regular small outbound beacons consistent with command-and-control.',
+      relatedEntityIds: ['c3-ent-proc', 'c3-ent-ip', 'c3-ent-domain'],
+    },
+  ],
+  timeline: [
+    {
+      id: 'c3-tl-1',
+      timestamp: '2026-06-20T13:38:00Z',
+      title: 'File written to disk',
+      description: 'svchost-update.exe written to the user Downloads folder (from an unapproved download).',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c3-ev-proctree'],
+    },
+    {
+      id: 'c3-tl-2',
+      timestamp: '2026-06-20T13:40:10Z',
+      title: 'Malware executed',
+      description: 'The dropper was executed by the user.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c3-ev-proctree'],
+    },
+    {
+      id: 'c3-tl-3',
+      timestamp: '2026-06-20T13:40:25Z',
+      title: 'Persistence established',
+      description: 'A registry Run key was created to survive reboot.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c3-ev-persistence'],
+    },
+    {
+      id: 'c3-tl-4',
+      timestamp: '2026-06-20T13:41:00Z',
+      title: 'C2 beacon started',
+      description: 'The process began beaconing to 203.0.113.200.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c3-ev-network'],
+    },
+    {
+      id: 'c3-tl-5',
+      timestamp: '2026-06-20T13:42:00Z',
+      title: 'EDR detection and quarantine',
+      description: 'EDR detected and quarantined the executable.',
+      phase: 'detection',
+      relatedEvidenceIds: ['c3-ev-detection'],
+    },
+    {
+      id: 'c3-tl-6',
+      timestamp: '2026-06-20T14:05:00Z',
+      title: 'Host isolated',
+      description: 'Analyst isolated DEV-WS-221 and began remediation.',
+      phase: 'containment',
+    },
+  ],
+  analystQuestions: [
+    {
+      id: 'c3-q-1',
+      question: 'Is the file hash known-malicious in threat intel?',
+      status: 'answered',
+      answer: 'Yes — the hash matches a known commodity trojan family (synthetic).',
+      rationale: 'EDR verdict plus internal threat-intel match.',
+      createdAt: '2026-06-20T13:50:00Z',
+      answeredAt: '2026-06-20T14:00:00Z',
+    },
+    {
+      id: 'c3-q-2',
+      question: 'Did the malware execute and persist?',
+      status: 'answered',
+      answer: 'Yes — it executed and created a registry Run key before being quarantined.',
+      rationale: 'Process telemetry and the Run-key evidence confirm execution and persistence.',
+      createdAt: '2026-06-20T13:52:00Z',
+      answeredAt: '2026-06-20T14:02:00Z',
+    },
+    {
+      id: 'c3-q-3',
+      question: 'Was any data exfiltrated over the C2 channel?',
+      status: 'answered',
+      answer: 'No evidence of bulk data transfer; only small periodic beacons before quarantine.',
+      rationale: 'Network telemetry shows ~1 KB beacons, no large outbound transfers.',
+      createdAt: '2026-06-20T13:55:00Z',
+      answeredAt: '2026-06-20T14:10:00Z',
+    },
+  ],
+  findings: [
+    {
+      id: 'c3-f-1',
+      title: 'Malware executed and established persistence',
+      description:
+        'A malicious dropper executed on DEV-WS-221 and created a registry Run key for persistence before EDR quarantine.',
+      confidence: 'high',
+      category: 'malicious_activity',
+      severity: 'high',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c3-ev-detection', 'c3-ev-proctree', 'c3-ev-persistence'],
+      relatedTimelineEventIds: ['c3-tl-2', 'c3-tl-3'],
+    },
+    {
+      id: 'c3-f-2',
+      title: 'Outbound command-and-control established',
+      description: 'The process beaconed to a low-reputation host; no large data transfer observed before containment.',
+      confidence: 'high',
+      category: 'malicious_activity',
+      severity: 'medium',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c3-ev-network'],
+      relatedTimelineEventIds: ['c3-tl-4'],
+    },
+  ],
+  mitreMappings: [
+    {
+      id: 'c3-mt-1',
+      tactic: 'Execution',
+      techniqueId: 'T1204.002',
+      techniqueName: 'User Execution: Malicious File',
+      rationale: 'The user executed the malicious dropper from the Downloads folder.',
+      confidence: 'high',
+      relatedFindingIds: ['c3-f-1'],
+      relatedEvidenceIds: ['c3-ev-proctree'],
+    },
+    {
+      id: 'c3-mt-2',
+      tactic: 'Persistence',
+      techniqueId: 'T1547.001',
+      techniqueName: 'Registry Run Keys / Startup Folder',
+      rationale: 'A HKCU Run key was created to persist the dropper.',
+      confidence: 'high',
+      relatedFindingIds: ['c3-f-1'],
+      relatedEvidenceIds: ['c3-ev-persistence'],
+    },
+    {
+      id: 'c3-mt-3',
+      tactic: 'Command and Control',
+      techniqueId: 'T1071.001',
+      techniqueName: 'Application Layer Protocol: Web Protocols',
+      rationale: 'The process beaconed to a remote host over HTTPS.',
+      confidence: 'high',
+      relatedFindingIds: ['c3-f-2'],
+      relatedEvidenceIds: ['c3-ev-network'],
+    },
+  ],
+  recommendations: [
+    {
+      id: 'c3-rec-1',
+      title: 'Isolate and reimage DEV-WS-221',
+      description: 'Host isolated; rebuild from a known-good image and restore from backup.',
+      priority: 'high',
+    },
+    {
+      id: 'c3-rec-2',
+      title: 'Block indicators at the perimeter',
+      description: 'Block the file hash, 203.0.113.200, and cdn-sync.fake-malware[.]example.',
+      priority: 'high',
+    },
+    {
+      id: 'c3-rec-3',
+      title: 'Fleet-wide hash hunt',
+      description: 'Hunt for the dropper hash and the Run-key persistence across all endpoints.',
+      priority: 'medium',
+    },
+    {
+      id: 'c3-rec-4',
+      title: 'User-awareness follow-up',
+      description: 'Remind the user about unapproved software downloads and developer endpoint policy.',
+      priority: 'low',
+    },
+  ],
+  closure: {
+    verdict: 'true_positive',
+    closureStatus: 'closed',
+    rationale:
+      'Confirmed malware execution with registry persistence and C2 beaconing. Contained by isolation and reimage; no evidence of data exfiltration.',
+    recommendedAction:
+      'Complete the reimage, keep indicators blocked, and finish the fleet-wide hunt for the hash.',
+    impactSummary:
+      'One developer workstation compromised and reimaged. No confirmed data loss; limited blast radius.',
+    closedAt: '2026-06-20T15:10:00Z',
+    closedBy: 'okafor.analyst',
+  },
+  createdAt: '2026-06-20T13:45:00Z',
+  updatedAt: '2026-06-20T15:10:00Z',
+}
+
+/** The synthetic demo cases shipped with the app (also the sample case library). */
+export const demoCases: SocCase[] = [suspiciousPowerShell, impossibleTravel, malwareEdrAlert]

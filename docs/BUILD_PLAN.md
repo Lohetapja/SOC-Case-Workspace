@@ -169,6 +169,11 @@ in-browser; `npm run build` passes.
   investigation checklist (evidence / timeline / findings / closure). Checklist
   state persists on the case (`ChecklistItem` on `SocCase`); `ChecklistSection`
   shows it in the detail workspace.
+- ☑ **Sample case library / guided demo** — `src/pages/SampleCasesPage.tsx` with a
+  "How to explore this demo" walkthrough and three fully-populated synthetic
+  samples (Phishing → PowerShell, Impossible Travel, Malware / EDR Alert). Each can
+  be added to the workspace (duplicate-safe via `useCases().addSampleCase`) and
+  opened. The three samples also seed the workspace on first run.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)
