@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { SocCase } from '../types'
-import type { NewEvidenceInput, NewTimelineEventInput } from '../data/casesStore'
+import type { NewEvidenceInput, NewQuestionInput, NewTimelineEventInput } from '../data/casesStore'
 import {
   confidenceLabels,
   entityTypeLabels,
@@ -13,6 +13,7 @@ import {
 import { formatDateTime } from '../utils/format'
 import { EvidenceSection } from './EvidenceSection'
 import { TimelineSection } from './TimelineSection'
+import { DecisionJournalSection } from './DecisionJournalSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -22,6 +23,8 @@ interface CaseDetailWorkspaceProps {
   onRemoveEvidence: (evidenceId: string) => void
   onAddTimelineEvent: (input: NewTimelineEventInput) => void
   onRemoveTimelineEvent: (eventId: string) => void
+  onAddQuestion: (input: NewQuestionInput) => void
+  onRemoveQuestion: (questionId: string) => void
 }
 
 function Section({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
@@ -52,6 +55,8 @@ export function CaseDetailWorkspace({
   onRemoveEvidence,
   onAddTimelineEvent,
   onRemoveTimelineEvent,
+  onAddQuestion,
+  onRemoveQuestion,
 }: CaseDetailWorkspaceProps) {
   return (
     <div className="detail">
@@ -124,28 +129,11 @@ export function CaseDetailWorkspace({
         onRemove={onRemoveTimelineEvent}
       />
 
-      <Section title="Analyst questions" count={socCase.analystQuestions.length}>
-        {socCase.analystQuestions.length === 0 ? (
-          <Empty />
-        ) : (
-          <ul className="detail-list">
-            {socCase.analystQuestions.map((question) => (
-              <li key={question.id} className="detail-item">
-                <div className="detail-item__head">
-                  <strong>{question.question}</strong>
-                  <span className={`chip ${question.status === 'answered' ? 'chip--ok' : 'chip--open'}`}>
-                    {question.status === 'answered' ? 'Answered' : 'Open'}
-                  </span>
-                </div>
-                {question.answer && <p className="detail-text">{question.answer}</p>}
-                {question.rationale && (
-                  <p className="detail-item__note">Rationale: {question.rationale}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+      <DecisionJournalSection
+        questions={socCase.analystQuestions}
+        onAdd={onAddQuestion}
+        onRemove={onRemoveQuestion}
+      />
 
       <Section title="Findings" count={socCase.findings.length}>
         {socCase.findings.length === 0 ? (

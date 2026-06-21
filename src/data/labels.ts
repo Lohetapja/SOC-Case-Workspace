@@ -5,6 +5,7 @@ import type {
   Confidence,
   EntityType,
   EvidenceType,
+  QuestionStatus,
   RecommendationPriority,
   Severity,
   TimelinePhase,
@@ -96,4 +97,10 @@ export const timelinePhaseLabels: Record<TimelinePhase, string> = {
   analyst_action: 'Analyst action',
   containment: 'Containment',
   other: 'Other',
+}
+
+export const questionStatusLabels: Record<QuestionStatus, string> = {
+  open: 'Open',
+  answered: 'Answered',
+  not_applicable: 'Not applicable',
 }

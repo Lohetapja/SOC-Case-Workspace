@@ -114,8 +114,8 @@ export interface TimelineEvent {
   relatedEvidenceIds?: string[]
 }
 
-/** Whether an analyst question is still open or has been resolved. */
-export type QuestionStatus = 'open' | 'answered'
+/** Whether an analyst question is still open, resolved, or ruled out. */
+export type QuestionStatus = 'open' | 'answered' | 'not_applicable'
 
 /** An open investigative question and the decision/answer reached. */
 export interface AnalystQuestion {

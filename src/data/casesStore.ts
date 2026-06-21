@@ -1,8 +1,10 @@
 import type {
+  AnalystQuestion,
   CaseSource,
   CaseStatus,
   EvidenceItem,
   EvidenceType,
+  QuestionStatus,
   Severity,
   SocCase,
   TimelineEvent,
@@ -105,6 +107,30 @@ export function createTimelineEvent(input: NewTimelineEventInput): TimelineEvent
     description: input.description.trim(),
     phase: input.phase,
     relatedEvidenceIds: input.relatedEvidenceId ? [input.relatedEvidenceId] : undefined,
+  }
+}
+
+/** Fields collected from the add-analyst-question form. */
+export interface NewQuestionInput {
+  question: string
+  status: QuestionStatus
+  answer: string
+  rationale: string
+}
+
+/** Build an analyst-question / decision-journal entry from form input. */
+export function createAnalystQuestion(input: NewQuestionInput): AnalystQuestion {
+  const now = new Date().toISOString()
+  const answer = input.answer.trim()
+  const rationale = input.rationale.trim()
+  return {
+    id: generateId('q'),
+    question: input.question.trim(),
+    status: input.status,
+    answer: answer || undefined,
+    rationale: rationale || undefined,
+    createdAt: now,
+    answeredAt: input.status === 'answered' ? now : undefined,
   }
 }
 

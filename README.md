@@ -50,8 +50,9 @@ every section; the **Evidence** and **Timeline** sections are editable (add /
 remove, saved to localStorage). Two read-only visual modes share a tabbed view: a
 **Case Graph** (Obsidian-inspired force-directed graph, with drag-to-pin layout)
 and an **Artifact Map** (a structured investigation-flow view that groups a case's
-artifacts into lanes). Editing for the decision journal, MITRE mapping, and
-reports sections is still to come.
+artifacts into lanes). The **Decision Journal** (analyst questions) is also
+editable, and its open questions feed the Artifact Map's "Investigation gaps"
+panel. Editing for the MITRE mapping and reports sections is still to come.
 See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).

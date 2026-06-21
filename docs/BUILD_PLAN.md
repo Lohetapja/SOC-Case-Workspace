@@ -69,10 +69,14 @@ the changes. Added an optional `phase` field to `TimelineEvent`. Helpers:
 
 ---
 
-## Milestone 5 — Analyst questions / decision journal  ☐
+## Milestone 5 — Analyst questions / decision journal  ☑
+**Done:** The Analyst questions section in the case detail workspace is editable —
+list questions with status chips; add via a small form (question, status
+open/answered/not-applicable, answer/decision, rationale) and remove. Persisted
+through `useCases().updateCase` → localStorage. Open questions feed the Artifact
+Map's "Investigation gaps" panel (fallback list when none). Added a
+`not_applicable` `QuestionStatus`. Helper: `createAnalystQuestion`.
 **Goal:** Capture reasoning.
-**Deliverables:** Add questions and decisions (with rationale); list per case.
-**Acceptance:** Entries persist and are clearly distinguished (question vs decision).
 
 ---
 
