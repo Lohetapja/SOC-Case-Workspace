@@ -55,8 +55,9 @@ editable, and its open questions feed the Artifact Map's "Investigation gaps"
 panel. **Findings** are editable too — evidence-backed conclusions with category,
 severity, confidence, status, and linked supporting evidence. **MITRE ATT&CK
 mappings** (analyst-authored, evidence-backed) and the **classification & closure**
-assessment are editable too, and surface in the Case Graph / Artifact Map. Markdown
-report export is still to come.
+assessment are editable too, and surface in the Case Graph / Artifact Map. Finally,
+any case can be exported as a clean **Markdown investigation report** (live preview,
+copy, and download `.md`) from the Reports page.
 See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).

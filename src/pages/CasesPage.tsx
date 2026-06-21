@@ -18,13 +18,20 @@ interface CasesPageProps {
   onOpenCase: (id: string) => void
   onCloseCase: () => void
   onOpenGraph: (id: string) => void
+  onOpenReport: (id: string) => void
 }
 
 /**
  * Cases section. Shows the case list (with create + delete) or, when a case is
  * active, its read-only detail workspace. Backed by localStorage.
  */
-export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }: CasesPageProps) {
+export function CasesPage({
+  activeCaseId,
+  onOpenCase,
+  onCloseCase,
+  onOpenGraph,
+  onOpenReport,
+}: CasesPageProps) {
   const { cases, addCase, removeCase, updateCase } = useCases()
   const [showForm, setShowForm] = useState(false)
 
@@ -37,6 +44,7 @@ export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }
         socCase={activeCase}
         onBack={onCloseCase}
         onOpenGraph={() => onOpenGraph(caseId)}
+        onOpenReport={() => onOpenReport(caseId)}
         onAddEvidence={(input) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,

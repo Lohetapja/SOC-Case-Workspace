@@ -32,6 +32,11 @@ export default function App() {
     setSection('graph')
   }
 
+  function openCaseReport(caseId: string) {
+    setActiveCaseId(caseId)
+    setSection('reports')
+  }
+
   function renderSection() {
     switch (section) {
       case 'overview':
@@ -43,6 +48,7 @@ export default function App() {
             onOpenCase={setActiveCaseId}
             onCloseCase={() => setActiveCaseId(null)}
             onOpenGraph={openCaseGraph}
+            onOpenReport={openCaseReport}
           />
         )
       case 'graph':
@@ -56,7 +62,7 @@ export default function App() {
       case 'mitre':
         return <MitreMappingPage />
       case 'reports':
-        return <ReportsPage />
+        return <ReportsPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
       default:
         return null
     }

@@ -112,10 +112,17 @@ the detail header and in the Case Graph / Artifact Map header. Reworked
 
 ---
 
-## Milestone 8 — Markdown report export  ☐
+## Milestone 8 — Markdown report export  ☑
+**Done:** The Reports page exports a case as a clean Markdown investigation report
+(title, metadata, executive summary, status & classification, entities, evidence,
+timeline, decision journal, findings, MITRE mapping, recommendations, closure
+rationale, limitations/missing evidence, synthetic-data disclaimer). Evidence-
+backed: findings cite supporting evidence, mappings include rationale + confidence,
+open questions feed the missing-evidence section (fallback list when none). Live
+read-only preview, Copy Markdown, and Download `.md` (safe `soc-report-<slug>-<date>.md`
+filename) — dependency-free, no external services. Pure generator in
+`src/utils/caseReport.ts`; an "Export report" link in the case detail opens it.
 **Goal:** Produce the deliverable.
-**Deliverables:** Generate Markdown combining all sections; copy + download.
-**Acceptance:** Exported report is coherent and includes every populated section.
 
 ---
 

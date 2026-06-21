@@ -29,6 +29,7 @@ interface CaseDetailWorkspaceProps {
   socCase: SocCase
   onBack: () => void
   onOpenGraph: () => void
+  onOpenReport: () => void
   onAddEvidence: (input: NewEvidenceInput) => void
   onRemoveEvidence: (evidenceId: string) => void
   onAddTimelineEvent: (input: NewTimelineEventInput) => void
@@ -66,6 +67,7 @@ export function CaseDetailWorkspace({
   socCase,
   onBack,
   onOpenGraph,
+  onOpenReport,
   onAddEvidence,
   onRemoveEvidence,
   onAddTimelineEvent,
@@ -197,6 +199,16 @@ export function CaseDetailWorkspace({
         </div>
         <button type="button" className="btn" onClick={onOpenGraph}>
           Open Case Graph →
+        </button>
+      </section>
+
+      <section className="card detail-graph-cta">
+        <div>
+          <h2 className="detail-section__title">Investigation report</h2>
+          <p className="detail-text">Generate a Markdown report of this case to copy or download.</p>
+        </div>
+        <button type="button" className="btn" onClick={onOpenReport}>
+          Export report →
         </button>
       </section>
     </div>
