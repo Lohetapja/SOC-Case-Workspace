@@ -3,7 +3,12 @@ import { CaseSummaryCard } from '../components/CaseSummaryCard'
 import { CreateCaseForm } from '../components/CreateCaseForm'
 import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
-import { createAnalystQuestion, createEvidenceItem, createTimelineEvent } from '../data/casesStore'
+import {
+  createAnalystQuestion,
+  createEvidenceItem,
+  createFinding,
+  createTimelineEvent,
+} from '../data/casesStore'
 
 interface CasesPageProps {
   /** The currently opened case, or null to show the list. */
@@ -64,6 +69,18 @@ export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }
           updateCase(caseId, (socCase) => ({
             ...socCase,
             analystQuestions: socCase.analystQuestions.filter((q) => q.id !== questionId),
+          }))
+        }
+        onAddFinding={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            findings: [...socCase.findings, createFinding(input)],
+          }))
+        }
+        onRemoveFinding={(findingId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            findings: socCase.findings.filter((finding) => finding.id !== findingId),
           }))
         }
       />

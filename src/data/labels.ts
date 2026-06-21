@@ -5,6 +5,8 @@ import type {
   Confidence,
   EntityType,
   EvidenceType,
+  FindingCategory,
+  FindingStatus,
   QuestionStatus,
   RecommendationPriority,
   Severity,
@@ -103,4 +105,19 @@ export const questionStatusLabels: Record<QuestionStatus, string> = {
   open: 'Open',
   answered: 'Answered',
   not_applicable: 'Not applicable',
+}
+
+export const findingCategoryLabels: Record<FindingCategory, string> = {
+  malicious_activity: 'Malicious activity',
+  suspicious_activity: 'Suspicious activity',
+  misconfiguration: 'Misconfiguration',
+  policy_violation: 'Policy violation',
+  benign: 'Benign',
+  other: 'Other',
+}
+
+export const findingStatusLabels: Record<FindingStatus, string> = {
+  draft: 'Draft',
+  confirmed: 'Confirmed',
+  rejected: 'Rejected',
 }

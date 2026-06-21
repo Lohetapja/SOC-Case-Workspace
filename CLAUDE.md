@@ -15,6 +15,40 @@ Authoritative scope lives in:
 - `docs/BUILD_PLAN.md` — the ordered milestones (build one at a time).
 - `docs/DECISIONS.md` — why the architecture is the way it is.
 
+## Standing project rules
+
+These are the defaults for every milestone, so prompts can stay short. Unless a
+prompt explicitly overrides one of these, assume all of them apply — there is no
+need to restate them in each prompt.
+
+1. Always read `CLAUDE.md`, `README.md`, `docs/BUILD_PLAN.md`, and
+   `docs/DECISIONS.md` before starting a milestone.
+2. Work one milestone at a time.
+3. Keep the scope small.
+4. Stop after the milestone is complete and wait for the next instruction.
+5. Do not commit.
+6. Do not push.
+7. Do not run `git commit`.
+8. Do not run `git push`.
+9. The user commits, pushes, and deploys manually with GitHub Desktop.
+10. The app must remain frontend-only, browser-first, and localStorage-based
+    unless the user explicitly says otherwise.
+11. Use synthetic data only.
+12. Do not add a backend, database, authentication, external APIs, or routing
+    libraries unless the user explicitly asks.
+13. Do not overhaul unrelated styling or unrelated features.
+14. Reuse the existing `updateCase` / localStorage pattern where possible.
+15. Run `npm run build` before reporting completion.
+16. After each milestone, report only:
+    - what changed
+    - files created/edited
+    - build result
+    - how to test
+    - next smallest logical step
+17. Keep reports concise to save tokens.
+18. Do not repeat the full project explanation back unless something changed or
+    there is a risk.
+
 ## How to work here (important)
 
 1. **One milestone at a time.** Follow `docs/BUILD_PLAN.md` in order. Do not jump
@@ -56,5 +90,7 @@ Authoritative scope lives in:
 
 ## Current status
 
-Milestone 0 (documentation) is in progress/complete. The React app has **not**
-been scaffolded yet. The next step is **Milestone 1** in `docs/BUILD_PLAN.md`.
+The app is scaffolded and deployed (GitHub Pages). Completed milestones and the
+next step are tracked in `docs/BUILD_PLAN.md` — treat it as the source of truth
+and check it at the start of each milestone. Live demo:
+https://lohetapja.github.io/SOC-Case-Workspace/

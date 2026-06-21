@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react'
 import type { SocCase } from '../types'
-import type { NewEvidenceInput, NewQuestionInput, NewTimelineEventInput } from '../data/casesStore'
+import type {
+  NewEvidenceInput,
+  NewFindingInput,
+  NewQuestionInput,
+  NewTimelineEventInput,
+} from '../data/casesStore'
 import {
   confidenceLabels,
   entityTypeLabels,
@@ -14,6 +19,7 @@ import { formatDateTime } from '../utils/format'
 import { EvidenceSection } from './EvidenceSection'
 import { TimelineSection } from './TimelineSection'
 import { DecisionJournalSection } from './DecisionJournalSection'
+import { FindingsSection } from './FindingsSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -25,6 +31,8 @@ interface CaseDetailWorkspaceProps {
   onRemoveTimelineEvent: (eventId: string) => void
   onAddQuestion: (input: NewQuestionInput) => void
   onRemoveQuestion: (questionId: string) => void
+  onAddFinding: (input: NewFindingInput) => void
+  onRemoveFinding: (findingId: string) => void
 }
 
 function Section({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
@@ -57,6 +65,8 @@ export function CaseDetailWorkspace({
   onRemoveTimelineEvent,
   onAddQuestion,
   onRemoveQuestion,
+  onAddFinding,
+  onRemoveFinding,
 }: CaseDetailWorkspaceProps) {
   return (
     <div className="detail">
@@ -135,23 +145,13 @@ export function CaseDetailWorkspace({
         onRemove={onRemoveQuestion}
       />
 
-      <Section title="Findings" count={socCase.findings.length}>
-        {socCase.findings.length === 0 ? (
-          <Empty />
-        ) : (
-          <ul className="detail-list">
-            {socCase.findings.map((finding) => (
-              <li key={finding.id} className="detail-item">
-                <div className="detail-item__head">
-                  <strong>{finding.title}</strong>
-                  <span className="chip">{confidenceLabels[finding.confidence]} confidence</span>
-                </div>
-                <p className="detail-text">{finding.description}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+      <FindingsSection
+        findings={socCase.findings}
+        evidence={socCase.evidence}
+        timeline={socCase.timeline}
+        onAdd={onAddFinding}
+        onRemove={onRemoveFinding}
+      />
 
       <Section title="MITRE ATT&CK mappings" count={socCase.mitreMappings.length}>
         {socCase.mitreMappings.length === 0 ? (

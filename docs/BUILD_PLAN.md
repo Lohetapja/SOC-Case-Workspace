@@ -78,6 +78,14 @@ Map's "Investigation gaps" panel (fallback list when none). Added a
 `not_applicable` `QuestionStatus`. Helper: `createAnalystQuestion`.
 **Goal:** Capture reasoning.
 
+**Findings (editable):** the Findings section in the case detail workspace is also
+editable — evidence-backed conclusions with title, category, severity/impact,
+confidence, status (draft/confirmed/rejected), description, and selectable
+supporting evidence + related timeline events. Persisted via `updateCase` →
+localStorage; new findings appear in the Artifact Map. Optional `category`,
+`severity`, `status`, `relatedTimelineEventIds` added to `Finding`. Helper:
+`createFinding`.
+
 ---
 
 ## Milestone 6 — MITRE ATT&CK mapping  ☐

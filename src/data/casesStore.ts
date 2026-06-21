@@ -2,8 +2,12 @@ import type {
   AnalystQuestion,
   CaseSource,
   CaseStatus,
+  Confidence,
   EvidenceItem,
   EvidenceType,
+  Finding,
+  FindingCategory,
+  FindingStatus,
   QuestionStatus,
   Severity,
   SocCase,
@@ -131,6 +135,35 @@ export function createAnalystQuestion(input: NewQuestionInput): AnalystQuestion 
     rationale: rationale || undefined,
     createdAt: now,
     answeredAt: input.status === 'answered' ? now : undefined,
+  }
+}
+
+/** Fields collected from the add-finding form. */
+export interface NewFindingInput {
+  title: string
+  category: FindingCategory
+  severity: Severity
+  confidence: Confidence
+  status: FindingStatus
+  description: string
+  relatedEvidenceIds: string[]
+  relatedTimelineEventIds: string[]
+}
+
+/** Build an evidence-backed finding from form input. */
+export function createFinding(input: NewFindingInput): Finding {
+  return {
+    id: generateId('f'),
+    title: input.title.trim(),
+    description: input.description.trim(),
+    confidence: input.confidence,
+    category: input.category,
+    severity: input.severity,
+    status: input.status,
+    relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
+    relatedTimelineEventIds: input.relatedTimelineEventIds.length
+      ? input.relatedTimelineEventIds
+      : undefined,
   }
 }
 

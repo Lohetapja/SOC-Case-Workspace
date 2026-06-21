@@ -130,14 +130,34 @@ export interface AnalystQuestion {
   answeredAt?: string
 }
 
+/** Category/type of a finding. */
+export type FindingCategory =
+  | 'malicious_activity'
+  | 'suspicious_activity'
+  | 'misconfiguration'
+  | 'policy_violation'
+  | 'benign'
+  | 'other'
+
+/** Review status of a finding. */
+export type FindingStatus = 'draft' | 'confirmed' | 'rejected'
+
 /** A conclusion the analyst has drawn from the evidence. */
 export interface Finding {
   id: string
   title: string
   description: string
   confidence: Confidence
+  /** Optional category/type of the finding. */
+  category?: FindingCategory
+  /** Optional severity/impact (reuses the case severity scale). */
+  severity?: Severity
+  /** Optional review status. */
+  status?: FindingStatus
   /** Evidence that supports this finding. */
   relatedEvidenceIds?: string[]
+  /** Timeline events related to this finding. */
+  relatedTimelineEventIds?: string[]
 }
 
 /** A mapping from a case finding to a MITRE ATT&CK technique. */
