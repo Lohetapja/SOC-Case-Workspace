@@ -24,6 +24,7 @@ import { DecisionJournalSection } from './DecisionJournalSection'
 import { FindingsSection } from './FindingsSection'
 import { MitreMappingSection } from './MitreMappingSection'
 import { ClosureSection } from './ClosureSection'
+import { ChecklistSection } from './ChecklistSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -41,6 +42,7 @@ interface CaseDetailWorkspaceProps {
   onAddMitre: (input: NewMitreInput) => void
   onRemoveMitre: (mappingId: string) => void
   onSaveClosure: (input: ClosureInput) => void
+  onToggleChecklistItem: (itemId: string) => void
 }
 
 function Section({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
@@ -79,6 +81,7 @@ export function CaseDetailWorkspace({
   onAddMitre,
   onRemoveMitre,
   onSaveClosure,
+  onToggleChecklistItem,
 }: CaseDetailWorkspaceProps) {
   return (
     <div className="detail">
@@ -114,6 +117,10 @@ export function CaseDetailWorkspace({
       <Section title="Summary">
         <p className="detail-text">{socCase.summary || 'No summary provided.'}</p>
       </Section>
+
+      {socCase.checklist && socCase.checklist.length > 0 && (
+        <ChecklistSection checklist={socCase.checklist} onToggle={onToggleChecklistItem} />
+      )}
 
       <ClosureSection closure={socCase.closure} onSave={onSaveClosure} />
 

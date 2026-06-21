@@ -3,6 +3,8 @@ import type {
   CaseClosure,
   CaseSource,
   CaseStatus,
+  ChecklistGroup,
+  ChecklistItem,
   ClassificationVerdict,
   ClosureStatus,
   Confidence,
@@ -20,6 +22,7 @@ import type {
 } from '../types'
 import { readJSON, removeKey, writeJSON } from '../utils/storage'
 import { demoCases } from './demoCases'
+import { getCaseTemplate, type CaseTemplate } from './caseTemplates'
 
 const STORAGE_KEY = 'soc-case-workspace:cases'
 
@@ -116,13 +119,18 @@ export interface NewCaseInput {
   severity: Severity
   owner: string
   status?: CaseStatus
+  /** Optional template to prefill starter content from. */
+  templateId?: string
 }
 
-/** Build a new, empty case from form input. Child collections start empty and
- *  are populated in their own sections/milestones. */
+/**
+ * Build a new case from form input. A blank case starts with empty collections;
+ * if a template is chosen, starter analyst questions, draft (low-confidence)
+ * MITRE mappings, and an investigation checklist are prefilled — all editable.
+ */
 export function createCase(input: NewCaseInput): SocCase {
   const now = new Date().toISOString()
-  return {
+  const base: SocCase = {
     id: generateId('case'),
     title: input.title.trim(),
     summary: input.summary.trim(),
@@ -140,6 +148,48 @@ export function createCase(input: NewCaseInput): SocCase {
     createdAt: now,
     updatedAt: now,
   }
+
+  const template = input.templateId ? getCaseTemplate(input.templateId) : undefined
+  if (!template) return base
+
+  return {
+    ...base,
+    templateId: template.id,
+    analystQuestions: template.analystQuestions.map((entry) =>
+      createAnalystQuestion({
+        question: entry.question,
+        status: 'open',
+        answer: '',
+        rationale: entry.rationale ?? '',
+      }),
+    ),
+    mitreMappings: template.mitreTechniques.map((technique) =>
+      createMitreMapping({
+        techniqueId: technique.techniqueId,
+        techniqueName: technique.techniqueName,
+        tactic: technique.tactic,
+        confidence: 'low',
+        rationale:
+          technique.rationale ??
+          `Possible technique from the "${template.name}" template — validate against evidence.`,
+        relatedFindingIds: [],
+        relatedEvidenceIds: [],
+      }),
+    ),
+    checklist: buildChecklistFromTemplate(template),
+  }
+}
+
+function buildChecklistFromTemplate(template: CaseTemplate): ChecklistItem[] {
+  const items: ChecklistItem[] = []
+  const add = (group: ChecklistGroup, labels: string[]) => {
+    for (const label of labels) items.push({ id: generateId('chk'), group, label, done: false })
+  }
+  add('evidence', template.evidenceChecklist)
+  add('timeline', template.timelineCheckpoints)
+  add('findings', template.suggestedFindings)
+  add('closure', template.closureConsiderations)
+  return items
 }
 
 /** Fields collected from the add-evidence form. */

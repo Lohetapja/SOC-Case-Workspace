@@ -229,6 +229,17 @@ export interface ReportMetadata {
   version: string
 }
 
+/** Which part of the investigation a checklist item belongs to. */
+export type ChecklistGroup = 'evidence' | 'timeline' | 'findings' | 'closure'
+
+/** A single, checkable investigation-checklist item (seeded from a template). */
+export interface ChecklistItem {
+  id: string
+  group: ChecklistGroup
+  label: string
+  done: boolean
+}
+
 /**
  * The aggregate root: one investigation, with all of its child records embedded.
  */
@@ -254,6 +265,10 @@ export interface SocCase {
   closure?: CaseClosure
   /** Present once a report has been generated for the case. */
   reportMetadata?: ReportMetadata
+  /** Id of the template the case was created from, if any. */
+  templateId?: string
+  /** Investigation checklist seeded from a template. */
+  checklist?: ChecklistItem[]
   createdAt: string
   updatedAt: string
 }

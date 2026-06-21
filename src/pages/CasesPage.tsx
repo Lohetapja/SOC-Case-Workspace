@@ -111,6 +111,14 @@ export function CasesPage({
             closure: buildClosure(socCase.closure, input),
           }))
         }
+        onToggleChecklistItem={(itemId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            checklist: socCase.checklist?.map((item) =>
+              item.id === itemId ? { ...item, done: !item.done } : item,
+            ),
+          }))
+        }
       />
     )
   }

@@ -1,6 +1,7 @@
 import type {
   CaseSource,
   CaseStatus,
+  ChecklistGroup,
   ClassificationVerdict,
   ClosureStatus,
   Confidence,
@@ -62,6 +63,13 @@ export const closureStatusLabels: Record<ClosureStatus, string> = {
   monitoring: 'Monitoring',
   escalated: 'Escalated',
   closed: 'Closed',
+}
+
+export const checklistGroupLabels: Record<ChecklistGroup, string> = {
+  evidence: 'Evidence to collect',
+  timeline: 'Timeline checkpoints',
+  findings: 'Findings to validate',
+  closure: 'Closure considerations',
 }
 
 export const confidenceLabels: Record<Confidence, string> = {

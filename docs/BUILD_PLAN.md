@@ -163,6 +163,12 @@ in-browser; `npm run build` passes.
 - ☑ **Data management (Settings)** — Export cases as a versioned JSON backup,
   Import (validate + replace, with confirmation), Reset demo data, and Clear local
   data. `src/pages/SettingsPage.tsx` + helpers in `src/data/casesStore.ts`.
+- ☑ **Case templates / investigation checklists** — five built-in synthetic
+  templates (`src/data/caseTemplates.ts`). Creating a case from a template prefills
+  starter analyst questions, draft (low-confidence) MITRE mappings, and a grouped
+  investigation checklist (evidence / timeline / findings / closure). Checklist
+  state persists on the case (`ChecklistItem` on `SocCase`); `ChecklistSection`
+  shows it in the detail workspace.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)
