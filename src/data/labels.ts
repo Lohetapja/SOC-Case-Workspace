@@ -2,6 +2,7 @@ import type {
   CaseSource,
   CaseStatus,
   ClassificationVerdict,
+  ClosureStatus,
   Confidence,
   EntityType,
   EvidenceType,
@@ -49,9 +50,18 @@ export const sourceLabels: Record<CaseSource, string> = {
 
 export const verdictLabels: Record<ClassificationVerdict, string> = {
   true_positive: 'True positive',
-  false_positive: 'False positive',
   benign_true_positive: 'Benign true positive',
+  false_positive: 'False positive',
+  suspicious: 'Suspicious',
+  undetermined: 'Undetermined',
   inconclusive: 'Inconclusive',
+}
+
+export const closureStatusLabels: Record<ClosureStatus, string> = {
+  open: 'Open',
+  monitoring: 'Monitoring',
+  escalated: 'Escalated',
+  closed: 'Closed',
 }
 
 export const confidenceLabels: Record<Confidence, string> = {

@@ -4,9 +4,11 @@ import { CreateCaseForm } from '../components/CreateCaseForm'
 import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
 import {
+  buildClosure,
   createAnalystQuestion,
   createEvidenceItem,
   createFinding,
+  createMitreMapping,
   createTimelineEvent,
 } from '../data/casesStore'
 
@@ -81,6 +83,24 @@ export function CasesPage({ activeCaseId, onOpenCase, onCloseCase, onOpenGraph }
           updateCase(caseId, (socCase) => ({
             ...socCase,
             findings: socCase.findings.filter((finding) => finding.id !== findingId),
+          }))
+        }
+        onAddMitre={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            mitreMappings: [...socCase.mitreMappings, createMitreMapping(input)],
+          }))
+        }
+        onRemoveMitre={(mappingId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            mitreMappings: socCase.mitreMappings.filter((mapping) => mapping.id !== mappingId),
+          }))
+        }
+        onSaveClosure={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            closure: buildClosure(socCase.closure, input),
           }))
         }
       />

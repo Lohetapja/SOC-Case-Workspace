@@ -4,6 +4,7 @@ import { buildCaseGraph, type CaseGraphNode, type GraphNodeType } from '../utils
 import { CaseGraph, NODE_TYPE_META } from '../components/CaseGraph'
 import { ArtifactMap } from '../components/ArtifactMap'
 import { clearCaseLayout, loadCaseLayout, saveNodePosition } from '../utils/graphLayout'
+import { closureStatusLabels, verdictLabels } from '../data/labels'
 
 type VizMode = 'graph' | 'map'
 
@@ -106,6 +107,16 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
               ? `Read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
               : 'Read-only investigation-flow view: artifacts grouped into lanes.'}
           </p>
+          {(activeCase?.closure?.verdict || activeCase?.closure?.closureStatus) && (
+            <p className="graph-classification">
+              {activeCase.closure.verdict && (
+                <span className="chip">{verdictLabels[activeCase.closure.verdict]}</span>
+              )}
+              {activeCase.closure.closureStatus && (
+                <span className="chip">{closureStatusLabels[activeCase.closure.closureStatus]}</span>
+              )}
+            </p>
+          )}
         </div>
         <div className="graph-controls">
           <label className="graph-select">

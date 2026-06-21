@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react'
 import type { SocCase } from '../types'
 import type {
+  ClosureInput,
   NewEvidenceInput,
   NewFindingInput,
+  NewMitreInput,
   NewQuestionInput,
   NewTimelineEventInput,
 } from '../data/casesStore'
 import {
-  confidenceLabels,
+  closureStatusLabels,
   entityTypeLabels,
   priorityLabels,
   severityLabels,
@@ -20,6 +22,8 @@ import { EvidenceSection } from './EvidenceSection'
 import { TimelineSection } from './TimelineSection'
 import { DecisionJournalSection } from './DecisionJournalSection'
 import { FindingsSection } from './FindingsSection'
+import { MitreMappingSection } from './MitreMappingSection'
+import { ClosureSection } from './ClosureSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -33,6 +37,9 @@ interface CaseDetailWorkspaceProps {
   onRemoveQuestion: (questionId: string) => void
   onAddFinding: (input: NewFindingInput) => void
   onRemoveFinding: (findingId: string) => void
+  onAddMitre: (input: NewMitreInput) => void
+  onRemoveMitre: (mappingId: string) => void
+  onSaveClosure: (input: ClosureInput) => void
 }
 
 function Section({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
@@ -67,6 +74,9 @@ export function CaseDetailWorkspace({
   onRemoveQuestion,
   onAddFinding,
   onRemoveFinding,
+  onAddMitre,
+  onRemoveMitre,
+  onSaveClosure,
 }: CaseDetailWorkspaceProps) {
   return (
     <div className="detail">
@@ -86,23 +96,24 @@ export function CaseDetailWorkspace({
             {socCase.sourceDetail ? ` (${socCase.sourceDetail})` : ''}
           </span>
           <span className="chip">Owner: {socCase.owner}</span>
+          {socCase.closure?.verdict && (
+            <span className="chip">Classification: {verdictLabels[socCase.closure.verdict]}</span>
+          )}
+          {socCase.closure?.closureStatus && (
+            <span className="chip">Closure: {closureStatusLabels[socCase.closure.closureStatus]}</span>
+          )}
         </div>
         <div className="detail-header__dates">
           <span>Created {formatDateTime(socCase.createdAt)}</span>
           <span>Updated {formatDateTime(socCase.updatedAt)}</span>
         </div>
-        {socCase.closure && (
-          <div className="detail-closure">
-            <strong>Closed — {verdictLabels[socCase.closure.verdict]}</strong>
-            <p>{socCase.closure.summary}</p>
-            <p className="detail-closure__rationale">{socCase.closure.rationale}</p>
-          </div>
-        )}
       </header>
 
       <Section title="Summary">
         <p className="detail-text">{socCase.summary || 'No summary provided.'}</p>
       </Section>
+
+      <ClosureSection closure={socCase.closure} onSave={onSaveClosure} />
 
       <Section title="Affected entities" count={socCase.affectedEntities.length}>
         {socCase.affectedEntities.length === 0 ? (
@@ -153,26 +164,13 @@ export function CaseDetailWorkspace({
         onRemove={onRemoveFinding}
       />
 
-      <Section title="MITRE ATT&CK mappings" count={socCase.mitreMappings.length}>
-        {socCase.mitreMappings.length === 0 ? (
-          <Empty />
-        ) : (
-          <ul className="detail-list">
-            {socCase.mitreMappings.map((mapping) => (
-              <li key={mapping.id} className="detail-item">
-                <div className="detail-item__head">
-                  <strong>
-                    {mapping.techniqueId} — {mapping.techniqueName}
-                  </strong>
-                  <span className="chip">{mapping.tactic}</span>
-                  <span className="chip">{confidenceLabels[mapping.confidence]} confidence</span>
-                </div>
-                <p className="detail-text">{mapping.rationale}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+      <MitreMappingSection
+        mappings={socCase.mitreMappings}
+        findings={socCase.findings}
+        evidence={socCase.evidence}
+        onAdd={onAddMitre}
+        onRemove={onRemoveMitre}
+      />
 
       <Section title="Recommendations" count={socCase.recommendations.length}>
         {socCase.recommendations.length === 0 ? (

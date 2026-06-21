@@ -476,10 +476,13 @@ const impossibleTravel: SocCase = {
   ],
   closure: {
     verdict: 'benign_true_positive',
-    summary:
-      'The impossible-travel alert was a true detection but benign: the geo jump was caused by corporate VPN egress, not attacker activity.',
+    closureStatus: 'closed',
     rationale:
       'The Frankfurt IP matched the documented VPN egress range, MFA was satisfied on both sign-ins, and no anomalous post-login activity was found.',
+    recommendedAction:
+      'Add the corporate VPN egress range to the impossible-travel allowlist to reduce repeat false positives.',
+    impactSummary:
+      'No account compromise; a benign VPN-driven geo anomaly. No business or security impact.',
     closedAt: '2026-06-19T09:45:00Z',
     closedBy: 'rivera.analyst',
   },

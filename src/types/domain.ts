@@ -169,9 +169,11 @@ export interface MitreMapping {
   techniqueId: string
   /** Technique or sub-technique name. */
   techniqueName: string
-  /** Why this technique applies to the case. */
+  /** Why this technique applies to the case (analyst-authored). */
   rationale: string
   confidence: Confidence
+  /** Findings supporting the mapping. */
+  relatedFindingIds?: string[]
   /** Evidence supporting the mapping. */
   relatedEvidenceIds?: string[]
 }
@@ -187,21 +189,31 @@ export interface Recommendation {
   priority: RecommendationPriority
 }
 
-/** Final classification verdict for a closed case. */
+/** Final classification verdict for a case. */
 export type ClassificationVerdict =
   | 'true_positive'
-  | 'false_positive'
   | 'benign_true_positive'
+  | 'false_positive'
+  | 'suspicious'
+  | 'undetermined'
   | 'inconclusive'
 
-/** Closure details recorded when a case is classified and closed. */
+/** Where the case sits in the response lifecycle. */
+export type ClosureStatus = 'open' | 'monitoring' | 'escalated' | 'closed'
+
+/**
+ * Classification & closure assessment. All fields are optional so an analyst can
+ * fill it in progressively — a case does not have to be closed to classify it.
+ */
 export interface CaseClosure {
-  verdict: ClassificationVerdict
-  /** Closing summary of the outcome. */
-  summary: string
-  /** Primary justification for the verdict. */
-  rationale: string
-  closedAt: string
+  verdict?: ClassificationVerdict
+  closureStatus?: ClosureStatus
+  /** Justification for the classification / closure. */
+  rationale?: string
+  recommendedAction?: string
+  /** Business / security impact summary. */
+  impactSummary?: string
+  closedAt?: string
   closedBy?: string
 }
 

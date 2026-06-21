@@ -998,11 +998,31 @@ body {
 .evidence-form,
 .timeline-form,
 .journal-form,
-.finding-form {
+.finding-form,
+.mitre-form,
+.closure-form {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg-main);
+}
+
+.closure-view__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.closure-view .detail-text + .detail-text {
+  margin-top: 8px;
+}
+
+.graph-classification {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
 }
 
 .form__checks {

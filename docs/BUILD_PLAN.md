@@ -88,20 +88,27 @@ localStorage; new findings appear in the Artifact Map. Optional `category`,
 
 ---
 
-## Milestone 6 — MITRE ATT&CK mapping  ☐
+## Milestone 6 — MITRE ATT&CK mapping  ☑
+**Done:** The MITRE section in the case detail workspace is editable — list
+mappings with rationale, add (technique ID, name, tactic, confidence, rationale,
+selectable supporting findings + evidence), and remove. Analyst-authored and
+evidence-backed; persisted via `updateCase` → localStorage. New mappings appear
+in the Case Graph and Artifact Map automatically. Added optional
+`relatedFindingIds` to `MitreMapping`. Helper: `createMitreMapping`.
 **Goal:** Map findings to techniques with rationale and confidence.
-**Deliverables:**
-- Embedded curated subset of ATT&CK tactics/techniques (static data).
-- Add mappings (technique, rationale, confidence) to a case.
-**Acceptance:** Mappings persist and show technique ID + name, rationale, confidence.
 
 ---
 
-## Milestone 7 — Closure classification  ☐
+## Milestone 7 — Closure classification  ☑
+**Done:** Editable "Classification & closure" section in the case detail
+workspace — classification (true/benign-true/false positive, suspicious,
+undetermined), closure status (open/monitoring/escalated/closed), rationale,
+recommended next action, and impact summary. Can be filled progressively (no need
+to close first); persisted via `updateCase` → localStorage. Surfaced as chips in
+the detail header and in the Case Graph / Artifact Map header. Reworked
+`CaseClosure` to all-optional richer fields + `ClosureStatus`. Helpers:
+`buildClosure`. (`Recommendations` remains read-only for now.)
 **Goal:** Reach and record a verdict.
-**Deliverables:** Classification UI (verdict, closing summary, justification);
-case status reflects closure.
-**Acceptance:** A case can be closed with a verdict and reopened/edited.
 
 ---
 

@@ -1,13 +1,17 @@
 import type {
   AnalystQuestion,
+  CaseClosure,
   CaseSource,
   CaseStatus,
+  ClassificationVerdict,
+  ClosureStatus,
   Confidence,
   EvidenceItem,
   EvidenceType,
   Finding,
   FindingCategory,
   FindingStatus,
+  MitreMapping,
   QuestionStatus,
   Severity,
   SocCase,
@@ -165,6 +169,57 @@ export function createFinding(input: NewFindingInput): Finding {
       ? input.relatedTimelineEventIds
       : undefined,
   }
+}
+
+/** Fields collected from the add-MITRE-mapping form. */
+export interface NewMitreInput {
+  techniqueId: string
+  techniqueName: string
+  tactic: string
+  confidence: Confidence
+  rationale: string
+  relatedFindingIds: string[]
+  relatedEvidenceIds: string[]
+}
+
+/** Build an analyst-authored ATT&CK mapping from form input. */
+export function createMitreMapping(input: NewMitreInput): MitreMapping {
+  return {
+    id: generateId('mt'),
+    tactic: input.tactic.trim(),
+    techniqueId: input.techniqueId.trim(),
+    techniqueName: input.techniqueName.trim(),
+    rationale: input.rationale.trim(),
+    confidence: input.confidence,
+    relatedFindingIds: input.relatedFindingIds.length ? input.relatedFindingIds : undefined,
+    relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
+  }
+}
+
+/** Fields collected from the closure / classification form. */
+export interface ClosureInput {
+  verdict: ClassificationVerdict | ''
+  closureStatus: ClosureStatus | ''
+  rationale: string
+  recommendedAction: string
+  impactSummary: string
+}
+
+/** Merge closure-form input into the case's closure assessment. */
+export function buildClosure(existing: CaseClosure | undefined, input: ClosureInput): CaseClosure {
+  const closureStatus = input.closureStatus || undefined
+  const closure: CaseClosure = {
+    ...existing,
+    verdict: input.verdict || undefined,
+    closureStatus,
+    rationale: input.rationale.trim() || undefined,
+    recommendedAction: input.recommendedAction.trim() || undefined,
+    impactSummary: input.impactSummary.trim() || undefined,
+  }
+  if (closureStatus === 'closed' && !closure.closedAt) {
+    closure.closedAt = new Date().toISOString()
+  }
+  return closure
 }
 
 /** datetime-local has no timezone; treat the entered value as UTC (synthetic). */

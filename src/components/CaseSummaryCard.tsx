@@ -60,8 +60,8 @@ export function CaseSummaryCard({ socCase, onOpen, onDelete }: CaseSummaryCardPr
         ))}
       </div>
 
-      {socCase.closure && (
-        <p className="case-card__closure">Closed — {verdictLabels[socCase.closure.verdict]}</p>
+      {socCase.closure?.verdict && (
+        <p className="case-card__closure">{verdictLabels[socCase.closure.verdict]}</p>
       )}
 
       {onDelete && (
