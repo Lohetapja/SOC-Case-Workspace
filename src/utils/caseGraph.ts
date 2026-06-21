@@ -30,6 +30,9 @@ export interface CaseGraphNode {
   /** Position fields populated by the force-graph engine at render time. */
   x?: number
   y?: number
+  /** Fixed/pinned position — set on drag-end and when restoring a saved layout. */
+  fx?: number
+  fy?: number
 }
 
 export interface CaseGraphLink {

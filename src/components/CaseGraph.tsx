@@ -28,6 +28,8 @@ interface CaseGraphProps {
   width: number
   height: number
   onNodeClick: (node: CaseGraphNode) => void
+  /** Called when a node is dragged and released, with its pinned position. */
+  onNodePinned: (nodeId: string, x: number, y: number) => void
 }
 
 /** A node once the force engine has assigned it a position. */
@@ -41,7 +43,7 @@ function truncate(value: string, max: number): string {
  * Read-only force-directed graph of a single case. Zoom (scroll) and pan (drag)
  * are enabled by default; clicking a node bubbles up via onNodeClick.
  */
-export function CaseGraph({ data, width, height, onNodeClick }: CaseGraphProps) {
+export function CaseGraph({ data, width, height, onNodeClick, onNodePinned }: CaseGraphProps) {
   // The force-graph instance exposes imperative helpers (e.g. zoomToFit). Its
   // generic typing is awkward, so we keep the ref loosely typed.
   const graphRef = useRef<{ zoomToFit?: (ms?: number, px?: number) => void } | null>(null)
@@ -65,6 +67,14 @@ export function CaseGraph({ data, width, height, onNodeClick }: CaseGraphProps) 
       linkColor={() => 'rgba(148, 163, 184, 0.22)'}
       linkWidth={1}
       onNodeClick={(node) => onNodeClick(node as CaseGraphNode)}
+      onNodeDragEnd={(node) => {
+        // Pin the node where it was dropped (force-graph releases it otherwise)
+        // and persist the position.
+        const positioned = node as PositionedNode
+        positioned.fx = positioned.x
+        positioned.fy = positioned.y
+        onNodePinned(positioned.id, positioned.x, positioned.y)
+      }}
       nodePointerAreaPaint={(node, color, ctx) => {
         const positioned = node as PositionedNode
         ctx.fillStyle = color

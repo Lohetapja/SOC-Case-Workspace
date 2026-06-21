@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCases } from '../hooks/useCases'
 import { buildCaseGraph, type CaseGraphNode, type GraphNodeType } from '../utils/caseGraph'
 import { CaseGraph, NODE_TYPE_META } from '../components/CaseGraph'
+import { ArtifactMap } from '../components/ArtifactMap'
+import { clearCaseLayout, loadCaseLayout, saveNodePosition } from '../utils/graphLayout'
+
+type VizMode = 'graph' | 'map'
 
 const COLOR_BY_TYPE = Object.fromEntries(
   NODE_TYPE_META.map((meta) => [meta.type, meta.color]),
@@ -19,17 +23,44 @@ interface CaseGraphPageProps {
  */
 export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps) {
   const { cases } = useCases()
+  const [viz, setViz] = useState<VizMode>('graph')
   const [selectedNode, setSelectedNode] = useState<CaseGraphNode | null>(null)
+  // Bumped by "Reset layout" to rebuild the graph with cleared positions.
+  const [layoutVersion, setLayoutVersion] = useState(0)
 
   const activeCase = useMemo(() => {
     if (cases.length === 0) return null
     return cases.find((socCase) => socCase.id === activeCaseId) ?? cases[0]
   }, [cases, activeCaseId])
 
-  const graph = useMemo(
-    () => (activeCase ? buildCaseGraph(activeCase) : { nodes: [], links: [] }),
-    [activeCase],
-  )
+  const graph = useMemo(() => {
+    if (!activeCase) return { nodes: [], links: [] }
+    const built = buildCaseGraph(activeCase)
+    // Restore any saved (pinned) positions for this case.
+    const layout = loadCaseLayout(activeCase.id)
+    for (const node of built.nodes) {
+      const saved = layout[node.id]
+      if (saved) {
+        node.x = saved.x
+        node.y = saved.y
+        node.fx = saved.x
+        node.fy = saved.y
+      }
+    }
+    return built
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- layoutVersion forces a fresh rebuild on reset
+  }, [activeCase, layoutVersion])
+
+  function handleNodePinned(nodeId: string, x: number, y: number) {
+    if (activeCase) saveNodePosition(activeCase.id, nodeId, { x, y })
+  }
+
+  function handleResetLayout() {
+    if (!activeCase) return
+    clearCaseLayout(activeCase.id)
+    setSelectedNode(null)
+    setLayoutVersion((version) => version + 1)
+  }
 
   const countByType = useMemo(() => {
     const counts: Partial<Record<GraphNodeType, number>> = {}
@@ -51,7 +82,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
     const observer = new ResizeObserver(update)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [viz])
 
   if (cases.length === 0) {
     return (
@@ -69,26 +100,62 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
     <div className="graph-page">
       <header className="graph-page__head">
         <div>
-          <h1 className="page__title">Case Graph</h1>
+          <h1 className="page__title">{viz === 'graph' ? 'Case Graph' : 'Artifact Map'}</h1>
           <p className="page__subtitle">
-            Read-only relationship view · {graph.nodes.length} nodes · {graph.links.length} links.
+            {viz === 'graph'
+              ? `Read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
+              : 'Read-only investigation-flow view: artifacts grouped into lanes.'}
           </p>
         </div>
-        <label className="graph-select">
-          <span>Case</span>
-          <select
-            value={activeCase?.id}
-            onChange={(event) => onSelectCase(event.target.value)}
-          >
-            {cases.map((socCase) => (
-              <option key={socCase.id} value={socCase.id}>
-                {socCase.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="graph-controls">
+          <label className="graph-select">
+            <span>Case</span>
+            <select
+              value={activeCase?.id}
+              onChange={(event) => onSelectCase(event.target.value)}
+            >
+              {cases.map((socCase) => (
+                <option key={socCase.id} value={socCase.id}>
+                  {socCase.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          {viz === 'graph' && (
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={handleResetLayout}
+              title="Clear pinned positions for this case and re-run the layout"
+            >
+              Reset layout
+            </button>
+          )}
+        </div>
       </header>
 
+      <div className="viz-tabs" role="tablist" aria-label="Visualization mode">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={viz === 'graph'}
+          className={`viz-tab${viz === 'graph' ? ' viz-tab--active' : ''}`}
+          onClick={() => setViz('graph')}
+        >
+          Case Graph
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={viz === 'map'}
+          className={`viz-tab${viz === 'map' ? ' viz-tab--active' : ''}`}
+          onClick={() => setViz('map')}
+        >
+          Artifact Map
+        </button>
+      </div>
+
+      {viz === 'graph' ? (
       <div className="graph-body">
         <div className="graph-canvas" ref={containerRef}>
           <CaseGraph
@@ -96,6 +163,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
             width={size.width}
             height={size.height}
             onNodeClick={setSelectedNode}
+            onNodePinned={handleNodePinned}
           />
         </div>
 
@@ -117,7 +185,10 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
               </p>
             </div>
           ) : (
-            <p className="graph-hint">Click a node to see its details. Scroll to zoom, drag to pan.</p>
+            <p className="graph-hint">
+              Click a node for details. Drag a node to pin it (positions are saved
+              per case); scroll to zoom; drag the background to pan.
+            </p>
           )}
 
           <div className="graph-legend">
@@ -132,6 +203,9 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
           </div>
         </aside>
       </div>
+      ) : (
+        activeCase && <ArtifactMap socCase={activeCase} />
+      )}
     </div>
   )
 }

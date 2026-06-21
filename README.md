@@ -47,10 +47,11 @@ Vite + React + TypeScript app scaffolds the layout and lists cases backed by
 `localStorage` (seeded with two synthetic demo cases on first run), with a
 create-case form and delete. Clicking a case opens a **detail workspace** showing
 every section; the **Evidence** and **Timeline** sections are editable (add /
-remove, saved to localStorage), and a read-only **Case Graph** view (an
-Obsidian-inspired force-directed visualization of one case) reflects the changes.
-Editing for the decision journal, MITRE mapping, and reports sections is still to
-come.
+remove, saved to localStorage). Two read-only visual modes share a tabbed view: a
+**Case Graph** (Obsidian-inspired force-directed graph, with drag-to-pin layout)
+and an **Artifact Map** (a structured investigation-flow view that groups a case's
+artifacts into lanes). Editing for the decision journal, MITRE mapping, and
+reports sections is still to come.
 See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).

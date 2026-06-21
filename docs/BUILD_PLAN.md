@@ -110,6 +110,25 @@ MITRE, timeline→evidence, evidence→entity). Click-to-inspect detail panel, d
 minimal styling, zoom/pan, read-only, and a case selector that defaults to the
 first stored case. Pure transform in `src/utils/caseGraph.ts`. Verified
 in-browser; `npm run build` passes.
+**Pinned layout:** nodes can be dragged to pin them (fx/fy on drag-end); pinned
+positions persist per case in localStorage (`src/utils/graphLayout.ts`) and are
+restored on reopen, with a "Reset layout" button to clear a case's positions and
+re-run the layout.
+
+---
+
+## Milestone 10 — Artifact Map (read-only)  ☑
+*Second visual mode, alongside the Case Graph (tabs in the same section).*
+**Done:** A structured, investigation-flow view grouping a case's artifacts into
+lanes (Identity → Delivery → Execution → Network → Detection → Response). Plain
+React/CSS layout with a light SVG edge layer (no graph library). Artifact cards by
+type (user, host, email, file, process, destination, detection, finding, MITRE,
+response); clickable cards (details: type, title, description, timestamp, related
+evidence, connections) and clickable relationship edges (label, source → target,
+supporting evidence); an "Investigation gaps" panel sourced from open analyst
+questions, with a synthetic fallback list. Pure transform in
+`src/utils/artifactMap.ts`; reuses the active case + selector; read-only. Verified
+in-browser; `npm run build` passes.
 
 ---
 
