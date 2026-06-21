@@ -139,6 +139,15 @@ npm run preview  # preview the production build locally
 
 ---
 
+## Author / Links
+
+Built by **Riivo Maadla**.
+
+- LinkedIn: <https://www.linkedin.com/in/riivo-m-43530a154/>
+- GitHub: <https://github.com/Lohetapja>
+
+---
+
 ## License & use
 
 Educational portfolio project. Not affiliated with MITRE. "MITRE ATT&CK®" is a

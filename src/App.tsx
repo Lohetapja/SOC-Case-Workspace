@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AppHeader } from './components/AppHeader'
+import { AppFooter } from './components/AppFooter'
 import { Sidebar } from './components/Sidebar'
 import { OverviewPage } from './pages/OverviewPage'
 import { CasesPage } from './pages/CasesPage'
@@ -68,6 +69,7 @@ export default function App() {
         <Sidebar active={section} onSelect={navigate} />
         <main className="app__main">{renderSection()}</main>
       </div>
+      <AppFooter />
     </div>
   )
 }
