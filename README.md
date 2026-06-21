@@ -52,7 +52,9 @@ remove, saved to localStorage). Two read-only visual modes share a tabbed view: 
 and an **Artifact Map** (a structured investigation-flow view that groups a case's
 artifacts into lanes). The **Decision Journal** (analyst questions) is also
 editable, and its open questions feed the Artifact Map's "Investigation gaps"
-panel. Editing for the MITRE mapping and reports sections is still to come.
+panel. **Findings** are editable too — evidence-backed conclusions with category,
+severity, confidence, status, and linked supporting evidence. Editing for the
+MITRE mapping and reports sections is still to come.
 See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
 
 > Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).
