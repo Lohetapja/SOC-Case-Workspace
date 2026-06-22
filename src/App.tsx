@@ -69,7 +69,7 @@ export default function App() {
       case 'journal':
         return <DecisionJournalPage onOpenCase={openCaseDetail} />
       case 'mitre':
-        return <MitreMappingPage />
+        return <MitreMappingPage onOpenCase={openCaseDetail} />
       case 'reports':
         return <ReportsPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
       case 'settings':
