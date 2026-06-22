@@ -18,7 +18,9 @@ export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove }: Evidenc
   const [editingId, setEditingId] = useState<string | null>(null)
 
   function handleRemove(item: EvidenceItem) {
-    if (window.confirm(`Remove evidence "${item.title}"?`)) {
+    if (window.confirm(
+      `Remove evidence "${item.title}"? Links from timeline events, findings, ATT&CK mappings, and agent contributions will also be cleared.`,
+    )) {
       onRemove(item.id)
     }
   }
@@ -52,7 +54,9 @@ export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove }: Evidenc
       )}
 
       {evidence.length === 0 ? (
-        <p className="detail-empty">None recorded yet.</p>
+        <p className="detail-empty">
+          No evidence recorded yet. Add the first factual artifact or observation for this case.
+        </p>
       ) : (
         <ul className="detail-list">
           {evidence.map((item) => (

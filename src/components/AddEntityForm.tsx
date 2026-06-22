@@ -48,7 +48,7 @@ export function AddEntityForm({ onAdd, onCancel }: AddEntityFormProps) {
         <label className="form__label" htmlFor="entity-notes">Notes (optional)</label>
         <textarea id="entity-notes" className="form__textarea" value={description} onChange={(event) => setDescription(event.target.value)} />
       </div>
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
       <div className="form__actions">
         <button type="submit" className="btn">Add entity</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>Cancel</button>

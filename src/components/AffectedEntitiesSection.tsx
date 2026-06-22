@@ -14,7 +14,9 @@ export function AffectedEntitiesSection({ entities, onAdd, onRemove }: AffectedE
   const [showForm, setShowForm] = useState(false)
 
   function handleRemove(entity: Entity) {
-    if (window.confirm(`Remove affected entity "${entity.value}"?`)) onRemove(entity.id)
+    if (window.confirm(
+      `Remove affected entity "${entity.value}"? Links from evidence will also be cleared.`,
+    )) onRemove(entity.id)
   }
 
   return (
@@ -24,7 +26,11 @@ export function AffectedEntitiesSection({ entities, onAdd, onRemove }: AffectedE
         {!showForm && <button type="button" className="btn btn--secondary btn--sm" onClick={() => setShowForm(true)}>Add entity</button>}
       </div>
       {showForm && <AddEntityForm onAdd={(input) => { onAdd(input); setShowForm(false) }} onCancel={() => setShowForm(false)} />}
-      {entities.length === 0 ? <p className="detail-empty">None recorded yet.</p> : (
+      {entities.length === 0 ? (
+        <p className="detail-empty">
+          No affected entities yet. Add the user, host, account, or indicator under investigation.
+        </p>
+      ) : (
         <ul className="detail-list">
           {entities.map((entity) => (
             <li key={entity.id} className="detail-item">

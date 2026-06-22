@@ -31,6 +31,7 @@ export function AgentContributionsSection({
 }: AgentContributionsSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [copyErrorId, setCopyErrorId] = useState<string | null>(null)
   const evidenceById = new Map(evidence.map((item) => [item.id, item.title]))
 
   function handleRemove(contribution: AgentContribution) {
@@ -40,9 +41,14 @@ export function AgentContributionsSection({
   }
 
   async function copyOutput(contribution: AgentContribution) {
-    await navigator.clipboard.writeText(contribution.output)
-    setCopiedId(contribution.id)
-    window.setTimeout(() => setCopiedId(null), 1600)
+    setCopyErrorId(null)
+    try {
+      await navigator.clipboard.writeText(contribution.output)
+      setCopiedId(contribution.id)
+      window.setTimeout(() => setCopiedId(null), 1600)
+    } catch {
+      setCopyErrorId(contribution.id)
+    }
   }
 
   return (
@@ -76,7 +82,10 @@ export function AgentContributionsSection({
       )}
 
       {contributions.length === 0 ? (
-        <p className="detail-empty">No external analysis attached to this case.</p>
+        <p className="detail-empty">
+          No agent contributions attached. Add pasted analysis only when you have external output
+          to review; it will remain separate from evidence.
+        </p>
       ) : (
         <ul className="detail-list agent-contributions__list">
           {contributions.map((contribution) => {
@@ -140,6 +149,11 @@ export function AgentContributionsSection({
                     >
                       {copiedId === contribution.id ? 'Copied' : 'Copy output'}
                     </button>
+                  )}
+                  {copyErrorId === contribution.id && (
+                    <span className="inline-error" role="alert">
+                      Copy failed. Select the output above and copy it manually.
+                    </span>
                   )}
                 </div>
                 {contribution.status === 'accepted' && (

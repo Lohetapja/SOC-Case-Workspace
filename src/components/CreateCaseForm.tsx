@@ -126,7 +126,7 @@ export function CreateCaseForm({ onCreate, onCancel }: CreateCaseFormProps) {
         </div>
       </div>
 
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
 
       <div className="form__actions">
         <button type="submit" className="btn">Create case</button>

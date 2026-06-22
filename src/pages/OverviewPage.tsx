@@ -44,7 +44,7 @@ export function OverviewPage({ onNavigate }: OverviewPageProps) {
 
       <section className="card">
         <h2 className="about__title">Workspace sections</h2>
-        <p className="placeholder__hint">
+        <p className="overview-hint">
           Work inside a case to build the investigation, or use these workspace-level views to
           review related records across all cases.
         </p>

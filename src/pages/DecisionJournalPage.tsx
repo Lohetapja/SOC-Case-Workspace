@@ -5,7 +5,7 @@ import { questionStatusLabels } from '../data/labels'
 import { WorkspaceFilters } from '../components/WorkspaceFilters'
 
 interface DecisionJournalPageProps {
-  onOpenCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 const statusOptions = Object.keys(questionStatusLabels) as QuestionStatus[]
@@ -59,9 +59,14 @@ export function DecisionJournalPage({ onOpenCase }: DecisionJournalPageProps) {
       </header>
 
       {items.length === 0 ? (
-        <p className="cases-note">
-          No analyst questions recorded yet. Open a case to add investigation questions.
-        </p>
+        <div className="empty-state">
+          <p className="cases-note">
+            No analyst questions recorded yet. Open a case to add an investigation question.
+          </p>
+          <button type="button" className="btn btn--secondary" onClick={() => onOpenCase(cases[0]?.id ?? null)}>
+            {cases.length > 0 ? 'Open a case' : 'Go to Cases'}
+          </button>
+        </div>
       ) : (
         <>
           <WorkspaceFilters

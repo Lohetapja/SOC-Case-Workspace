@@ -36,7 +36,9 @@ export function FindingsSection({ findings, evidence, timeline, onAdd, onUpdate,
   const timelineTitleById = new Map(timeline.map((event) => [event.id, event.title]))
 
   function handleRemove(finding: Finding) {
-    if (window.confirm(`Remove finding "${finding.title}"?`)) {
+    if (window.confirm(
+      `Remove finding "${finding.title}"? Links from ATT&CK mappings will also be cleared.`,
+    )) {
       onRemove(finding.id)
     }
   }
@@ -72,7 +74,9 @@ export function FindingsSection({ findings, evidence, timeline, onAdd, onUpdate,
       )}
 
       {findings.length === 0 ? (
-        <p className="detail-empty">None recorded yet.</p>
+        <p className="detail-empty">
+          No findings yet. Add a draft conclusion and link the evidence that supports it.
+        </p>
       ) : (
         <ul className="detail-list">
           {findings.map((finding) => {

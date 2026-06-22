@@ -205,6 +205,9 @@ in-browser; `npm run build` passes.
 - ☑ **Focused tests and CI hardening** — Vitest protects quality review, Markdown
   reports, reference cleanup, graph/map transforms, import/export validation, and
   bundled sample-case shape. GitHub Pages CI runs tests before the production build.
+- ☑ **UX rough-edge cleanup** — navigation copy, actionable empty states, form and
+  data-management feedback, destructive confirmations, reference-safe deletion,
+  and small action-alignment inconsistencies were polished without changing scope.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

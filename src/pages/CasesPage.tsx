@@ -20,6 +20,11 @@ import {
   updateTimelineEvent,
 } from '../data/casesStore'
 import type { AgentContributionStatus } from '../types'
+import {
+  removeEvidenceRecord,
+  removeFindingRecord,
+  removeTimelineRecord,
+} from '../utils/caseReferences'
 
 interface CasesPageProps {
   /** The currently opened case, or null to show the list. */
@@ -32,7 +37,7 @@ interface CasesPageProps {
 
 /**
  * Cases section. Shows the case list (with create + delete) or, when a case is
- * active, its read-only detail workspace. Backed by localStorage.
+ * active, its editable detail workspace. Backed by localStorage.
  */
 export function CasesPage({
   activeCaseId,
@@ -100,10 +105,7 @@ export function CasesPage({
           }))
         }
         onRemoveEvidence={(evidenceId) =>
-          updateCase(caseId, (socCase) => ({
-            ...socCase,
-            evidence: socCase.evidence.filter((item) => item.id !== evidenceId),
-          }))
+          updateCase(caseId, (socCase) => removeEvidenceRecord(socCase, evidenceId))
         }
         onAddTimelineEvent={(input) =>
           updateCase(caseId, (socCase) => ({
@@ -120,10 +122,7 @@ export function CasesPage({
           }))
         }
         onRemoveTimelineEvent={(eventId) =>
-          updateCase(caseId, (socCase) => ({
-            ...socCase,
-            timeline: socCase.timeline.filter((event) => event.id !== eventId),
-          }))
+          updateCase(caseId, (socCase) => removeTimelineRecord(socCase, eventId))
         }
         onAddQuestion={(input) =>
           updateCase(caseId, (socCase) => ({
@@ -195,10 +194,7 @@ export function CasesPage({
           }))
         }
         onRemoveFinding={(findingId) =>
-          updateCase(caseId, (socCase) => ({
-            ...socCase,
-            findings: socCase.findings.filter((finding) => finding.id !== findingId),
-          }))
+          updateCase(caseId, (socCase) => removeFindingRecord(socCase, findingId))
         }
         onAddMitre={(input) =>
           updateCase(caseId, (socCase) => ({
@@ -255,7 +251,7 @@ export function CasesPage({
   function handleDelete(id: string) {
     const target = cases.find((socCase) => socCase.id === id)
     const label = target ? target.title : 'this case'
-    if (window.confirm(`Delete "${label}"? This cannot be undone.`)) {
+    if (window.confirm(`Permanently delete "${label}" from this browser? This cannot be undone.`)) {
       removeCase(id)
     }
   }
@@ -288,7 +284,10 @@ export function CasesPage({
       )}
 
       {cases.length === 0 ? (
-        <p className="cases-note">No cases yet. Create one to get started.</p>
+        <p className="cases-note">
+          No cases in this browser yet. Create a blank or template-based case above, or load a
+          guided case from Sample Cases.
+        </p>
       ) : (
         <div className="case-list">
           {cases.map((socCase) => (
@@ -303,9 +302,8 @@ export function CasesPage({
       )}
 
       <p className="cases-note">
-        Cases are saved to your browser's localStorage (synthetic data only). New
-        cases start empty — evidence, timeline, and the other sections are filled
-        in their own milestones.
+        Cases are saved to this browser's localStorage (synthetic data only). Open any case to
+        add evidence, reconstruct its timeline, document findings, and export a report.
       </p>
     </div>
   )

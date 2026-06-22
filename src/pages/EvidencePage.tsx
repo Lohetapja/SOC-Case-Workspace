@@ -6,7 +6,7 @@ import { formatDateTime } from '../utils/format'
 import { WorkspaceFilters } from '../components/WorkspaceFilters'
 
 interface EvidencePageProps {
-  onOpenCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 const evidenceTypeOptions = Object.keys(evidenceTypeLabels) as EvidenceType[]
@@ -47,7 +47,14 @@ export function EvidencePage({ onOpenCase }: EvidencePageProps) {
       </header>
 
       {items.length === 0 ? (
-        <p className="cases-note">No evidence recorded yet. Open a case to add evidence.</p>
+        <div className="empty-state">
+          <p className="cases-note">
+            No evidence recorded yet. Open a case to add the first factual artifact.
+          </p>
+          <button type="button" className="btn btn--secondary" onClick={() => onOpenCase(cases[0]?.id ?? null)}>
+            {cases.length > 0 ? 'Open a case' : 'Go to Cases'}
+          </button>
+        </div>
       ) : (
         <>
           <WorkspaceFilters

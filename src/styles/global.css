@@ -237,22 +237,11 @@ body {
   margin-top: 16px;
 }
 
-/* ---- Placeholder section ---- */
-.placeholder__hint {
+/* ---- Supporting page copy ---- */
+.overview-hint {
   margin: 0;
   color: var(--text-muted);
   font-size: 14px;
-}
-
-.placeholder__note {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
 }
 
 /* ---- About panel ---- */
@@ -381,6 +370,17 @@ body {
   margin-top: 16px;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+.empty-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state .cases-note {
+  margin: 0;
 }
 
 /* Chips and severity pills */
@@ -1095,6 +1095,17 @@ body {
   margin-left: auto;
 }
 
+.detail-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.detail-item__actions .detail-item__remove {
+  margin-left: 0;
+}
+
 .evidence-form,
 .timeline-form,
 .journal-form,
@@ -1303,6 +1314,23 @@ body {
 
 .data-action__error {
   margin-top: 14px;
+}
+
+.action-feedback {
+  margin: 0 0 12px;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.action-feedback--error {
+  color: #b91c1c;
+}
+
+.inline-error {
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* ---- Markdown report export ---- */

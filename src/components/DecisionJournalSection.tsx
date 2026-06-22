@@ -61,7 +61,9 @@ export function DecisionJournalSection({ questions, onAdd, onUpdate, onRemove }:
       )}
 
       {questions.length === 0 ? (
-        <p className="detail-empty">None recorded yet.</p>
+        <p className="detail-empty">
+          No analyst questions yet. Add the first investigation question or decision point.
+        </p>
       ) : (
         <ul className="detail-list">
           {questions.map((question) => (

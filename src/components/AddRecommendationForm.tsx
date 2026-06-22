@@ -44,7 +44,7 @@ export function AddRecommendationForm({ onAdd, onCancel }: AddRecommendationForm
         <label className="form__label" htmlFor="rec-notes">Rationale / notes</label>
         <textarea id="rec-notes" className="form__textarea" value={description} onChange={(event) => setDescription(event.target.value)} />
       </div>
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
       <div className="form__actions"><button type="submit" className="btn">Add recommendation</button><button type="button" className="btn btn--secondary" onClick={onCancel}>Cancel</button></div>
     </form>
   )

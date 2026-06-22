@@ -80,7 +80,7 @@ export function AddQuestionForm({ onAdd, onCancel, initialValue }: AddQuestionFo
         />
       </div>
 
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
 
       <div className="form__actions">
         <button type="submit" className="btn">{initialValue ? 'Save question' : 'Add question'}</button>

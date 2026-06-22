@@ -6,7 +6,7 @@ import { formatDateTime } from '../utils/format'
 import { WorkspaceFilters } from '../components/WorkspaceFilters'
 
 interface TimelinePageProps {
-  onOpenCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 const phaseOptions = Object.keys(timelinePhaseLabels) as TimelinePhase[]
@@ -57,7 +57,14 @@ export function TimelinePage({ onOpenCase }: TimelinePageProps) {
       </header>
 
       {items.length === 0 ? (
-        <p className="cases-note">No timeline events recorded yet. Open a case to build the timeline.</p>
+        <div className="empty-state">
+          <p className="cases-note">
+            No timeline events recorded yet. Open a case to add the alert time and key activity.
+          </p>
+          <button type="button" className="btn btn--secondary" onClick={() => onOpenCase(cases[0]?.id ?? null)}>
+            {cases.length > 0 ? 'Open a case' : 'Go to Cases'}
+          </button>
+        </div>
       ) : (
         <>
           <WorkspaceFilters

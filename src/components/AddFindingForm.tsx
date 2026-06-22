@@ -174,7 +174,7 @@ export function AddFindingForm({ evidence, timeline, onAdd, onCancel, initialVal
         </fieldset>
       )}
 
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
 
       <div className="form__actions">
         <button type="submit" className="btn">{initialValue ? 'Save finding' : 'Add finding'}</button>

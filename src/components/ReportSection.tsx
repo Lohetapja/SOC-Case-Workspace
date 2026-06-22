@@ -10,41 +10,66 @@ interface ReportSectionProps {
 export function ReportSection({ socCase }: ReportSectionProps) {
   const markdown = useMemo(() => buildCaseReport(socCase), [socCase])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [copied, setCopied] = useState(false)
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
+  const [downloadFeedback, setDownloadFeedback] = useState<{
+    error: boolean
+    text: string
+  } | null>(null)
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(markdown)
+      setCopyFeedback('Markdown copied to the clipboard.')
     } catch {
       // Fallback: select the text so the user can copy manually.
+      textareaRef.current?.focus()
       textareaRef.current?.select()
+      setCopyFeedback('Clipboard access was unavailable. The report text is selected for manual copying.')
     }
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
+    window.setTimeout(() => setCopyFeedback(null), 3000)
   }
 
   function handleDownload() {
-    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = reportFilename(socCase)
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-    URL.revokeObjectURL(url)
+    setDownloadFeedback(null)
+    try {
+      const filename = reportFilename(socCase)
+      const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = filename
+      document.body.appendChild(anchor)
+      anchor.click()
+      document.body.removeChild(anchor)
+      URL.revokeObjectURL(url)
+      setDownloadFeedback({ error: false, text: `Download started: ${filename}` })
+    } catch {
+      setDownloadFeedback({
+        error: true,
+        text: 'Could not create the Markdown download. The report preview is still available.',
+      })
+    }
   }
 
   return (
     <div className="report">
       <div className="report__actions">
         <button type="button" className="btn" onClick={handleCopy}>
-          {copied ? 'Copied!' : 'Copy Markdown'}
+          {copyFeedback?.startsWith('Markdown copied') ? 'Copied!' : 'Copy Markdown'}
         </button>
         <button type="button" className="btn btn--secondary" onClick={handleDownload}>
           Download .md
         </button>
       </div>
+      {copyFeedback && <p className="action-feedback" role="status">{copyFeedback}</p>}
+      {downloadFeedback && (
+        <p
+          className={`action-feedback${downloadFeedback.error ? ' action-feedback--error' : ''}`}
+          role={downloadFeedback.error ? 'alert' : 'status'}
+        >
+          {downloadFeedback.text}
+        </p>
+      )}
       <textarea
         ref={textareaRef}
         className="report__preview"

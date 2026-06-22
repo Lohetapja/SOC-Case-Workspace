@@ -18,35 +18,54 @@ export function SettingsPage() {
   const { cases } = useCases()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
 
   function handleExport() {
     setError(null)
-    const json = JSON.stringify(buildCasesExport(cases), null, 2)
-    const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = casesExportFilename()
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-    URL.revokeObjectURL(url)
+    setMessage(null)
+    try {
+      const filename = casesExportFilename()
+      const json = JSON.stringify(buildCasesExport(cases), null, 2)
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = filename
+      document.body.appendChild(anchor)
+      anchor.click()
+      document.body.removeChild(anchor)
+      URL.revokeObjectURL(url)
+      setMessage(`Export started: ${filename}`)
+    } catch {
+      setError('Could not create the JSON backup. Your local cases were not changed.')
+    }
   }
 
   function handleImportFile(event: ChangeEvent<HTMLInputElement>) {
     setError(null)
+    setMessage(null)
     const file = event.target.files?.[0]
     event.target.value = '' // allow re-selecting the same file
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
       try {
-        const imported = parseCasesImport(JSON.parse(String(reader.result)))
+        let parsed: unknown
+        try {
+          parsed = JSON.parse(String(reader.result))
+        } catch {
+          throw new Error('The selected file is not valid JSON.')
+        }
+        const imported = parseCasesImport(parsed)
         const ok = window.confirm(
           `Replace all current cases with ${imported.length} case(s) from "${file.name}"? This cannot be undone.`,
         )
-        if (!ok) return
+        if (!ok) {
+          setMessage('Import canceled. Your current cases were not changed.')
+          return
+        }
         persistCases(imported)
+        clearAllGraphLayouts()
         window.location.reload()
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : 'Could not import this file.')
@@ -58,17 +77,22 @@ export function SettingsPage() {
 
   function handleReset() {
     setError(null)
-    if (!window.confirm('Reset to the original synthetic demo cases? This replaces your current cases.')) {
+    setMessage(null)
+    if (!window.confirm(
+      'Reset to the original synthetic demo cases? This replaces your current cases and saved graph layouts. Export a backup first if needed. This cannot be undone.',
+    )) {
       return
     }
     resetToDemoCases()
+    clearAllGraphLayouts()
     window.location.reload()
   }
 
   function handleClear() {
     setError(null)
+    setMessage(null)
     const ok = window.confirm(
-      'Clear all locally saved data? Your cases and saved graph layouts will be removed, and the app will reload with the demo cases.',
+      'Clear all locally saved data? Your cases and graph layouts will be removed, then the app will reload with fresh demo cases. Export a backup first if needed. This cannot be undone.',
     )
     if (!ok) return
     clearStoredCases()
@@ -113,6 +137,7 @@ export function SettingsPage() {
             className="btn btn--secondary data-action__btn"
             onClick={() => {
               setError(null)
+              setMessage(null)
               fileInputRef.current?.click()
             }}
           >
@@ -153,7 +178,8 @@ export function SettingsPage() {
           </button>
         </div>
 
-        {error && <p className="form__error data-action__error">Import failed: {error}</p>}
+        {message && <p className="action-feedback" role="status">{message}</p>}
+        {error && <p className="form__error data-action__error" role="alert">Action failed: {error}</p>}
       </section>
     </div>
   )

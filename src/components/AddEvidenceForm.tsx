@@ -94,7 +94,7 @@ export function AddEvidenceForm({ onAdd, onCancel, initialValue }: AddEvidenceFo
         />
       </div>
 
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
 
       <div className="form__actions">
         <button type="submit" className="btn">{initialValue ? 'Save evidence' : 'Add evidence'}</button>

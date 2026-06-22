@@ -20,7 +20,9 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
           <h1 className="page__title">Reports</h1>
           <p className="page__subtitle">Export a case as a Markdown investigation report.</p>
         </header>
-        <p className="cases-note">No cases to report on yet. Create a case first.</p>
+        <p className="cases-note">
+          No case is available for report export. Create a case or load a guided sample first.
+        </p>
         <button type="button" className="btn" onClick={() => onOpenCase(null)}>
           Go to Cases
         </button>

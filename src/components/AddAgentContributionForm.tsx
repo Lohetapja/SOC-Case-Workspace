@@ -139,7 +139,7 @@ export function AddAgentContributionForm({
         </fieldset>
       )}
 
-      {error && <p className="form__error">{error}</p>}
+      {error && <p className="form__error" role="alert">{error}</p>}
       <div className="form__actions">
         <button type="submit" className="btn">{initialValue ? 'Save contribution' : 'Add contribution'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>Cancel</button>

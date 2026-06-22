@@ -88,7 +88,7 @@ export function CaseMetadataSection({ socCase, onSave }: CaseMetadataSectionProp
             <label className="form__label" htmlFor="meta-owner">Owner</label>
             <input id="meta-owner" className="form__input" value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Analyst name or unassigned" />
           </div>
-          {error && <p className="form__error">{error}</p>}
+          {error && <p className="form__error" role="alert">{error}</p>}
           <div className="form__actions">
             <button type="submit" className="btn">Save case context</button>
             <button type="button" className="btn btn--secondary" onClick={() => setEditing(false)}>Cancel</button>

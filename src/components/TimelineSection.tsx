@@ -23,7 +23,9 @@ export function TimelineSection({ timeline, evidence, onAdd, onUpdate, onRemove 
   const evidenceTitleById = new Map(evidence.map((item) => [item.id, item.title]))
 
   function handleRemove(event: TimelineEvent) {
-    if (window.confirm(`Remove timeline event "${event.title}"?`)) {
+    if (window.confirm(
+      `Remove timeline event "${event.title}"? Links from findings will also be cleared.`,
+    )) {
       onRemove(event.id)
     }
   }
@@ -58,7 +60,9 @@ export function TimelineSection({ timeline, evidence, onAdd, onUpdate, onRemove 
       )}
 
       {sorted.length === 0 ? (
-        <p className="detail-empty">None recorded yet.</p>
+        <p className="detail-empty">
+          No timeline events yet. Start with the alert time or earliest observed activity.
+        </p>
       ) : (
         <ol className="detail-timeline">
           {sorted.map((event) => {

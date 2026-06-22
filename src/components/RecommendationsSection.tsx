@@ -24,7 +24,11 @@ export function RecommendationsSection({ recommendations, onAdd, onRemove }: Rec
         {!showForm && <button type="button" className="btn btn--secondary btn--sm" onClick={() => setShowForm(true)}>Add recommendation</button>}
       </div>
       {showForm && <AddRecommendationForm onAdd={(input) => { onAdd(input); setShowForm(false) }} onCancel={() => setShowForm(false)} />}
-      {recommendations.length === 0 ? <p className="detail-empty">None recorded yet.</p> : (
+      {recommendations.length === 0 ? (
+        <p className="detail-empty">
+          No recommendations yet. Add the next containment, monitoring, or recovery action.
+        </p>
+      ) : (
         <ul className="detail-list">
           {recommendations.map((recommendation) => (
             <li key={recommendation.id} className="detail-item">

@@ -25,7 +25,10 @@ export function SampleCasesPage({ onOpenCase }: SampleCasesPageProps) {
 
   function handleAdd(caseId: string, name: string) {
     const sample = demoCases.find((socCase) => socCase.id === caseId)
-    if (!sample) return
+    if (!sample) {
+      setMessage(`Could not load "${name}". Reset demo data in Settings and try again.`)
+      return
+    }
     const result = addSampleCase(sample)
     setMessage(
       result === 'added'
@@ -53,7 +56,7 @@ export function SampleCasesPage({ onOpenCase }: SampleCasesPageProps) {
         </ol>
       </section>
 
-      {message && <p className="sample-message">{message}</p>}
+      {message && <p className="sample-message" role="status" aria-live="polite">{message}</p>}
 
       <div className="sample-list">
         {sampleLibrary.map((entry) => {

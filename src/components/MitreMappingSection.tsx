@@ -60,7 +60,9 @@ export function MitreMappingSection({ mappings, findings, evidence, onAdd, onUpd
       )}
 
       {mappings.length === 0 ? (
-        <p className="detail-empty">None recorded yet.</p>
+        <p className="detail-empty">
+          No ATT&amp;CK mappings yet. Add a technique when evidence supports observed behavior.
+        </p>
       ) : (
         <ul className="detail-list">
           {mappings.map((mapping) => {

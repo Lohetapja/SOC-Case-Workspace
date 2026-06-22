@@ -5,7 +5,7 @@ import { confidenceLabels } from '../data/labels'
 import { WorkspaceFilters } from '../components/WorkspaceFilters'
 
 interface MitreMappingPageProps {
-  onOpenCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 const confidenceOptions = Object.keys(confidenceLabels) as Confidence[]
@@ -68,10 +68,15 @@ export function MitreMappingPage({ onOpenCase }: MitreMappingPageProps) {
       </header>
 
       {items.length === 0 ? (
-        <p className="cases-note">
-          No MITRE mappings recorded yet. Open a case to add ATT&CK techniques with rationale and
-          confidence.
-        </p>
+        <div className="empty-state">
+          <p className="cases-note">
+            No MITRE mappings recorded yet. Open a case to add an analyst-authored technique with
+            rationale and confidence.
+          </p>
+          <button type="button" className="btn btn--secondary" onClick={() => onOpenCase(cases[0]?.id ?? null)}>
+            {cases.length > 0 ? 'Open a case' : 'Go to Cases'}
+          </button>
+        </div>
       ) : (
         <>
           <WorkspaceFilters
