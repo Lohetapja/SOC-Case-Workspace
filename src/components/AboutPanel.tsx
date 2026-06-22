@@ -2,22 +2,20 @@
 export function AboutPanel() {
   return (
     <section className="card about" aria-labelledby="about-title">
-      <h2 id="about-title" className="about__title">About this project</h2>
+      <h2 id="about-title" className="about__title">What this workspace does</h2>
       <p>
-        This is an educational SOC investigation workspace using <strong>synthetic
-        data only</strong>.
+        SOC Case Workspace turns fragmented alert details into a structured,
+        evidence-backed investigation that another analyst can review and defend.
       </p>
       <p>
-        It models how a Security Operations Center analyst turns an alert into a
-        defensible investigation: collect evidence, reconstruct the timeline,
-        document decisions, form findings, map behavior to ATT&amp;CK, classify the
-        case, review its quality, and export a Markdown report.
+        The workflow is: alert intake → evidence → timeline → analyst reasoning →
+        findings → MITRE ATT&amp;CK → closure → quality review → Markdown report.
       </p>
       <ul>
+        <li>Built for SOC Analyst, Blue Team, and DFIR learning and portfolio review</li>
         <li>Frontend-only — runs entirely in your browser</li>
         <li>No backend, no authentication, no external APIs</li>
-        <li>No real alerts, hosts, IPs, or customer data — ever</li>
-        <li>Designed for SOC, Blue Team, and DFIR learning — not live operations</li>
+        <li>Educational workspace using synthetic data only — not live operations</li>
       </ul>
     </section>
   )

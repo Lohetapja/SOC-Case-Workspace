@@ -208,6 +208,10 @@ in-browser; `npm run build` passes.
 - ☑ **UX rough-edge cleanup** — navigation copy, actionable empty states, form and
   data-management feedback, destructive confirmations, reference-safe deletion,
   and small action-alignment inconsistencies were polished without changing scope.
+- ☑ **Value clarity pass** — the Overview now explains the alert-to-report workflow,
+  provides a direct 60-second demo path, and uses clearer analyst guidance. Markdown
+  reports now read as investigation summaries and only list gaps actually recorded
+  on the case.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

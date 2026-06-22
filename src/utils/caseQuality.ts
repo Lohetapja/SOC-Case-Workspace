@@ -67,7 +67,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     guidance:
       socCase.affectedEntities.length > 0
         ? 'The case has clear subjects for the investigation, graph, and report.'
-        : 'Add at least one affected entity so the case graph and report have a clear subject.',
+        : 'Add at least one affected entity so the case has a clear subject.',
   })
 
   const missingContext = [
@@ -101,7 +101,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     guidance:
       socCase.evidence.length > 0
         ? 'Evidence is available to support or refute the investigation.'
-        : 'Collect at least one factual artifact before drawing conclusions.',
+        : 'Collect at least one factual artifact so findings can be traced back to evidence.',
   })
 
   add({
@@ -115,7 +115,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     guidance:
       socCase.timeline.length > 0
         ? 'The sequence of activity can be reviewed chronologically.'
-        : 'Add key alert, attacker, analyst, and response events to reconstruct what happened.',
+        : 'Add the alert, observed activity, and response timestamps to reconstruct what happened.',
   })
 
   const timelineWithMissingEvidence = socCase.timeline.filter((event) =>
@@ -171,7 +171,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         : 'No unresolved analyst questions',
     guidance:
       openQuestions.length > 0
-        ? 'Resolve each question or explicitly mark it not applicable before closure.'
+        ? 'There are still open analyst questions before closure. Answer them or mark them not applicable.'
         : 'The decision journal has no unresolved questions blocking closure review.',
     detail: openQuestions.length > 0 ? openQuestions.map((question) => question.question).join(' • ') : undefined,
   })
@@ -217,7 +217,9 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         : confirmedFindings.length === 0
           ? 'Confirm or reject draft findings so the report distinguishes conclusions from hypotheses.'
           : unsupportedFindings.length > 0
-            ? 'Link supporting evidence to every confirmed finding where possible.'
+            ? unsupportedFindings.length === 1
+              ? 'This finding has no supporting evidence linked. Connect the artifact that supports the conclusion.'
+              : 'These findings have no supporting evidence linked. Connect the artifacts that support each conclusion.'
             : 'Each confirmed conclusion links back to supporting evidence.',
     detail:
       unsupportedFindings.length > 0
@@ -308,7 +310,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
           : 'ATT&CK mappings include rationale and confidence',
     guidance:
       weakMappings.length > 0
-        ? 'Record a valid technique ID, explain the observed behavior, and record analyst confidence.'
+        ? 'MITRE mappings should include a valid technique ID, rationale, and analyst confidence.'
         : 'Mappings are documented as analyst judgments rather than automatic detections.',
     detail:
       weakMappings.length > 0
@@ -407,7 +409,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         ? 'Classification and closure status are recorded'
         : 'Classification has no closure status',
     guidance: !closure?.verdict
-      ? 'Record a classification before treating the investigation as closure-ready.'
+      ? 'Classify the outcome so reviewers can distinguish malicious, benign, false-positive, and unresolved activity.'
       : closure.closureStatus
         ? 'The case has an explicit analyst classification and response lifecycle state.'
         : 'Add a closure status such as monitoring, escalated, or closed.',
@@ -433,7 +435,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     title: hasNextAction ? 'A recommended next action is recorded' : 'No recommended next action recorded',
     guidance: hasNextAction
       ? 'The report can explain what should happen after the investigation.'
-      : 'Add a closure next action or at least one recommendation for the response owner.',
+      : 'Add a concrete containment, monitoring, escalation, or prevention action for the response owner.',
   })
 
   add({
