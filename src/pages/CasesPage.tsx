@@ -5,12 +5,14 @@ import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
 import {
   buildClosure,
+  createAgentContribution,
   createAnalystQuestion,
   createEvidenceItem,
   createFinding,
   createMitreMapping,
   createTimelineEvent,
 } from '../data/casesStore'
+import type { AgentContributionStatus } from '../types'
 
 interface CasesPageProps {
   /** The currently opened case, or null to show the list. */
@@ -79,6 +81,41 @@ export function CasesPage({
           updateCase(caseId, (socCase) => ({
             ...socCase,
             analystQuestions: socCase.analystQuestions.filter((q) => q.id !== questionId),
+          }))
+        }
+        onAddAgentContribution={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            agentContributions: [
+              ...(socCase.agentContributions ?? []),
+              createAgentContribution(input),
+            ],
+          }))
+        }
+        onRemoveAgentContribution={(contributionId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            agentContributions: (socCase.agentContributions ?? []).filter(
+              (contribution) => contribution.id !== contributionId,
+            ),
+          }))
+        }
+        onUpdateAgentContributionStatus={(
+          contributionId: string,
+          status: AgentContributionStatus,
+        ) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            agentContributions: (socCase.agentContributions ?? []).map((contribution) =>
+              contribution.id === contributionId
+                ? {
+                    ...contribution,
+                    status,
+                    reviewedAt:
+                      status === 'unreviewed' ? undefined : new Date().toISOString(),
+                  }
+                : contribution,
+            ),
           }))
         }
         onAddFinding={(input) =>

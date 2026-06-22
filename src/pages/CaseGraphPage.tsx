@@ -16,13 +16,14 @@ interface CaseGraphPageProps {
   /** The shared active case; falls back to the first stored case when null. */
   activeCaseId: string | null
   onSelectCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 /**
  * Read-only Case Graph view. Visualizes the relationships inside ONE case
  * (the shared active case, or the first stored case). No editing.
  */
-export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps) {
+export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGraphPageProps) {
   const { cases } = useCases()
   const [viz, setViz] = useState<VizMode>('graph')
   const [selectedNode, setSelectedNode] = useState<CaseGraphNode | null>(null)
@@ -93,6 +94,9 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
           <p className="page__subtitle">Visualize the relationships inside one case.</p>
         </header>
         <p className="cases-note">No cases to visualize yet. Create a case first.</p>
+        <button type="button" className="btn" onClick={() => onOpenCase(null)}>
+          Go to Cases
+        </button>
       </div>
     )
   }
@@ -142,6 +146,13 @@ export function CaseGraphPage({ activeCaseId, onSelectCase }: CaseGraphPageProps
               Reset layout
             </button>
           )}
+          <button
+            type="button"
+            className="btn btn--sm"
+            onClick={() => onOpenCase(activeCase?.id ?? null)}
+          >
+            Open selected case
+          </button>
         </div>
       </header>
 

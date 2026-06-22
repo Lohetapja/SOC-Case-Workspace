@@ -39,7 +39,7 @@ export default function App() {
     setSection('reports')
   }
 
-  function openCaseDetail(caseId: string) {
+  function openCaseDetail(caseId: string | null) {
     setActiveCaseId(caseId)
     setSection('cases')
   }
@@ -61,7 +61,13 @@ export default function App() {
           />
         )
       case 'graph':
-        return <CaseGraphPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
+        return (
+          <CaseGraphPage
+            activeCaseId={activeCaseId}
+            onSelectCase={setActiveCaseId}
+            onOpenCase={openCaseDetail}
+          />
+        )
       case 'evidence':
         return <EvidencePage onOpenCase={openCaseDetail} />
       case 'timeline':
@@ -71,7 +77,13 @@ export default function App() {
       case 'mitre':
         return <MitreMappingPage onOpenCase={openCaseDetail} />
       case 'reports':
-        return <ReportsPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
+        return (
+          <ReportsPage
+            activeCaseId={activeCaseId}
+            onSelectCase={setActiveCaseId}
+            onOpenCase={openCaseDetail}
+          />
+        )
       case 'settings':
         return <SettingsPage />
       default:

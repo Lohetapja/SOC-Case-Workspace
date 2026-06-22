@@ -21,3 +21,5 @@ pnpm-debug.log*
 
 .claude/
 dist/
+AGENTS.md
+docs/BUILD_PLAN.md

@@ -181,6 +181,21 @@ in-browser; `npm run build` passes.
   analyst-authored (not automatic detections) with technique/tactic/confidence/
   rationale + supporting findings & evidence. Shared `WorkspaceFilters` component;
   reuses case data + `openCaseDetail` navigation (no new storage).
+- ☑ **Case context navigation repair** — Case Graph / Artifact Map and Reports
+  expose an "Open selected case" action. Case-selector changes update the shared
+  active case, the action returns to that case's detail workspace, and an empty
+  workspace falls back safely to the Cases list (no routing dependency).
+- ☑ **Case Quality Review / investigation readiness** — advisory pass, warning,
+  and missing checks in the case detail workspace cover context, evidence and
+  timeline, unresolved questions, evidence-backed findings, ATT&CK rationale,
+  closure reasoning, next actions, and report availability. The review evaluates
+  canonical analyst-reviewed case data only and never blocks report export.
+- ☑ **Agent Contributions / external analysis import** — optional pasted analysis
+  is stored on the case with source/tool, contribution type, optional confidence,
+  human review status, and evidence links. Agent output is explicitly not evidence,
+  never auto-promotes into canonical findings/mappings/recommendations/reports, and
+  never affects closure or quality scoring; accepted text can be copied for manual
+  analyst entry and validation.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

@@ -5,10 +5,11 @@ interface ReportsPageProps {
   /** Shared active case; falls back to the first stored case. */
   activeCaseId: string | null
   onSelectCase: (id: string) => void
+  onOpenCase: (id: string | null) => void
 }
 
 /** Markdown investigation report export for one case. */
-export function ReportsPage({ activeCaseId, onSelectCase }: ReportsPageProps) {
+export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsPageProps) {
   const { cases } = useCases()
   const activeCase = cases.find((socCase) => socCase.id === activeCaseId) ?? cases[0]
 
@@ -20,6 +21,9 @@ export function ReportsPage({ activeCaseId, onSelectCase }: ReportsPageProps) {
           <p className="page__subtitle">Export a case as a Markdown investigation report.</p>
         </header>
         <p className="cases-note">No cases to report on yet. Create a case first.</p>
+        <button type="button" className="btn" onClick={() => onOpenCase(null)}>
+          Go to Cases
+        </button>
       </div>
     )
   }
@@ -33,19 +37,28 @@ export function ReportsPage({ activeCaseId, onSelectCase }: ReportsPageProps) {
             Markdown export of the selected case (synthetic data only).
           </p>
         </div>
-        <label className="graph-select">
-          <span>Case</span>
-          <select
-            value={activeCase?.id}
-            onChange={(event) => onSelectCase(event.target.value)}
+        <div className="graph-controls">
+          <label className="graph-select">
+            <span>Case</span>
+            <select
+              value={activeCase?.id}
+              onChange={(event) => onSelectCase(event.target.value)}
+            >
+              {cases.map((socCase) => (
+                <option key={socCase.id} value={socCase.id}>
+                  {socCase.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className="btn btn--sm"
+            onClick={() => onOpenCase(activeCase?.id ?? null)}
           >
-            {cases.map((socCase) => (
-              <option key={socCase.id} value={socCase.id}>
-                {socCase.title}
-              </option>
-            ))}
-          </select>
-        </label>
+            Open selected case
+          </button>
+        </div>
       </header>
 
       {activeCase && <ReportSection socCase={activeCase} />}

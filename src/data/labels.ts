@@ -1,4 +1,6 @@
 import type {
+  AgentContributionStatus,
+  AgentContributionType,
   CaseSource,
   CaseStatus,
   ChecklistGroup,
@@ -137,5 +139,20 @@ export const findingCategoryLabels: Record<FindingCategory, string> = {
 export const findingStatusLabels: Record<FindingStatus, string> = {
   draft: 'Draft',
   confirmed: 'Confirmed',
+  rejected: 'Rejected',
+}
+
+export const agentContributionTypeLabels: Record<AgentContributionType, string> = {
+  summary: 'Summary',
+  finding_suggestion: 'Finding suggestion',
+  mitre_suggestion: 'MITRE suggestion',
+  recommendation_suggestion: 'Recommendation suggestion',
+  other: 'Other',
+}
+
+export const agentContributionStatusLabels: Record<AgentContributionStatus, string> = {
+  unreviewed: 'Unreviewed',
+  reviewed: 'Reviewed',
+  accepted: 'Accepted',
   rejected: 'Rejected',
 }

@@ -1,4 +1,7 @@
 import type {
+  AgentContribution,
+  AgentContributionStatus,
+  AgentContributionType,
   AnalystQuestion,
   CaseClosure,
   CaseSource,
@@ -312,6 +315,32 @@ export function createMitreMapping(input: NewMitreInput): MitreMapping {
     confidence: input.confidence,
     relatedFindingIds: input.relatedFindingIds.length ? input.relatedFindingIds : undefined,
     relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
+  }
+}
+
+/** Fields collected from the external-analysis contribution form. */
+export interface NewAgentContributionInput {
+  agentName: string
+  type: AgentContributionType
+  output: string
+  confidence: Confidence | ''
+  status: AgentContributionStatus
+  relatedEvidenceIds: string[]
+}
+
+/** Build an explicitly untrusted, human-reviewed external-analysis record. */
+export function createAgentContribution(input: NewAgentContributionInput): AgentContribution {
+  const now = new Date().toISOString()
+  return {
+    id: generateId('agent'),
+    agentName: input.agentName.trim(),
+    type: input.type,
+    output: input.output.trim(),
+    confidence: input.confidence || undefined,
+    status: input.status,
+    relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
+    createdAt: now,
+    reviewedAt: input.status === 'unreviewed' ? undefined : now,
   }
 }
 

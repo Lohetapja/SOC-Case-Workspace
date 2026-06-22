@@ -189,6 +189,34 @@ export interface Recommendation {
   priority: RecommendationPriority
 }
 
+/** Kind of analysis pasted from an external agent or analyst tool. */
+export type AgentContributionType =
+  | 'summary'
+  | 'finding_suggestion'
+  | 'mitre_suggestion'
+  | 'recommendation_suggestion'
+  | 'other'
+
+/** Human review state for external analysis. */
+export type AgentContributionStatus = 'unreviewed' | 'reviewed' | 'accepted' | 'rejected'
+
+/**
+ * Optional external analysis attached to a case. This is never evidence and is
+ * never promoted into findings, mappings, recommendations, closure, or reports
+ * automatically.
+ */
+export interface AgentContribution {
+  id: string
+  agentName: string
+  type: AgentContributionType
+  output: string
+  confidence?: Confidence
+  status: AgentContributionStatus
+  relatedEvidenceIds?: string[]
+  createdAt: string
+  reviewedAt?: string
+}
+
 /** Final classification verdict for a case. */
 export type ClassificationVerdict =
   | 'true_positive'
@@ -261,6 +289,8 @@ export interface SocCase {
   findings: Finding[]
   mitreMappings: MitreMapping[]
   recommendations: Recommendation[]
+  /** Optional, human-reviewed external analysis. Not evidence. */
+  agentContributions?: AgentContribution[]
   /** Present once the case has been classified and closed. */
   closure?: CaseClosure
   /** Present once a report has been generated for the case. */

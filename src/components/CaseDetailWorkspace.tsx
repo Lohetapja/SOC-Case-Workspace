@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
-import type { SocCase } from '../types'
+import type { AgentContributionStatus, SocCase } from '../types'
 import type {
   ClosureInput,
+  NewAgentContributionInput,
   NewEvidenceInput,
   NewFindingInput,
   NewMitreInput,
@@ -25,6 +26,8 @@ import { FindingsSection } from './FindingsSection'
 import { MitreMappingSection } from './MitreMappingSection'
 import { ClosureSection } from './ClosureSection'
 import { ChecklistSection } from './ChecklistSection'
+import { CaseQualityReview } from './CaseQualityReview'
+import { AgentContributionsSection } from './AgentContributionsSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -37,6 +40,12 @@ interface CaseDetailWorkspaceProps {
   onRemoveTimelineEvent: (eventId: string) => void
   onAddQuestion: (input: NewQuestionInput) => void
   onRemoveQuestion: (questionId: string) => void
+  onAddAgentContribution: (input: NewAgentContributionInput) => void
+  onRemoveAgentContribution: (contributionId: string) => void
+  onUpdateAgentContributionStatus: (
+    contributionId: string,
+    status: AgentContributionStatus,
+  ) => void
   onAddFinding: (input: NewFindingInput) => void
   onRemoveFinding: (findingId: string) => void
   onAddMitre: (input: NewMitreInput) => void
@@ -76,6 +85,9 @@ export function CaseDetailWorkspace({
   onRemoveTimelineEvent,
   onAddQuestion,
   onRemoveQuestion,
+  onAddAgentContribution,
+  onRemoveAgentContribution,
+  onUpdateAgentContributionStatus,
   onAddFinding,
   onRemoveFinding,
   onAddMitre,
@@ -117,6 +129,8 @@ export function CaseDetailWorkspace({
       <Section title="Summary">
         <p className="detail-text">{socCase.summary || 'No summary provided.'}</p>
       </Section>
+
+      <CaseQualityReview socCase={socCase} onOpenReport={onOpenReport} />
 
       {socCase.checklist && socCase.checklist.length > 0 && (
         <ChecklistSection checklist={socCase.checklist} onToggle={onToggleChecklistItem} />
@@ -163,6 +177,14 @@ export function CaseDetailWorkspace({
         questions={socCase.analystQuestions}
         onAdd={onAddQuestion}
         onRemove={onRemoveQuestion}
+      />
+
+      <AgentContributionsSection
+        contributions={socCase.agentContributions ?? []}
+        evidence={socCase.evidence}
+        onAdd={onAddAgentContribution}
+        onRemove={onRemoveAgentContribution}
+        onUpdateStatus={onUpdateAgentContributionStatus}
       />
 
       <FindingsSection
