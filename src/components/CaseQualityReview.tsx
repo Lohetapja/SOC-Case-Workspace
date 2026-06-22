@@ -11,6 +11,7 @@ const GROUPS: { id: QualityCheckGroup; title: string }[] = [
   { id: 'evidence', title: 'Evidence and timeline' },
   { id: 'reasoning', title: 'Analyst reasoning' },
   { id: 'mitre', title: 'ATT&CK mapping' },
+  { id: 'agents', title: 'Agent contributions' },
   { id: 'closure', title: 'Closure and report readiness' },
 ]
 

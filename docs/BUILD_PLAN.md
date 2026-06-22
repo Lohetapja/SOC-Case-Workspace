@@ -187,15 +187,16 @@ in-browser; `npm run build` passes.
   workspace falls back safely to the Cases list (no routing dependency).
 - ☑ **Case Quality Review / investigation readiness** — advisory pass, warning,
   and missing checks in the case detail workspace cover context, evidence and
-  timeline, unresolved questions, evidence-backed findings, ATT&CK rationale,
-  closure reasoning, next actions, and report availability. The review evaluates
-  canonical analyst-reviewed case data only and never blocks report export.
+  timeline/reference integrity, unresolved questions, evidence-backed findings,
+  ATT&CK rationale/references, agent-review state, closure reasoning, next actions,
+  and report availability. The review evaluates canonical case data and never
+  blocks report export.
 - ☑ **Agent Contributions / external analysis import** — optional pasted analysis
   is stored on the case with source/tool, contribution type, optional confidence,
   human review status, and evidence links. Agent output is explicitly not evidence,
-  never auto-promotes into canonical findings/mappings/recommendations/reports, and
-  never affects closure or quality scoring; accepted text can be copied for manual
-  analyst entry and validation.
+  never auto-promotes into canonical findings/mappings/recommendations/reports or
+  closure. Quality Review only flags unreviewed/unevidenced contributions; accepted
+  text can be copied for manual analyst entry and validation.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

@@ -7,6 +7,7 @@ export type QualityCheckGroup =
   | 'evidence'
   | 'reasoning'
   | 'mitre'
+  | 'agents'
   | 'closure'
 
 export interface CaseQualityCheck {
@@ -35,6 +36,8 @@ const ATTACKER_BEHAVIOR =
 export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
   const checks: CaseQualityCheck[] = []
   const add = (check: CaseQualityCheck) => checks.push(check)
+  const evidenceIds = new Set(socCase.evidence.map((item) => item.id))
+  const findingIds = new Set(socCase.findings.map((finding) => finding.id))
 
   const summaryLength = (socCase.summary ?? '').trim().length
   add({
@@ -67,6 +70,26 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         : 'Add at least one affected entity so the case graph and report have a clear subject.',
   })
 
+  const missingContext = [
+    !socCase.source && 'source',
+    !socCase.severity && 'severity',
+    (!socCase.owner?.trim() || socCase.owner === 'unassigned') && 'owner',
+    !socCase.status && 'status',
+  ].filter((value): value is string => Boolean(value))
+  add({
+    id: 'case-metadata',
+    group: 'context',
+    status: missingContext.length > 0 ? 'warning' : 'pass',
+    title:
+      missingContext.length > 0
+        ? `Case context needs ${missingContext.join(', ')}`
+        : 'Source, severity, owner, and status are recorded',
+    guidance:
+      missingContext.length > 0
+        ? 'Complete the intake metadata so ownership, urgency, and workflow state are clear.'
+        : 'The case has enough intake metadata for triage ownership and prioritization.',
+  })
+
   add({
     id: 'evidence',
     group: 'evidence',
@@ -93,6 +116,48 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
       socCase.timeline.length > 0
         ? 'The sequence of activity can be reviewed chronologically.'
         : 'Add key alert, attacker, analyst, and response events to reconstruct what happened.',
+  })
+
+  const timelineWithMissingEvidence = socCase.timeline.filter((event) =>
+    (event.relatedEvidenceIds ?? []).some((id) => !evidenceIds.has(id)),
+  )
+  add({
+    id: 'timeline-reference-integrity',
+    group: 'evidence',
+    status: timelineWithMissingEvidence.length > 0 ? 'warning' : 'pass',
+    title:
+      timelineWithMissingEvidence.length > 0
+        ? `${timelineWithMissingEvidence.length} timeline ${timelineWithMissingEvidence.length === 1 ? 'event references' : 'events reference'} missing evidence`
+        : 'Timeline evidence references are valid',
+    guidance:
+      timelineWithMissingEvidence.length > 0
+        ? 'Remove stale links or reconnect these events to evidence that still exists.'
+        : 'Every evidence link used by the timeline resolves to a current case artifact.',
+    detail:
+      timelineWithMissingEvidence.length > 0
+        ? timelineWithMissingEvidence.map((event) => event.title).join(' • ')
+        : undefined,
+  })
+
+  const findingsWithMissingEvidence = socCase.findings.filter((finding) =>
+    (finding.relatedEvidenceIds ?? []).some((id) => !evidenceIds.has(id)),
+  )
+  add({
+    id: 'finding-reference-integrity',
+    group: 'evidence',
+    status: findingsWithMissingEvidence.length > 0 ? 'warning' : 'pass',
+    title:
+      findingsWithMissingEvidence.length > 0
+        ? `${findingsWithMissingEvidence.length} ${findingsWithMissingEvidence.length === 1 ? 'finding references' : 'findings reference'} deleted evidence`
+        : 'Finding evidence references are valid',
+    guidance:
+      findingsWithMissingEvidence.length > 0
+        ? 'Repair or remove stale evidence links before relying on these findings.'
+        : 'Every evidence link used by a finding resolves to a current case artifact.',
+    detail:
+      findingsWithMissingEvidence.length > 0
+        ? findingsWithMissingEvidence.map((finding) => finding.title).join(' • ')
+        : undefined,
   })
 
   const openQuestions = socCase.analystQuestions.filter((question) => question.status === 'open')
@@ -160,6 +225,36 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         : undefined,
   })
 
+  const weakFindings = socCase.findings.filter(
+    (finding) => !finding.confidence || (finding.description?.trim().length ?? 0) < 20,
+  )
+  add({
+    id: 'finding-quality',
+    group: 'reasoning',
+    status:
+      socCase.findings.length === 0
+        ? 'missing'
+        : weakFindings.length > 0
+          ? 'warning'
+          : 'pass',
+    title:
+      socCase.findings.length === 0
+        ? 'Finding quality cannot be assessed'
+        : weakFindings.length > 0
+          ? `${weakFindings.length} ${weakFindings.length === 1 ? 'finding needs' : 'findings need'} clearer reasoning`
+          : 'Findings include confidence and clear rationale',
+    guidance:
+      socCase.findings.length === 0
+        ? 'Add findings before evaluating their reasoning quality.'
+        : weakFindings.length > 0
+          ? 'Explain what the evidence means and record analyst confidence for each finding.'
+          : 'The findings communicate both the conclusion and the analyst’s confidence.',
+    detail:
+      weakFindings.length > 0
+        ? weakFindings.map((finding) => finding.title).join(' • ')
+        : undefined,
+  })
+
   const attackerBehavior = socCase.findings.some((finding) => {
     if (finding.status === 'rejected') return false
     return (
@@ -187,7 +282,10 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
   })
 
   const weakMappings = socCase.mitreMappings.filter(
-    (mapping) => !mapping.confidence || (mapping.rationale?.trim().length ?? 0) < 20,
+    (mapping) =>
+      !/^T\d{4}(?:\.\d{3})?$/.test(mapping.techniqueId?.trim() ?? '') ||
+      !mapping.confidence ||
+      (mapping.rationale?.trim().length ?? 0) < 20,
   )
   add({
     id: 'mitre-quality',
@@ -210,7 +308,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
           : 'ATT&CK mappings include rationale and confidence',
     guidance:
       weakMappings.length > 0
-        ? 'Explain the observed behavior behind each technique and record analyst confidence.'
+        ? 'Record a valid technique ID, explain the observed behavior, and record analyst confidence.'
         : 'Mappings are documented as analyst judgments rather than automatic detections.',
     detail:
       weakMappings.length > 0
@@ -218,22 +316,113 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
         : undefined,
   })
 
-  const closure = socCase.closure
-  const closureComplete = Boolean(closure?.verdict && closure.closureStatus && closure.rationale?.trim())
+  const mappingsWithMissingReferences = socCase.mitreMappings.filter(
+    (mapping) =>
+      (mapping.relatedEvidenceIds ?? []).some((id) => !evidenceIds.has(id)) ||
+      (mapping.relatedFindingIds ?? []).some((id) => !findingIds.has(id)),
+  )
   add({
-    id: 'closure',
+    id: 'mitre-reference-integrity',
+    group: 'mitre',
+    status: mappingsWithMissingReferences.length > 0 ? 'warning' : 'pass',
+    title:
+      mappingsWithMissingReferences.length > 0
+        ? `${mappingsWithMissingReferences.length} ATT&CK ${mappingsWithMissingReferences.length === 1 ? 'mapping has' : 'mappings have'} stale references`
+        : 'ATT&CK supporting references are valid',
+    guidance:
+      mappingsWithMissingReferences.length > 0
+        ? 'Reconnect these mappings to current findings/evidence or remove the stale links.'
+        : 'Every linked finding and evidence item used by a mapping still exists.',
+    detail:
+      mappingsWithMissingReferences.length > 0
+        ? mappingsWithMissingReferences
+            .map((mapping) => `${mapping.techniqueId} ${mapping.techniqueName}`)
+            .join(' • ')
+        : undefined,
+  })
+
+  const contributions = socCase.agentContributions ?? []
+  const unreviewedContributions = contributions.filter(
+    (contribution) => contribution.status === 'unreviewed',
+  )
+  add({
+    id: 'agent-review-status',
+    group: 'agents',
+    status: unreviewedContributions.length > 0 ? 'warning' : 'pass',
+    title:
+      unreviewedContributions.length > 0
+        ? `${unreviewedContributions.length} agent ${unreviewedContributions.length === 1 ? 'contribution is' : 'contributions are'} unreviewed`
+        : 'No unreviewed agent contributions',
+    guidance:
+      unreviewedContributions.length > 0
+        ? 'Review, accept, or reject each external suggestion before closure.'
+        : 'Every attached external contribution has an explicit human review status.',
+    detail:
+      unreviewedContributions.length > 0
+        ? unreviewedContributions.map((contribution) => contribution.agentName).join(' • ')
+        : undefined,
+  })
+
+  const acceptedWithoutEvidence = contributions.filter(
+    (contribution) =>
+      contribution.status === 'accepted' &&
+      (!contribution.relatedEvidenceIds?.length ||
+        contribution.relatedEvidenceIds.some((id) => !evidenceIds.has(id))),
+  )
+  add({
+    id: 'agent-evidence-links',
+    group: 'agents',
+    status: acceptedWithoutEvidence.length > 0 ? 'warning' : 'pass',
+    title:
+      acceptedWithoutEvidence.length > 0
+        ? `${acceptedWithoutEvidence.length} accepted agent ${acceptedWithoutEvidence.length === 1 ? 'contribution needs' : 'contributions need'} evidence review`
+        : 'Accepted agent contributions are evidence-linked where applicable',
+    guidance:
+      acceptedWithoutEvidence.length > 0
+        ? 'Link accepted suggestions to current evidence where possible before using them in analyst conclusions.'
+        : 'Accepted suggestions have supporting evidence links, or no accepted suggestions are present.',
+    detail:
+      acceptedWithoutEvidence.length > 0
+        ? acceptedWithoutEvidence.map((contribution) => contribution.agentName).join(' • ')
+        : undefined,
+  })
+
+  add({
+    id: 'agent-evidence-boundary',
+    group: 'agents',
+    status: 'pass',
+    title: 'Agent contributions remain separate from case evidence',
+    guidance:
+      'Agent output is not evidence until reviewed and linked. Rejected contributions do not support findings, mappings, closure, or reports.',
+  })
+
+  const closure = socCase.closure
+  add({
+    id: 'closure-classification',
     group: 'closure',
-    status: !closure?.verdict ? 'missing' : closureComplete ? 'pass' : 'warning',
+    status: !closure?.verdict ? 'missing' : closure.closureStatus ? 'pass' : 'warning',
     title: !closure?.verdict
       ? 'Closure classification is missing'
-      : closureComplete
-        ? 'Classification and closure reasoning are recorded'
-        : 'Closure assessment is incomplete',
+      : closure.closureStatus
+        ? 'Classification and closure status are recorded'
+        : 'Classification has no closure status',
     guidance: !closure?.verdict
       ? 'Record a classification before treating the investigation as closure-ready.'
-      : closureComplete
-        ? 'The classification, workflow status, and rationale are documented.'
-        : 'Add closure status and rationale so the classification is defensible.',
+      : closure.closureStatus
+        ? 'The case has an explicit analyst classification and response lifecycle state.'
+        : 'Add a closure status such as monitoring, escalated, or closed.',
+  })
+
+  add({
+    id: 'closure-rationale',
+    group: 'closure',
+    status: closure?.rationale?.trim() ? 'pass' : 'warning',
+    title: closure?.rationale?.trim()
+      ? 'Closure rationale is documented'
+      : 'Closure rationale is missing',
+    guidance: closure?.rationale?.trim()
+      ? 'The classification is supported by a written analyst justification.'
+      : 'Explain why the evidence supports the selected classification before closure.',
   })
 
   const hasNextAction = Boolean(closure?.recommendedAction?.trim() || socCase.recommendations.length)
