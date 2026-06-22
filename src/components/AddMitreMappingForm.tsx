@@ -10,17 +10,18 @@ interface AddMitreMappingFormProps {
   evidence: EvidenceItem[]
   onAdd: (input: NewMitreInput) => void
   onCancel: () => void
+  initialValue?: NewMitreInput
 }
 
-/** Form to add one analyst-authored ATT&CK mapping to the active case. */
-export function AddMitreMappingForm({ findings, evidence, onAdd, onCancel }: AddMitreMappingFormProps) {
-  const [techniqueId, setTechniqueId] = useState('')
-  const [techniqueName, setTechniqueName] = useState('')
-  const [tactic, setTactic] = useState('')
-  const [confidence, setConfidence] = useState<Confidence>('medium')
-  const [rationale, setRationale] = useState('')
-  const [findingIds, setFindingIds] = useState<string[]>([])
-  const [evidenceIds, setEvidenceIds] = useState<string[]>([])
+/** Form to add or edit one analyst-authored ATT&CK mapping. */
+export function AddMitreMappingForm({ findings, evidence, onAdd, onCancel, initialValue }: AddMitreMappingFormProps) {
+  const [techniqueId, setTechniqueId] = useState(initialValue?.techniqueId ?? '')
+  const [techniqueName, setTechniqueName] = useState(initialValue?.techniqueName ?? '')
+  const [tactic, setTactic] = useState(initialValue?.tactic ?? '')
+  const [confidence, setConfidence] = useState<Confidence>(initialValue?.confidence ?? 'medium')
+  const [rationale, setRationale] = useState(initialValue?.rationale ?? '')
+  const [findingIds, setFindingIds] = useState<string[]>(initialValue?.relatedFindingIds ?? [])
+  const [evidenceIds, setEvidenceIds] = useState<string[]>(initialValue?.relatedEvidenceIds ?? [])
   const [error, setError] = useState<string | null>(null)
 
   function toggle(list: string[], setList: (next: string[]) => void, id: string) {
@@ -45,7 +46,7 @@ export function AddMitreMappingForm({ findings, evidence, onAdd, onCancel }: Add
   }
 
   return (
-    <form className="form mitre-form" onSubmit={handleSubmit} aria-label="Add ATT&CK mapping">
+    <form className="form mitre-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit ATT&CK mapping' : 'Add ATT&CK mapping'}>
       <div className="form__row--inline">
         <div className="form__field">
           <label className="form__label" htmlFor="mt-id">Technique ID</label>
@@ -142,7 +143,7 @@ export function AddMitreMappingForm({ findings, evidence, onAdd, onCancel }: Add
       {error && <p className="form__error">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">Add mapping</button>
+        <button type="submit" className="btn">{initialValue ? 'Save mapping' : 'Add mapping'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>

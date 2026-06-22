@@ -7,6 +7,7 @@ import { AddQuestionForm } from './AddQuestionForm'
 interface DecisionJournalSectionProps {
   questions: AnalystQuestion[]
   onAdd: (input: NewQuestionInput) => void
+  onUpdate: (questionId: string, input: NewQuestionInput) => void
   onRemove: (questionId: string) => void
 }
 
@@ -21,8 +22,9 @@ function statusChipClass(status: AnalystQuestion['status']): string {
  * ones (with status, answer, rationale), and remove. Open questions also feed the
  * Artifact Map's "Investigation gaps" panel.
  */
-export function DecisionJournalSection({ questions, onAdd, onRemove }: DecisionJournalSectionProps) {
+export function DecisionJournalSection({ questions, onAdd, onUpdate, onRemove }: DecisionJournalSectionProps) {
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   function handleRemove(question: AnalystQuestion) {
     if (window.confirm(`Remove question "${question.question}"?`)) {
@@ -37,7 +39,7 @@ export function DecisionJournalSection({ questions, onAdd, onRemove }: DecisionJ
           Analyst questions
           <span className="detail-section__count">{questions.length}</span>
         </h2>
-        {!showForm && (
+        {!showForm && !editingId && (
           <button
             type="button"
             className="btn btn--secondary btn--sm"
@@ -69,17 +71,27 @@ export function DecisionJournalSection({ questions, onAdd, onRemove }: DecisionJ
                 <span className={statusChipClass(question.status)}>
                   {questionStatusLabels[question.status]}
                 </span>
-                <button
-                  type="button"
-                  className="btn-link-danger detail-item__remove"
-                  onClick={() => handleRemove(question)}
-                >
-                  Remove
-                </button>
+                <div className="detail-item__actions">
+                  <button type="button" className="btn-link" onClick={() => setEditingId(question.id)}>Edit</button>
+                  <button type="button" className="btn-link-danger detail-item__remove" onClick={() => handleRemove(question)}>Remove</button>
+                </div>
               </div>
-              {question.answer && <p className="detail-text">{question.answer}</p>}
-              {question.rationale && (
-                <p className="detail-item__note">Rationale: {question.rationale}</p>
+              {editingId === question.id ? (
+                <AddQuestionForm
+                  initialValue={{
+                    question: question.question,
+                    status: question.status,
+                    answer: question.answer ?? '',
+                    rationale: question.rationale ?? '',
+                  }}
+                  onAdd={(input) => { onUpdate(question.id, input); setEditingId(null) }}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <>
+                  {question.answer && <p className="detail-text">{question.answer}</p>}
+                  {question.rationale && <p className="detail-item__note">Rationale: {question.rationale}</p>}
+                </>
               )}
             </li>
           ))}

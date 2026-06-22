@@ -8,14 +8,15 @@ const statusOptions = Object.keys(questionStatusLabels) as QuestionStatus[]
 interface AddQuestionFormProps {
   onAdd: (input: NewQuestionInput) => void
   onCancel: () => void
+  initialValue?: NewQuestionInput
 }
 
-/** Small form to add one analyst question / decision-journal entry. */
-export function AddQuestionForm({ onAdd, onCancel }: AddQuestionFormProps) {
-  const [question, setQuestion] = useState('')
-  const [status, setStatus] = useState<QuestionStatus>('open')
-  const [answer, setAnswer] = useState('')
-  const [rationale, setRationale] = useState('')
+/** Small form to add or edit an analyst question / decision-journal entry. */
+export function AddQuestionForm({ onAdd, onCancel, initialValue }: AddQuestionFormProps) {
+  const [question, setQuestion] = useState(initialValue?.question ?? '')
+  const [status, setStatus] = useState<QuestionStatus>(initialValue?.status ?? 'open')
+  const [answer, setAnswer] = useState(initialValue?.answer ?? '')
+  const [rationale, setRationale] = useState(initialValue?.rationale ?? '')
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -28,7 +29,7 @@ export function AddQuestionForm({ onAdd, onCancel }: AddQuestionFormProps) {
   }
 
   return (
-    <form className="form journal-form" onSubmit={handleSubmit} aria-label="Add analyst question">
+    <form className="form journal-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit analyst question' : 'Add analyst question'}>
       <div className="form__field">
         <label className="form__label" htmlFor="q-question">Question</label>
         <input
@@ -82,7 +83,7 @@ export function AddQuestionForm({ onAdd, onCancel }: AddQuestionFormProps) {
       {error && <p className="form__error">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">Add question</button>
+        <button type="submit" className="btn">{initialValue ? 'Save question' : 'Add question'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>

@@ -223,6 +223,10 @@ export function createEvidenceItem(input: NewEvidenceInput): EvidenceItem {
   }
 }
 
+export function updateEvidenceItem(existing: EvidenceItem, input: NewEvidenceInput): EvidenceItem {
+  return { ...existing, ...createEvidenceItem(input), id: existing.id }
+}
+
 /** Editable context fields for an existing case. */
 export interface CaseMetadataInput {
   title: string
@@ -294,6 +298,13 @@ export function createTimelineEvent(input: NewTimelineEventInput): TimelineEvent
   }
 }
 
+export function updateTimelineEvent(
+  existing: TimelineEvent,
+  input: NewTimelineEventInput,
+): TimelineEvent {
+  return { ...existing, ...createTimelineEvent(input), id: existing.id }
+}
+
 /** Fields collected from the add-analyst-question form. */
 export interface NewQuestionInput {
   question: string
@@ -315,6 +326,21 @@ export function createAnalystQuestion(input: NewQuestionInput): AnalystQuestion 
     rationale: rationale || undefined,
     createdAt: now,
     answeredAt: input.status === 'answered' ? now : undefined,
+  }
+}
+
+export function updateAnalystQuestion(
+  existing: AnalystQuestion,
+  input: NewQuestionInput,
+): AnalystQuestion {
+  const updated = createAnalystQuestion(input)
+  return {
+    ...existing,
+    ...updated,
+    id: existing.id,
+    createdAt: existing.createdAt,
+    answeredAt:
+      input.status === 'answered' ? existing.answeredAt ?? updated.answeredAt : undefined,
   }
 }
 
@@ -347,6 +373,10 @@ export function createFinding(input: NewFindingInput): Finding {
   }
 }
 
+export function updateFinding(existing: Finding, input: NewFindingInput): Finding {
+  return { ...existing, ...createFinding(input), id: existing.id }
+}
+
 /** Fields collected from the add-MITRE-mapping form. */
 export interface NewMitreInput {
   techniqueId: string
@@ -372,6 +402,10 @@ export function createMitreMapping(input: NewMitreInput): MitreMapping {
   }
 }
 
+export function updateMitreMapping(existing: MitreMapping, input: NewMitreInput): MitreMapping {
+  return { ...existing, ...createMitreMapping(input), id: existing.id }
+}
+
 /** Fields collected from the external-analysis contribution form. */
 export interface NewAgentContributionInput {
   agentName: string
@@ -395,6 +429,25 @@ export function createAgentContribution(input: NewAgentContributionInput): Agent
     relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
     createdAt: now,
     reviewedAt: input.status === 'unreviewed' ? undefined : now,
+  }
+}
+
+export function updateAgentContribution(
+  existing: AgentContribution,
+  input: NewAgentContributionInput,
+): AgentContribution {
+  const updated = createAgentContribution(input)
+  return {
+    ...existing,
+    ...updated,
+    id: existing.id,
+    createdAt: existing.createdAt,
+    reviewedAt:
+      input.status === 'unreviewed'
+        ? undefined
+        : existing.status === input.status
+          ? existing.reviewedAt ?? updated.reviewedAt
+          : updated.reviewedAt,
   }
 }
 

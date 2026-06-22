@@ -8,15 +8,16 @@ const evidenceTypeOptions = Object.keys(evidenceTypeLabels) as EvidenceType[]
 interface AddEvidenceFormProps {
   onAdd: (input: NewEvidenceInput) => void
   onCancel: () => void
+  initialValue?: NewEvidenceInput
 }
 
-/** Small form to add one evidence item to the active case. */
-export function AddEvidenceForm({ onAdd, onCancel }: AddEvidenceFormProps) {
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState<EvidenceType>('log')
-  const [source, setSource] = useState('')
-  const [observedAt, setObservedAt] = useState('')
-  const [detail, setDetail] = useState('')
+/** Small form to add or edit one evidence item. */
+export function AddEvidenceForm({ onAdd, onCancel, initialValue }: AddEvidenceFormProps) {
+  const [title, setTitle] = useState(initialValue?.title ?? '')
+  const [type, setType] = useState<EvidenceType>(initialValue?.type ?? 'log')
+  const [source, setSource] = useState(initialValue?.source ?? '')
+  const [observedAt, setObservedAt] = useState(initialValue?.observedAt ?? '')
+  const [detail, setDetail] = useState(initialValue?.detail ?? '')
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -29,7 +30,7 @@ export function AddEvidenceForm({ onAdd, onCancel }: AddEvidenceFormProps) {
   }
 
   return (
-    <form className="form evidence-form" onSubmit={handleSubmit} aria-label="Add evidence">
+    <form className="form evidence-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit evidence' : 'Add evidence'}>
       <div className="form__field">
         <label className="form__label" htmlFor="ev-title">Title</label>
         <input
@@ -96,7 +97,7 @@ export function AddEvidenceForm({ onAdd, onCancel }: AddEvidenceFormProps) {
       {error && <p className="form__error">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">Add evidence</button>
+        <button type="submit" className="btn">{initialValue ? 'Save evidence' : 'Add evidence'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>

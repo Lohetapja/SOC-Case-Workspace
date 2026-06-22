@@ -9,6 +9,7 @@ interface MitreMappingSectionProps {
   findings: Finding[]
   evidence: EvidenceItem[]
   onAdd: (input: NewMitreInput) => void
+  onUpdate: (mappingId: string, input: NewMitreInput) => void
   onRemove: (mappingId: string) => void
 }
 
@@ -16,8 +17,9 @@ interface MitreMappingSectionProps {
  * Editable MITRE ATT&CK section: analyst-authored, evidence-backed mappings.
  * List with rationale, add, and remove.
  */
-export function MitreMappingSection({ mappings, findings, evidence, onAdd, onRemove }: MitreMappingSectionProps) {
+export function MitreMappingSection({ mappings, findings, evidence, onAdd, onUpdate, onRemove }: MitreMappingSectionProps) {
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const findingTitleById = new Map(findings.map((finding) => [finding.id, finding.title]))
   const evidenceTitleById = new Map(evidence.map((item) => [item.id, item.title]))
 
@@ -34,7 +36,7 @@ export function MitreMappingSection({ mappings, findings, evidence, onAdd, onRem
           MITRE ATT&amp;CK mappings
           <span className="detail-section__count">{mappings.length}</span>
         </h2>
-        {!showForm && (
+        {!showForm && !editingId && (
           <button
             type="button"
             className="btn btn--secondary btn--sm"
@@ -76,22 +78,33 @@ export function MitreMappingSection({ mappings, findings, evidence, onAdd, onRem
                   </strong>
                   {mapping.tactic && <span className="chip">{mapping.tactic}</span>}
                   <span className="chip">{confidenceLabels[mapping.confidence]} confidence</span>
-                  <button
-                    type="button"
-                    className="btn-link-danger detail-item__remove"
-                    onClick={() => handleRemove(mapping)}
-                  >
-                    Remove
-                  </button>
+                  <div className="detail-item__actions">
+                    <button type="button" className="btn-link" onClick={() => setEditingId(mapping.id)}>Edit</button>
+                    <button type="button" className="btn-link-danger detail-item__remove" onClick={() => handleRemove(mapping)}>Remove</button>
+                  </div>
                 </div>
-                {mapping.rationale && (
-                  <p className="detail-text"><strong>Rationale:</strong> {mapping.rationale}</p>
-                )}
-                {supportingFindings.length > 0 && (
-                  <p className="detail-item__meta">Findings: {supportingFindings.join(', ')}</p>
-                )}
-                {supportingEvidence.length > 0 && (
-                  <p className="detail-item__meta">Evidence: {supportingEvidence.join(', ')}</p>
+                {editingId === mapping.id ? (
+                  <AddMitreMappingForm
+                    findings={findings}
+                    evidence={evidence}
+                    initialValue={{
+                      techniqueId: mapping.techniqueId,
+                      techniqueName: mapping.techniqueName,
+                      tactic: mapping.tactic,
+                      confidence: mapping.confidence,
+                      rationale: mapping.rationale,
+                      relatedFindingIds: mapping.relatedFindingIds ?? [],
+                      relatedEvidenceIds: mapping.relatedEvidenceIds ?? [],
+                    }}
+                    onAdd={(input) => { onUpdate(mapping.id, input); setEditingId(null) }}
+                    onCancel={() => setEditingId(null)}
+                  />
+                ) : (
+                  <>
+                    {mapping.rationale && <p className="detail-text"><strong>Rationale:</strong> {mapping.rationale}</p>}
+                    {supportingFindings.length > 0 && <p className="detail-item__meta">Findings: {supportingFindings.join(', ')}</p>}
+                    {supportingEvidence.length > 0 && <p className="detail-item__meta">Evidence: {supportingEvidence.join(', ')}</p>}
+                  </>
                 )}
               </li>
             )

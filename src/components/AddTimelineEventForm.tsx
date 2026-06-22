@@ -17,15 +17,16 @@ interface AddTimelineEventFormProps {
   evidence: EvidenceItem[]
   onAdd: (input: NewTimelineEventInput) => void
   onCancel: () => void
+  initialValue?: NewTimelineEventInput
 }
 
-/** Small form to add one timeline event to the active case. */
-export function AddTimelineEventForm({ evidence, onAdd, onCancel }: AddTimelineEventFormProps) {
-  const [title, setTitle] = useState('')
-  const [timestamp, setTimestamp] = useState(nowDateTimeLocal())
-  const [phase, setPhase] = useState<TimelinePhase>('attacker_activity')
-  const [description, setDescription] = useState('')
-  const [relatedEvidenceId, setRelatedEvidenceId] = useState('')
+/** Small form to add or edit one timeline event. */
+export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }: AddTimelineEventFormProps) {
+  const [title, setTitle] = useState(initialValue?.title ?? '')
+  const [timestamp, setTimestamp] = useState(initialValue?.timestamp ?? nowDateTimeLocal())
+  const [phase, setPhase] = useState<TimelinePhase>(initialValue?.phase ?? 'attacker_activity')
+  const [description, setDescription] = useState(initialValue?.description ?? '')
+  const [relatedEvidenceId, setRelatedEvidenceId] = useState(initialValue?.relatedEvidenceId ?? '')
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -42,7 +43,7 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel }: AddTimelineE
   }
 
   return (
-    <form className="form timeline-form" onSubmit={handleSubmit} aria-label="Add timeline event">
+    <form className="form timeline-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit timeline event' : 'Add timeline event'}>
       <div className="form__field">
         <label className="form__label" htmlFor="tl-title">Title</label>
         <input
@@ -117,7 +118,7 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel }: AddTimelineE
       {error && <p className="form__error">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">Add event</button>
+        <button type="submit" className="btn">{initialValue ? 'Save event' : 'Add event'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>

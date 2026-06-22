@@ -20,6 +20,7 @@ interface AddAgentContributionFormProps {
   evidence: EvidenceItem[]
   onAdd: (input: NewAgentContributionInput) => void
   onCancel: () => void
+  initialValue?: NewAgentContributionInput
 }
 
 /** Paste external analysis into a case without treating it as evidence. */
@@ -27,13 +28,14 @@ export function AddAgentContributionForm({
   evidence,
   onAdd,
   onCancel,
+  initialValue,
 }: AddAgentContributionFormProps) {
-  const [agentName, setAgentName] = useState('')
-  const [type, setType] = useState<AgentContributionType>('other')
-  const [output, setOutput] = useState('')
-  const [confidence, setConfidence] = useState<Confidence | ''>('')
-  const [status, setStatus] = useState<AgentContributionStatus>('unreviewed')
-  const [evidenceIds, setEvidenceIds] = useState<string[]>([])
+  const [agentName, setAgentName] = useState(initialValue?.agentName ?? '')
+  const [type, setType] = useState<AgentContributionType>(initialValue?.type ?? 'other')
+  const [output, setOutput] = useState(initialValue?.output ?? '')
+  const [confidence, setConfidence] = useState<Confidence | ''>(initialValue?.confidence ?? '')
+  const [status, setStatus] = useState<AgentContributionStatus>(initialValue?.status ?? 'unreviewed')
+  const [evidenceIds, setEvidenceIds] = useState<string[]>(initialValue?.relatedEvidenceIds ?? [])
   const [error, setError] = useState<string | null>(null)
 
   function toggleEvidence(id: string) {
@@ -52,7 +54,7 @@ export function AddAgentContributionForm({
   }
 
   return (
-    <form className="form agent-form" onSubmit={handleSubmit} aria-label="Add agent contribution">
+    <form className="form agent-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit agent contribution' : 'Add agent contribution'}>
       <div className="form__row--inline">
         <div className="form__field">
           <label className="form__label" htmlFor="agent-name">Agent / tool name</label>
@@ -139,7 +141,7 @@ export function AddAgentContributionForm({
 
       {error && <p className="form__error">{error}</p>}
       <div className="form__actions">
-        <button type="submit" className="btn">Add contribution</button>
+        <button type="submit" className="btn">{initialValue ? 'Save contribution' : 'Add contribution'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>Cancel</button>
       </div>
     </form>

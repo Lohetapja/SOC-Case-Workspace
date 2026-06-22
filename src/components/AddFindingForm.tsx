@@ -25,18 +25,19 @@ interface AddFindingFormProps {
   timeline: TimelineEvent[]
   onAdd: (input: NewFindingInput) => void
   onCancel: () => void
+  initialValue?: NewFindingInput
 }
 
-/** Form to add one evidence-backed finding to the active case. */
-export function AddFindingForm({ evidence, timeline, onAdd, onCancel }: AddFindingFormProps) {
-  const [title, setTitle] = useState('')
-  const [category, setCategory] = useState<FindingCategory>('suspicious_activity')
-  const [severity, setSeverity] = useState<Severity>('medium')
-  const [confidence, setConfidence] = useState<Confidence>('medium')
-  const [status, setStatus] = useState<FindingStatus>('draft')
-  const [description, setDescription] = useState('')
-  const [evidenceIds, setEvidenceIds] = useState<string[]>([])
-  const [timelineIds, setTimelineIds] = useState<string[]>([])
+/** Form to add or edit one evidence-backed finding. */
+export function AddFindingForm({ evidence, timeline, onAdd, onCancel, initialValue }: AddFindingFormProps) {
+  const [title, setTitle] = useState(initialValue?.title ?? '')
+  const [category, setCategory] = useState<FindingCategory>(initialValue?.category ?? 'suspicious_activity')
+  const [severity, setSeverity] = useState<Severity>(initialValue?.severity ?? 'medium')
+  const [confidence, setConfidence] = useState<Confidence>(initialValue?.confidence ?? 'medium')
+  const [status, setStatus] = useState<FindingStatus>(initialValue?.status ?? 'draft')
+  const [description, setDescription] = useState(initialValue?.description ?? '')
+  const [evidenceIds, setEvidenceIds] = useState<string[]>(initialValue?.relatedEvidenceIds ?? [])
+  const [timelineIds, setTimelineIds] = useState<string[]>(initialValue?.relatedTimelineEventIds ?? [])
   const [error, setError] = useState<string | null>(null)
 
   function toggle(list: string[], setList: (next: string[]) => void, id: string) {
@@ -62,7 +63,7 @@ export function AddFindingForm({ evidence, timeline, onAdd, onCancel }: AddFindi
   }
 
   return (
-    <form className="form finding-form" onSubmit={handleSubmit} aria-label="Add finding">
+    <form className="form finding-form" onSubmit={handleSubmit} aria-label={initialValue ? 'Edit finding' : 'Add finding'}>
       <div className="form__field">
         <label className="form__label" htmlFor="f-title">Title</label>
         <input
@@ -176,7 +177,7 @@ export function AddFindingForm({ evidence, timeline, onAdd, onCancel }: AddFindi
       {error && <p className="form__error">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">Add finding</button>
+        <button type="submit" className="btn">{initialValue ? 'Save finding' : 'Add finding'}</button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>
