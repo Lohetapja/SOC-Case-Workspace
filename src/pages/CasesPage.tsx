@@ -7,9 +7,11 @@ import {
   buildClosure,
   createAgentContribution,
   createAnalystQuestion,
+  createEntity,
   createEvidenceItem,
   createFinding,
   createMitreMapping,
+  createRecommendation,
   createTimelineEvent,
 } from '../data/casesStore'
 import type { AgentContributionStatus } from '../types'
@@ -47,6 +49,37 @@ export function CasesPage({
         onBack={onCloseCase}
         onOpenGraph={() => onOpenGraph(caseId)}
         onOpenReport={() => onOpenReport(caseId)}
+        onSaveMetadata={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            title: input.title.trim(),
+            summary: input.summary.trim(),
+            source: input.source,
+            sourceDetail: input.source === socCase.source ? socCase.sourceDetail : undefined,
+            severity: input.severity,
+            status: input.status,
+            owner: input.owner.trim() || 'unassigned',
+          }))
+        }
+        onAddEntity={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            affectedEntities: [...socCase.affectedEntities, createEntity(input)],
+          }))
+        }
+        onRemoveEntity={(entityId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            affectedEntities: socCase.affectedEntities.filter((entity) => entity.id !== entityId),
+            evidence: socCase.evidence.map((item) => {
+              const relatedEntityIds = item.relatedEntityIds?.filter((id) => id !== entityId)
+              return {
+                ...item,
+                relatedEntityIds: relatedEntityIds?.length ? relatedEntityIds : undefined,
+              }
+            }),
+          }))
+        }
         onAddEvidence={(input) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,
@@ -140,6 +173,20 @@ export function CasesPage({
           updateCase(caseId, (socCase) => ({
             ...socCase,
             mitreMappings: socCase.mitreMappings.filter((mapping) => mapping.id !== mappingId),
+          }))
+        }
+        onAddRecommendation={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            recommendations: [...socCase.recommendations, createRecommendation(input)],
+          }))
+        }
+        onRemoveRecommendation={(recommendationId) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            recommendations: socCase.recommendations.filter(
+              (recommendation) => recommendation.id !== recommendationId,
+            ),
           }))
         }
         onSaveClosure={(input) =>

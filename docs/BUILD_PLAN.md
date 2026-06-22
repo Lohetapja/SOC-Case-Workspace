@@ -197,12 +197,15 @@ in-browser; `npm run build` passes.
   never auto-promotes into canonical findings/mappings/recommendations/reports or
   closure. Quality Review only flags unreviewed/unevidenced contributions; accepted
   text can be copied for manual analyst entry and validation.
+- ☑ **Editable case context, affected entities, and recommendations** — core
+  metadata can be revised in the case workspace; affected entities and response
+  recommendations can be added/removed and persist through the existing case
+  aggregate. New records feed quality checks, visual maps, and report export.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)
 - Search & filter across cases.
 - Richer ATT&CK coverage and tactic grouping.
-- Editable Affected entities and Recommendations sections.
 - Only after the frontend workflow is proven: optional backend/database.
 
 > Anything in the parking lot is **out of scope** until the MVP (M1–M8) is

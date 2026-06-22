@@ -1,5 +1,12 @@
 import type { SocCase } from '../types'
-import { confidenceLabels, entityTypeLabels, priorityLabels, sourceLabels } from '../data/labels'
+import {
+  confidenceLabels,
+  entityTypeLabels,
+  priorityLabels,
+  recommendationCategoryLabels,
+  recommendationStatusLabels,
+  sourceLabels,
+} from '../data/labels'
 
 /**
  * Transforms a single SocCase into a structured, investigation-flow "Artifact
@@ -105,7 +112,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
   }
 
   // --- Delivery: email evidence + file entities ---
-  const emailArtifacts: { id: string; evidenceId: string; relatedEntityIds: string[] }[] = []
+  const emailArtifacts: { id: string; evidenceId?: string; relatedEntityIds: string[] }[] = []
   for (const item of socCase.evidence) {
     if (item.type === 'email') {
       const id = artifactId(item.id)
@@ -119,6 +126,19 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         relatedEvidenceIds: [item.id],
       })
       emailArtifacts.push({ id, evidenceId: item.id, relatedEntityIds: item.relatedEntityIds ?? [] })
+    }
+  }
+  for (const entity of socCase.affectedEntities) {
+    if (entity.type === 'email') {
+      const id = artifactId(entity.id)
+      nodes.push({
+        id,
+        lane: 'delivery',
+        type: 'email',
+        title: entity.value,
+        description: entity.description ?? entity.role ?? entityTypeLabels[entity.type],
+      })
+      emailArtifacts.push({ id, relatedEntityIds: [] })
     }
   }
   const fileIds: string[] = []
@@ -210,7 +230,12 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
       lane: 'response',
       type: 'response',
       title: rec.title,
-      description: `${priorityLabels[rec.priority]} priority · ${rec.description}`,
+      description: [
+        `${priorityLabels[rec.priority]} priority`,
+        rec.category && recommendationCategoryLabels[rec.category],
+        rec.status && recommendationStatusLabels[rec.status],
+        rec.description,
+      ].filter(Boolean).join(' · '),
     })
     responseIds.push(id)
   }
@@ -220,8 +245,9 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
   for (const email of emailArtifacts) {
     const linkedUsers = email.relatedEntityIds.map(artifactId).filter((id) => userIds.includes(id))
     const recipients = linkedUsers.length ? linkedUsers : userIds.slice(0, 1)
-    for (const user of recipients) addEdge(user, email.id, 'received', [email.evidenceId])
-    for (const file of fileIds) addEdge(email.id, file, 'carried attachment', [email.evidenceId])
+    const supportingEvidence = email.evidenceId ? [email.evidenceId] : undefined
+    for (const user of recipients) addEdge(user, email.id, 'received', supportingEvidence)
+    for (const file of fileIds) addEdge(email.id, file, 'carried attachment', supportingEvidence)
   }
 
   // Execution chain: file/host led to process.

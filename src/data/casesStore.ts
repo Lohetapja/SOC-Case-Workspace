@@ -11,6 +11,8 @@ import type {
   ClassificationVerdict,
   ClosureStatus,
   Confidence,
+  Entity,
+  EntityType,
   EvidenceItem,
   EvidenceType,
   Finding,
@@ -18,6 +20,10 @@ import type {
   FindingStatus,
   MitreMapping,
   QuestionStatus,
+  Recommendation,
+  RecommendationCategory,
+  RecommendationPriority,
+  RecommendationStatus,
   Severity,
   SocCase,
   TimelineEvent,
@@ -214,6 +220,54 @@ export function createEvidenceItem(input: NewEvidenceInput): EvidenceItem {
     detail: input.detail.trim(),
     source: input.source.trim() || undefined,
     observedAt: normalizeTimestamp(input.observedAt),
+  }
+}
+
+/** Editable context fields for an existing case. */
+export interface CaseMetadataInput {
+  title: string
+  summary: string
+  source: CaseSource
+  severity: Severity
+  status: CaseStatus
+  owner: string
+}
+
+/** Fields collected from the add-affected-entity form. */
+export interface NewEntityInput {
+  type: EntityType
+  value: string
+  role: string
+  description: string
+}
+
+export function createEntity(input: NewEntityInput): Entity {
+  return {
+    id: generateId('entity'),
+    type: input.type,
+    value: input.value.trim(),
+    role: input.role.trim() || undefined,
+    description: input.description.trim() || undefined,
+  }
+}
+
+/** Fields collected from the add-recommendation form. */
+export interface NewRecommendationInput {
+  title: string
+  category: RecommendationCategory
+  priority: RecommendationPriority
+  status: RecommendationStatus
+  description: string
+}
+
+export function createRecommendation(input: NewRecommendationInput): Recommendation {
+  return {
+    id: generateId('rec'),
+    title: input.title.trim(),
+    category: input.category,
+    priority: input.priority,
+    status: input.status,
+    description: input.description.trim(),
   }
 }
 

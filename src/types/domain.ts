@@ -49,6 +49,8 @@ export type EntityType =
   | 'file'
   | 'file_hash'
   | 'process'
+  | 'email'
+  | 'other'
 
 /** A person, machine, or indicator involved in the case. Synthetic only. */
 export interface Entity {
@@ -181,12 +183,31 @@ export interface MitreMapping {
 /** Priority of a recommended action. */
 export type RecommendationPriority = 'low' | 'medium' | 'high'
 
+/** Operational category for a recommended response action. */
+export type RecommendationCategory =
+  | 'containment'
+  | 'eradication'
+  | 'recovery'
+  | 'monitoring'
+  | 'escalation'
+  | 'prevention'
+  | 'other'
+
+/** Progress state of a recommended response action. */
+export type RecommendationStatus =
+  | 'proposed'
+  | 'in_progress'
+  | 'completed'
+  | 'not_applicable'
+
 /** A recommended remediation or follow-up action. */
 export interface Recommendation {
   id: string
   title: string
   description: string
   priority: RecommendationPriority
+  category?: RecommendationCategory
+  status?: RecommendationStatus
 }
 
 /** Kind of analysis pasted from an external agent or analyst tool. */

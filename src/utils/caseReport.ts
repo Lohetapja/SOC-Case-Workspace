@@ -8,6 +8,8 @@ import {
   findingStatusLabels,
   priorityLabels,
   questionStatusLabels,
+  recommendationCategoryLabels,
+  recommendationStatusLabels,
   severityLabels,
   sourceLabels,
   statusLabels,
@@ -101,10 +103,10 @@ function statusAndClassification(socCase: SocCase): string {
 function affectedEntities(socCase: SocCase): string {
   const head = '## Affected entities'
   if (socCase.affectedEntities.length === 0) return `${head}\n\n_None recorded._`
-  const rows = socCase.affectedEntities.map(
-    (entity) =>
-      `- **${entityTypeLabels[entity.type]}:** \`${entity.value}\`${entity.role ? ` — ${entity.role}` : ''}`,
-  )
+  const rows = socCase.affectedEntities.map((entity) => {
+    const context = [entity.role, entity.description].filter(Boolean).join(' — ')
+    return `- **${entityTypeLabels[entity.type]}:** \`${entity.value}\`${context ? ` — ${context}` : ''}`
+  })
   return `${head}\n\n${rows.join('\n')}`
 }
 
@@ -191,9 +193,14 @@ function mitreMapping(socCase: SocCase, findingTitle: TitleMap, evidenceTitle: T
 function recommendations(socCase: SocCase): string {
   const head = '## Recommendations / next actions'
   if (socCase.recommendations.length === 0) return `${head}\n\n_None recorded._`
-  const rows = socCase.recommendations.map(
-    (rec) => `- **${rec.title}** (${priorityLabels[rec.priority]} priority): ${rec.description}`,
-  )
+  const rows = socCase.recommendations.map((rec) => {
+    const metadata = [
+      rec.category && recommendationCategoryLabels[rec.category],
+      `${priorityLabels[rec.priority]} priority`,
+      rec.status && recommendationStatusLabels[rec.status],
+    ].filter(Boolean).join(' · ')
+    return `- **${rec.title}** (${metadata})${rec.description ? `: ${rec.description}` : ''}`
+  })
   return `${head}\n\n${rows.join('\n')}`
 }
 

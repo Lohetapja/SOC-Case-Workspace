@@ -12,7 +12,9 @@ import type {
   FindingCategory,
   FindingStatus,
   QuestionStatus,
+  RecommendationCategory,
   RecommendationPriority,
+  RecommendationStatus,
   Severity,
   TimelinePhase,
 } from '../types'
@@ -86,6 +88,23 @@ export const priorityLabels: Record<RecommendationPriority, string> = {
   high: 'High',
 }
 
+export const recommendationCategoryLabels: Record<RecommendationCategory, string> = {
+  containment: 'Containment',
+  eradication: 'Eradication',
+  recovery: 'Recovery',
+  monitoring: 'Monitoring',
+  escalation: 'Escalation',
+  prevention: 'Prevention',
+  other: 'Other',
+}
+
+export const recommendationStatusLabels: Record<RecommendationStatus, string> = {
+  proposed: 'Proposed',
+  in_progress: 'In progress',
+  completed: 'Completed',
+  not_applicable: 'Not applicable',
+}
+
 export const entityTypeLabels: Record<EntityType, string> = {
   host: 'Host',
   user: 'User',
@@ -97,6 +116,8 @@ export const entityTypeLabels: Record<EntityType, string> = {
   file: 'File',
   file_hash: 'File hash',
   process: 'Process',
+  email: 'Email',
+  other: 'Other',
 }
 
 export const evidenceTypeLabels: Record<EvidenceType, string> = {
