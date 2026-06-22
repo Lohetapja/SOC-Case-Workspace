@@ -467,6 +467,45 @@ body {
   text-decoration: underline;
 }
 
+.btn-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Cross-case workspace pages (Evidence / Timeline / Decision Journal) ---- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filters__search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.detail-item__open {
+  margin-left: auto;
+}
+
+.detail-item__case {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 /* ---- Page header row variant ---- */
 .page__header--row {
   display: flex;

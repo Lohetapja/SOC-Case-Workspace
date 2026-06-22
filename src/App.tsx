@@ -63,11 +63,11 @@ export default function App() {
       case 'graph':
         return <CaseGraphPage activeCaseId={activeCaseId} onSelectCase={setActiveCaseId} />
       case 'evidence':
-        return <EvidencePage />
+        return <EvidencePage onOpenCase={openCaseDetail} />
       case 'timeline':
-        return <TimelinePage />
+        return <TimelinePage onOpenCase={openCaseDetail} />
       case 'journal':
-        return <DecisionJournalPage />
+        return <DecisionJournalPage onOpenCase={openCaseDetail} />
       case 'mitre':
         return <MitreMappingPage />
       case 'reports':

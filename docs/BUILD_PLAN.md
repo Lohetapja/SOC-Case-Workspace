@@ -174,6 +174,11 @@ in-browser; `npm run build` passes.
   samples (Phishing → PowerShell, Impossible Travel, Malware / EDR Alert). Each can
   be added to the workspace (duplicate-safe via `useCases().addSampleCase`) and
   opened. The three samples also seed the workspace on first run.
+- ☑ **Cross-case workspace pages** — the Evidence, Timeline, and Decision Journal
+  sidebar pages are real read-only views across all cases (search + filters + an
+  "Open case" action), replacing the old placeholders. Timeline is chronological;
+  Decision Journal lists open questions first. Shared `WorkspaceFilters` component;
+  reuses case data + `openCaseDetail` navigation (no new storage).
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)
