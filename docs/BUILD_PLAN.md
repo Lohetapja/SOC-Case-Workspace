@@ -202,6 +202,9 @@ in-browser; `npm run build` passes.
   metadata can be revised in the case workspace; affected entities and response
   recommendations can be added/removed and persist through the existing case
   aggregate. New records feed quality checks, visual maps, and report export.
+- ☑ **Focused tests and CI hardening** — Vitest protects quality review, Markdown
+  reports, reference cleanup, graph/map transforms, import/export validation, and
+  bundled sample-case shape. GitHub Pages CI runs tests before the production build.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

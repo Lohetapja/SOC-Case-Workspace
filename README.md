@@ -107,6 +107,7 @@ inside one case instead of leaving them as scattered notes.
 | Language | TypeScript |
 | Persistence | Browser localStorage |
 | Graph | `react-force-graph-2d` |
+| Tests | Vitest |
 | Deployment | GitHub Pages + GitHub Actions |
 | Backend / APIs | None |
 
@@ -117,6 +118,7 @@ Requires Node.js 18+ with npm.
 ```bash
 npm install
 npm run dev
+npm test
 npm run build
 npm run preview
 ```

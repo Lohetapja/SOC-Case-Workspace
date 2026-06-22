@@ -157,3 +157,23 @@ acceptable trade for a local, offline tool and far less code than a custom
 renderer. The graph is canvas-based and client-only, consistent with the
 frontend-only, no-network constraints. The 2D build (not 3D) keeps the dependency
 footprint and visual complexity modest. Still no backend or external API.
+
+---
+
+## ADR-0010 — Vitest for focused domain-logic tests
+**Date:** 2026-06-22 · **Status:** Accepted
+
+**Context:** The investigation workflow now depends on connected pure functions
+for quality review, report generation, reference cleanup, visual transforms, and
+local JSON validation. Regressions in these functions could silently weaken a
+case or its exported report.
+
+**Decision:** Use Vitest in its default Node environment for small, focused tests
+of non-UI logic. Run `npm test` in the GitHub Pages workflow before `npm run build`.
+Do not add browser automation or a component-test framework yet.
+
+**Consequences:** Core workflow logic gains fast regression coverage with one
+lightweight development dependency and no production runtime cost. Full browser
+and accessibility testing remain future work if the project needs them. The test
+setup uses patched Node-18-compatible tool lines (Vitest 3.2.6+ and Vite 6.4.3+);
+the dependency audit reports no known vulnerabilities at this milestone.
