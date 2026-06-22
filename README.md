@@ -4,158 +4,139 @@
 
 ## Live demo
 
-**https://lohetapja.github.io/SOC-Case-Workspace/**
+**[Open SOC Case Workspace](https://lohetapja.github.io/SOC-Case-Workspace/)**
 
-Runs entirely in your browser (synthetic data only, no backend). Deployed from
-`main` to GitHub Pages via GitHub Actions.
+The app is deployed to GitHub Pages from `main` through GitHub Actions. It runs
+entirely in the browser and stores workspace data in localStorage.
 
----
+## What it is
 
-**SOC Case Workspace** is an educational portfolio project that models how a
-Security Operations Center (SOC) analyst structures an investigation — from
-alert intake, through evidence and timeline reconstruction, to evidence-backed
-findings, ATT&CK mapping, and a final exportable report.
+SOC Case Workspace is an educational, frontend-only investigation workspace. It
+models how a SOC analyst turns an alert into a structured, evidence-backed case:
 
-It is **not** a SIEM, EDR, or live security tool. It is a thinking and
-documentation workspace that demonstrates the *analytical workflow* of incident
-triage and investigation using synthetic data only.
+**alert intake → evidence → timeline → analyst decisions → findings → MITRE
+ATT&CK mapping → closure → quality review → Markdown report**
 
----
+It is not a SIEM or EDR. The project focuses on the analytical work between an
+alert firing and an analyst producing a defensible investigation report.
 
-## Why this project exists
+## The problem it solves
 
-Most SOC tooling focuses on detection and data collection. The harder,
-less-visible skill is **investigative reasoning**: taking a noisy alert and
-turning it into a defensible, well-documented case with a clear verdict.
+Security alerts often begin as disconnected facts: a process event, sign-in,
+email, IP address, or detection rule. The difficult part is explaining what
+happened, which evidence supports that conclusion, what remains unknown, and why
+the case was classified a certain way.
 
-This project makes that reasoning process explicit and reviewable:
+SOC Case Workspace makes that reasoning visible and reviewable. It keeps facts,
+questions, conclusions, ATT&CK mappings, response actions, and closure rationale
+inside one case instead of leaving them as scattered notes.
 
-- How is an alert triaged into a case?
-- What evidence supports or refutes the hypothesis?
-- What is the order of events?
-- What questions did the analyst ask, and what did they decide?
-- Which ATT&CK techniques are in play, and with what confidence?
-- How was the case classified at closure, and why?
-- What does the final report look like?
+## Who it is for
 
----
+- SOC Analyst, Blue Team, and DFIR learners practicing investigation structure.
+- Junior analysts learning to separate evidence from assumptions and findings.
+- Portfolio reviewers who want to see practical security-analysis thinking.
+- Developers exploring a typed, local-first React workflow without backend
+  infrastructure.
 
-## Status
+## Current features
 
-**Milestone 1 complete — case list, create form, and local persistence.** The
-Vite + React + TypeScript app scaffolds the layout and lists cases backed by
-`localStorage` (seeded with two synthetic demo cases on first run), with a
-create-case form and delete. Clicking a case opens a **detail workspace** showing
-every section; the **Evidence** and **Timeline** sections are editable (add /
-remove, saved to localStorage). Two read-only visual modes share a tabbed view: a
-**Case Graph** (Obsidian-inspired force-directed graph, with drag-to-pin layout)
-and an **Artifact Map** (a structured investigation-flow view that groups a case's
-artifacts into lanes). The **Decision Journal** (analyst questions) is also
-editable, and its open questions feed the Artifact Map's "Investigation gaps"
-panel. **Findings** are editable too — evidence-backed conclusions with category,
-severity, confidence, status, and linked supporting evidence. **MITRE ATT&CK
-mappings** (analyst-authored, evidence-backed) and the **classification & closure**
-assessment are editable too, and surface in the Case Graph / Artifact Map. Finally,
-any case can be exported as a clean **Markdown investigation report** (live preview,
-copy, and download `.md`) from the Reports page.
-See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) for the build order.
+- Structured case intake with editable metadata, affected entities, and case
+  templates.
+- Investigation checklists for common scenarios such as phishing, suspicious
+  PowerShell, impossible travel, malware alerts, and brute-force activity.
+- Editable evidence, chronological timeline events, analyst questions, findings,
+  and analyst-authored MITRE ATT&CK mappings.
+- Evidence and timeline links that show what supports each analytical conclusion.
+- Recommendations, response actions, closure classification, impact summary, and
+  closure rationale.
+- Case Quality Review with pass, warning, and missing checks for investigation
+  readiness.
+- Case Graph and structured Artifact Map views for exploring relationships and
+  investigation flow.
+- Workspace-level Evidence, Timeline, Decision Journal, and MITRE views across
+  all cases.
+- Human-reviewed Agent Contributions for pasted external analysis; agent output
+  remains separate from evidence.
+- Live Markdown report preview with copy and `.md` download.
+- Synthetic sample-case library, JSON backup/import, and demo-data reset controls.
+- Browser localStorage persistence with no accounts or server.
 
-> Building/running requires [Node.js](https://nodejs.org/) 18+ (with npm).
+## 60-second demo path
 
----
+1. [Open the live demo](https://lohetapja.github.io/SOC-Case-Workspace/).
+2. Select **Sample Cases** and open a populated synthetic case.
+3. Review the case’s **Evidence**.
+4. Follow the reconstructed **Timeline**.
+5. Read the **Analyst questions / Decision Journal**.
+6. Inspect the evidence-backed **Findings** and analyst-authored **MITRE mapping**.
+7. Check **Case Quality Review** for unresolved gaps and report readiness.
+8. Open **Case Graph**, then switch to **Artifact Map** to inspect relationships.
+9. Open **Reports** and export the Markdown investigation report.
 
-## MVP scope
+## Safety and educational use
 
-A **frontend-first**, single-user, local-only web app with these features, built
-in order:
+- All bundled cases, entities, evidence, identities, hostnames, indicators, and
+  incident narratives are synthetic.
+- The app makes no investigation API calls and sends no telemetry.
+- There is no authentication, account system, backend, or database.
+- External agent/tool text is treated as an unverified suggestion, never as
+  evidence or an automatic conclusion.
+- This is an educational portfolio project, not a production incident-management
+  system, and should not be used for real customer or incident data.
 
-1. **Case list & create-case form** — intake an alert as a structured case.
-2. **Case detail workspace** — the working surface for one case.
-3. **Evidence board** — collect and annotate evidence items.
-4. **Timeline builder** — order events into a coherent narrative.
-5. **Analyst questions / decision journal** — record open questions and decisions.
-6. **MITRE ATT&CK mapping** — map findings to techniques with rationale & confidence.
-7. **Closure classification** — assign a final verdict (e.g. true/false positive).
-8. **Markdown report export** — generate a clean, shareable case report.
+## Current limitations
 
-See [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) for the full specification.
+- Data is stored per browser in localStorage; there is no device sync,
+  collaboration, or server-side recovery.
+- Navigation uses local React state, so sections and cases do not have shareable
+  deep links or browser-history routing.
+- ATT&CK mappings are manually authored against a small educational workflow, not
+  generated or validated by a live MITRE service.
+- Integrations with SIEM, EDR, email, identity, and threat-intelligence platforms
+  are intentionally out of scope.
+- The app does not perform automated containment, malware analysis, AI
+  investigation, or PDF export.
 
----
+## Tech stack
 
-## Non-goals (explicitly out of scope for MVP)
+| Concern | Implementation |
+| --- | --- |
+| Build tool | Vite |
+| UI | React |
+| Language | TypeScript |
+| Persistence | Browser localStorage |
+| Graph | `react-force-graph-2d` |
+| Deployment | GitHub Pages + GitHub Actions |
+| Backend / APIs | None |
 
-- ❌ No SIEM clone
-- ❌ No EDR integration
-- ❌ No live Sentinel / Defender / Splunk APIs
-- ❌ No automated containment or response actions
-- ❌ No malware analysis or sandboxing
-- ❌ No AI auto-investigation
-- ❌ No multi-user collaboration
-- ❌ No backend or database until the frontend workflow is proven
+## Run locally
 
----
-
-## Safety & privacy
-
-- **Synthetic data only.** No real alerts, logs, hostnames, IPs, user accounts,
-  or customer data of any kind. All demo content is fabricated.
-- **No network calls.** The MVP makes no external API requests and sends no
-  telemetry. Everything runs locally in the browser.
-- **No authentication, no accounts.** This is a single-user local tool.
-- **Local persistence only.** Data is stored in browser `localStorage`. Clearing
-  browser storage erases all cases. This is intentional for the MVP.
-- This is a **learning artifact**, not a production security product. It must not
-  be used to manage real incidents.
-
----
-
-## Tech stack (planned)
-
-| Concern        | Choice                          |
-| -------------- | ------------------------------- |
-| Build tool     | Vite                            |
-| UI framework   | React                           |
-| Language       | TypeScript                      |
-| Persistence    | Browser `localStorage` (MVP)    |
-| Backend        | None (yet)                      |
-
-See [docs/DECISIONS.md](docs/DECISIONS.md) for the reasoning behind these choices.
-
----
-
-## Getting started
-
-Requires **Node.js 18+** (ships with npm).
+Requires Node.js 18+ with npm.
 
 ```bash
-npm install      # install dependencies
-npm run dev      # start the dev server (prints a http://localhost URL)
-npm run build    # type-check and produce a production build in dist/
-npm run preview  # preview the production build locally
+npm install
+npm run dev
+npm run build
+npm run preview
 ```
 
----
+## Project documentation
 
-## Documentation
+- [Product specification](docs/PRODUCT_SPEC.md)
+- [Build plan](docs/BUILD_PLAN.md)
+- [Architecture decisions](docs/DECISIONS.md)
+- [AI-assisted development guidance](AGENTS.md)
 
-- [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md) — what we are building and why.
-- [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) — the ordered milestone plan.
-- [docs/DECISIONS.md](docs/DECISIONS.md) — architecture decision record.
-- [CLAUDE.md](CLAUDE.md) — working guidance for AI-assisted development.
-
----
-
-## Author / Links
+## Author
 
 Built by **Riivo Maadla**.
 
-- LinkedIn: <https://www.linkedin.com/in/riivo-m-43530a154/>
-- GitHub: <https://github.com/Lohetapja>
+- [LinkedIn](https://www.linkedin.com/in/riivo-m-43530a154/)
+- [GitHub](https://github.com/Lohetapja)
 
----
+## License and attribution
 
-## License & use
-
-Educational portfolio project. Not affiliated with MITRE. "MITRE ATT&CK®" is a
+Educational portfolio project. Not affiliated with MITRE. “MITRE ATT&CK®” is a
 registered trademark of The MITRE Corporation; this project references the
 framework for educational mapping only.

@@ -132,7 +132,7 @@ for `localStorage` (ADR-0003) and for Markdown export later. Trade-offs: no shar
 records across cases and no relational queries, both acceptable for a single-user
 MVP. The id-based cross-references keep room to normalize later if needed.
 
-**Synthetic-data guarantee:** The two demo cases in `src/data/demoCases.ts` use
+**Synthetic-data guarantee:** The built-in sample cases in `src/data/demoCases.ts` use
 reserved documentation IP ranges (RFC 5737 TEST-NET), the reserved `.example`
 TLD with defanged indicators, the fictional "contoso" org, and placeholder file
 hashes. No real IOCs or customer data are present (reinforces ADR-0006).

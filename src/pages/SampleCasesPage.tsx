@@ -9,6 +9,7 @@ const WALKTHROUGH_STEPS = [
   'Check the Timeline to see the sequence of events.',
   'Read the Analyst questions / decision journal.',
   'Inspect the Findings and the MITRE ATT&CK mapping.',
+  'Check Case Quality Review for unresolved gaps and report readiness.',
   'Open the Case Graph, then switch to the Artifact Map.',
   'Export the Markdown investigation report from Reports.',
 ]

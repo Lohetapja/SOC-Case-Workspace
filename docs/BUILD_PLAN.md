@@ -12,7 +12,7 @@ Legend: ☐ not started · ◐ in progress · ☑ done
 **Goal:** Define the product, scope, and build order before writing code.
 **Deliverables:**
 - `README.md`, `docs/PRODUCT_SPEC.md`, `docs/BUILD_PLAN.md`, `docs/DECISIONS.md`,
-  `CLAUDE.md`.
+  `CLAUDE.md`, and `AGENTS.md`.
 **Acceptance:** MVP, non-goals, safety/privacy, and build order are written down
 and internally consistent.
 
@@ -20,7 +20,7 @@ and internally consistent.
 
 ## Milestone 1 — Project scaffold + Case list & create  ☑
 **Done:** Vite/React/TS scaffold + layout; core data model
-(`src/types/domain.ts`) and two synthetic demo cases (`src/data/demoCases.ts`);
+(`src/types/domain.ts`) and three synthetic sample cases (`src/data/demoCases.ts`);
 typed `localStorage` helper (`src/utils/storage.ts`) and case store
 (`src/data/casesStore.ts`) seeded from the demo data; `useCases` hook; case list,
 create-case form, and delete. Verified: `npm run build` passes and the dev server
@@ -37,31 +37,32 @@ case is still there. `npm run dev` works; README "Getting started" updated.
 ---
 
 ## Milestone 2 — Case detail workspace  ☑
-**Done (read-only):** Clicking a case opens a detail workspace via shared
+**Done:** Clicking a case opens a detail workspace via shared
 `activeCaseId` state in `App` (no router). Header fields (title, status, severity,
 source, owner, created/updated) plus read-only sections for summary, affected
 entities, evidence, timeline, analyst questions, findings, MITRE mappings, and
 recommendations. "Back to Cases" returns to the list; an "Open Case Graph" link
 opens the graph for the same case. Cards are clickable except the Delete button.
-Inline editing of fields is intentionally deferred to a later milestone.
+Core metadata, affected entities, and recommendations were made editable in a
+later post-MVP milestone.
 **Goal:** Open a single case and view all of its sections.
 
 ---
 
 ## Milestone 3 — Evidence board  ☑
-**Done:** The Evidence section in the case detail workspace is editable — list
-existing items, add via a small form (title, type, source, observed-at,
-description), and remove. Persisted through `useCases().updateCase` → localStorage;
-the case detail and Case Graph reflect the changes. Inline editing of existing
-items is deferred. Helpers: `createEvidenceItem`, `updateCase`.
+**Done:** The Evidence section in the case detail workspace supports listing,
+adding, editing, and removing items (title, type, source, observed-at,
+description). Persisted through `useCases().updateCase` → localStorage; the case
+detail and visual views reflect the changes. Helpers: `createEvidenceItem`,
+`updateEvidenceItem`, `updateCase`.
 **Goal:** Attach evidence to a case.
 
 ---
 
 ## Milestone 4 — Timeline builder  ☑
 **Done:** The Timeline section in the case detail workspace is editable — events
-render sorted chronologically; add via a small form (title, timestamp, phase,
-description, optional related-evidence link) and remove. Persisted through
+render sorted chronologically and can be added, edited, or removed (title,
+timestamp, phase, description, optional related-evidence link). Persisted through
 `useCases().updateCase` → localStorage; the case detail and Case Graph reflect
 the changes. Added an optional `phase` field to `TimelineEvent`. Helpers:
 `createTimelineEvent`.
@@ -71,8 +72,8 @@ the changes. Added an optional `phase` field to `TimelineEvent`. Helpers:
 
 ## Milestone 5 — Analyst questions / decision journal  ☑
 **Done:** The Analyst questions section in the case detail workspace is editable —
-list questions with status chips; add via a small form (question, status
-open/answered/not-applicable, answer/decision, rationale) and remove. Persisted
+list questions with status chips; add, edit, or remove entries (question, status
+open/answered/not-applicable, answer/decision, rationale). Persisted
 through `useCases().updateCase` → localStorage. Open questions feed the Artifact
 Map's "Investigation gaps" panel (fallback list when none). Added a
 `not_applicable` `QuestionStatus`. Helper: `createAnalystQuestion`.
@@ -89,9 +90,9 @@ localStorage; new findings appear in the Artifact Map. Optional `category`,
 ---
 
 ## Milestone 6 — MITRE ATT&CK mapping  ☑
-**Done:** The MITRE section in the case detail workspace is editable — list
-mappings with rationale, add (technique ID, name, tactic, confidence, rationale,
-selectable supporting findings + evidence), and remove. Analyst-authored and
+**Done:** The MITRE section in the case detail workspace is editable — list,
+add, edit, or remove mappings (technique ID, name, tactic, confidence, rationale,
+selectable supporting findings + evidence). Analyst-authored and
 evidence-backed; persisted via `updateCase` → localStorage. New mappings appear
 in the Case Graph and Artifact Map automatically. Added optional
 `relatedFindingIds` to `MitreMapping`. Helper: `createMitreMapping`.
@@ -107,7 +108,7 @@ recommended next action, and impact summary. Can be filled progressively (no nee
 to close first); persisted via `updateCase` → localStorage. Surfaced as chips in
 the detail header and in the Case Graph / Artifact Map header. Reworked
 `CaseClosure` to all-optional richer fields + `ClosureStatus`. Helpers:
-`buildClosure`. (`Recommendations` remains read-only for now.)
+`buildClosure`. Recommendations were made editable in a later post-MVP milestone.
 **Goal:** Reach and record a verdict.
 
 ---
