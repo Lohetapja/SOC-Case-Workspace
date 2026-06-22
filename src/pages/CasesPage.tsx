@@ -13,6 +13,11 @@ import {
   createMitreMapping,
   createRecommendation,
   createTimelineEvent,
+  updateAnalystQuestion,
+  updateEvidenceItem,
+  updateFinding,
+  updateMitreMapping,
+  updateTimelineEvent,
 } from '../data/casesStore'
 import type { AgentContributionStatus } from '../types'
 
@@ -86,6 +91,14 @@ export function CasesPage({
             evidence: [...socCase.evidence, createEvidenceItem(input)],
           }))
         }
+        onUpdateEvidence={(evidenceId, input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            evidence: socCase.evidence.map((item) =>
+              item.id === evidenceId ? updateEvidenceItem(item, input) : item,
+            ),
+          }))
+        }
         onRemoveEvidence={(evidenceId) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,
@@ -98,6 +111,14 @@ export function CasesPage({
             timeline: [...socCase.timeline, createTimelineEvent(input)],
           }))
         }
+        onUpdateTimelineEvent={(eventId, input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            timeline: socCase.timeline.map((event) =>
+              event.id === eventId ? updateTimelineEvent(event, input) : event,
+            ),
+          }))
+        }
         onRemoveTimelineEvent={(eventId) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,
@@ -108,6 +129,14 @@ export function CasesPage({
           updateCase(caseId, (socCase) => ({
             ...socCase,
             analystQuestions: [...socCase.analystQuestions, createAnalystQuestion(input)],
+          }))
+        }
+        onUpdateQuestion={(questionId, input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            analystQuestions: socCase.analystQuestions.map((question) =>
+              question.id === questionId ? updateAnalystQuestion(question, input) : question,
+            ),
           }))
         }
         onRemoveQuestion={(questionId) =>
@@ -157,6 +186,14 @@ export function CasesPage({
             findings: [...socCase.findings, createFinding(input)],
           }))
         }
+        onUpdateFinding={(findingId, input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            findings: socCase.findings.map((finding) =>
+              finding.id === findingId ? updateFinding(finding, input) : finding,
+            ),
+          }))
+        }
         onRemoveFinding={(findingId) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,
@@ -167,6 +204,14 @@ export function CasesPage({
           updateCase(caseId, (socCase) => ({
             ...socCase,
             mitreMappings: [...socCase.mitreMappings, createMitreMapping(input)],
+          }))
+        }
+        onUpdateMitre={(mappingId, input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            mitreMappings: socCase.mitreMappings.map((mapping) =>
+              mapping.id === mappingId ? updateMitreMapping(mapping, input) : mapping,
+            ),
           }))
         }
         onRemoveMitre={(mappingId) =>

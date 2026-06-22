@@ -41,10 +41,13 @@ interface CaseDetailWorkspaceProps {
   onAddEntity: (input: NewEntityInput) => void
   onRemoveEntity: (entityId: string) => void
   onAddEvidence: (input: NewEvidenceInput) => void
+  onUpdateEvidence: (evidenceId: string, input: NewEvidenceInput) => void
   onRemoveEvidence: (evidenceId: string) => void
   onAddTimelineEvent: (input: NewTimelineEventInput) => void
+  onUpdateTimelineEvent: (eventId: string, input: NewTimelineEventInput) => void
   onRemoveTimelineEvent: (eventId: string) => void
   onAddQuestion: (input: NewQuestionInput) => void
+  onUpdateQuestion: (questionId: string, input: NewQuestionInput) => void
   onRemoveQuestion: (questionId: string) => void
   onAddAgentContribution: (input: NewAgentContributionInput) => void
   onRemoveAgentContribution: (contributionId: string) => void
@@ -53,8 +56,10 @@ interface CaseDetailWorkspaceProps {
     status: AgentContributionStatus,
   ) => void
   onAddFinding: (input: NewFindingInput) => void
+  onUpdateFinding: (findingId: string, input: NewFindingInput) => void
   onRemoveFinding: (findingId: string) => void
   onAddMitre: (input: NewMitreInput) => void
+  onUpdateMitre: (mappingId: string, input: NewMitreInput) => void
   onRemoveMitre: (mappingId: string) => void
   onAddRecommendation: (input: NewRecommendationInput) => void
   onRemoveRecommendation: (recommendationId: string) => void
@@ -72,17 +77,22 @@ export function CaseDetailWorkspace({
   onAddEntity,
   onRemoveEntity,
   onAddEvidence,
+  onUpdateEvidence,
   onRemoveEvidence,
   onAddTimelineEvent,
+  onUpdateTimelineEvent,
   onRemoveTimelineEvent,
   onAddQuestion,
+  onUpdateQuestion,
   onRemoveQuestion,
   onAddAgentContribution,
   onRemoveAgentContribution,
   onUpdateAgentContributionStatus,
   onAddFinding,
+  onUpdateFinding,
   onRemoveFinding,
   onAddMitre,
+  onUpdateMitre,
   onRemoveMitre,
   onAddRecommendation,
   onRemoveRecommendation,
@@ -136,18 +146,25 @@ export function CaseDetailWorkspace({
         onRemove={onRemoveEntity}
       />
 
-      <EvidenceSection evidence={socCase.evidence} onAdd={onAddEvidence} onRemove={onRemoveEvidence} />
+      <EvidenceSection
+        evidence={socCase.evidence}
+        onAdd={onAddEvidence}
+        onUpdate={onUpdateEvidence}
+        onRemove={onRemoveEvidence}
+      />
 
       <TimelineSection
         timeline={socCase.timeline}
         evidence={socCase.evidence}
         onAdd={onAddTimelineEvent}
+        onUpdate={onUpdateTimelineEvent}
         onRemove={onRemoveTimelineEvent}
       />
 
       <DecisionJournalSection
         questions={socCase.analystQuestions}
         onAdd={onAddQuestion}
+        onUpdate={onUpdateQuestion}
         onRemove={onRemoveQuestion}
       />
 
@@ -164,6 +181,7 @@ export function CaseDetailWorkspace({
         evidence={socCase.evidence}
         timeline={socCase.timeline}
         onAdd={onAddFinding}
+        onUpdate={onUpdateFinding}
         onRemove={onRemoveFinding}
       />
 
@@ -172,6 +190,7 @@ export function CaseDetailWorkspace({
         findings={socCase.findings}
         evidence={socCase.evidence}
         onAdd={onAddMitre}
+        onUpdate={onUpdateMitre}
         onRemove={onRemoveMitre}
       />
 
