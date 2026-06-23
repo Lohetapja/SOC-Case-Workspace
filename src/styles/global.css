@@ -837,8 +837,8 @@ body {
 /* ---- Artifact Map (structured, dark) ---- */
 .amap {
   display: flex;
-  height: calc(100vh - 300px);
-  min-height: 440px;
+  flex-direction: column;
+  min-height: 0;
   overflow: hidden;
   background: #0b0e14;
   border: 1px solid #1e2430;
@@ -846,9 +846,13 @@ body {
 }
 
 .amap__scroll {
-  flex: 1;
+  flex: none;
+  width: 100%;
   min-width: 0;
+  min-height: 430px;
+  max-height: 64vh;
   overflow: auto;
+  border-bottom: 1px solid #1e2430;
   background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
   background-size: 22px 22px;
 }
@@ -982,17 +986,19 @@ body {
 }
 
 .amap__panel {
-  width: 300px;
-  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+  gap: 16px;
+  width: auto;
   padding: 16px;
-  overflow-y: auto;
+  overflow: visible;
   background: #0d111a;
-  border-left: 1px solid #1e2430;
+  border-top: 1px solid #1e2430;
   color: #cbd5e1;
 }
 
 .amap__detail {
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .amap__detail-type {
@@ -1030,8 +1036,8 @@ body {
 }
 
 .amap__gaps {
-  padding-top: 14px;
-  border-top: 1px solid #1e2430;
+  padding-left: 16px;
+  border-left: 1px solid #1e2430;
 }
 
 .amap__gaps-title {
@@ -1782,43 +1788,6 @@ body {
 .quality-check__detail {
   color: #475569;
   font-style: italic;
-}
-
-@media (max-width: 900px) {
-  .amap {
-    flex-direction: column;
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .amap__scroll {
-    flex: none;
-    min-height: 400px;
-    max-height: 62vh;
-    border-bottom: 1px solid #1e2430;
-  }
-
-  .amap__panel {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
-    gap: 16px;
-    width: auto;
-    max-height: none;
-    border-top: 1px solid #1e2430;
-    border-left: 0;
-  }
-
-  .amap__detail {
-    margin-bottom: 0;
-  }
-
-  .amap__gaps {
-    padding-top: 0;
-    padding-left: 16px;
-    border-top: 0;
-    border-left: 1px solid #1e2430;
-  }
 }
 
 @media (max-width: 760px) {

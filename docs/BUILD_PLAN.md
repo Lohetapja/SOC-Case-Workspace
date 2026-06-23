@@ -212,10 +212,12 @@ in-browser; `npm run build` passes.
   provides a direct 60-second demo path, and uses clearer analyst guidance. Markdown
   reports now read as investigation summaries and only list gaps actually recorded
   on the case.
-- ☑ **Mobile layout + read-only case viewer foundation** — the app shell now has a
-  mobile menu/drawer with responsive header/sidebar/footer behavior. Case detail
-  can open a read-only, mobile-friendly case view with summary sections and
-  Markdown copy/download actions generated from local browser data.
+- ☑ **Mobile layout + read-only case viewer** — the app shell now has a mobile
+  menu/drawer with responsive header/sidebar/footer behavior. Case detail can
+  open a clean, read-only, mobile-friendly case view with metadata, entities,
+  evidence, timeline, decisions, findings, MITRE mappings, recommendations,
+  closure rationale, and Markdown copy/download actions generated from local
+  browser data.
 - ☑ **Default Artifact Map + workspace snapshots** — the visual investigation
   area now opens Artifact Map first, with Case Graph second and pinned layouts
   preserved. Settings can export/import replayable workspace snapshots containing
@@ -226,6 +228,9 @@ in-browser; `npm run build` passes.
   while hover/selection highlighting clarifies relationships. Settings can export
   the full workspace, one selected case, or multiple selected cases, with optional
   graph-layout and sample-case inclusion.
+- ☑ **Artifact Map bottom details panel** — Artifact Map now uses the full
+  available width for the lane map, with artifact/relationship details, helper
+  text, and Investigation Gaps in a bottom panel across desktop and mobile.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

@@ -114,7 +114,7 @@ export function ReadOnlyCasePage({
     <div className="page viewer-page">
       <div className="viewer-toolbar">
         <button type="button" className="btn btn--secondary" onClick={() => onBackToWorkspace(socCase.id)}>
-          ← Back to workspace
+          Back to workspace
         </button>
       </div>
 
@@ -130,12 +130,12 @@ export function ReadOnlyCasePage({
           <span className="chip">Status: {statusLabels[socCase.status]}</span>
           <span className="chip">Source: {sourceLabels[socCase.source]}</span>
           <span className="chip">Owner: {socCase.owner}</span>
-          {socCase.closure?.verdict && (
-            <span className="chip">Classification: {verdictLabels[socCase.closure.verdict]}</span>
-          )}
-          {socCase.closure?.closureStatus && (
-            <span className="chip">Closure: {closureStatusLabels[socCase.closure.closureStatus]}</span>
-          )}
+          <span className="chip">
+            Classification: {socCase.closure?.verdict ? verdictLabels[socCase.closure.verdict] : 'Not set'}
+          </span>
+          <span className="chip">
+            Closure: {socCase.closure?.closureStatus ? closureStatusLabels[socCase.closure.closureStatus] : 'Not set'}
+          </span>
         </div>
         <p className="viewer-summary">{socCase.summary || 'No case summary has been recorded.'}</p>
         <p className="viewer-share-note">
