@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SocCase } from '../types'
 import {
   ARTIFACT_LANES,
@@ -58,6 +58,22 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
   const [selection, setSelection] = useState<Selection>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null)
+
+  function clearSelection() {
+    setSelection(null)
+    setHoveredNodeId(null)
+    setHoveredEdgeId(null)
+  }
+
+  // Escape clears a locked selection (complements the Clear button and an
+  // empty-space click/tap).
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setSelection(null)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [])
 
   const evidenceTitleById = useMemo(
     () => new Map(socCase.evidence.map((item) => [item.id, item.title])),
@@ -183,7 +199,7 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
           ))}
         </div>
 
-        <div className="amap__canvas" style={{ width, height }} onClick={() => setSelection(null)}>
+        <div className="amap__canvas" style={{ width, height }} onClick={() => clearSelection()}>
           <svg className="amap__edges" width={width} height={height}>
             {map.edges.map((edge) => {
               const a = center(edge.source)
@@ -246,7 +262,15 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
       </div>
 
       <aside className="amap__panel">
-        {inspected?.kind === 'node' ? (
+        <div className="amap__panel-detail">
+          {selection && (
+            <div className="amap__detail-actions">
+              <button type="button" className="btn-link" onClick={() => clearSelection()}>
+                Clear selection
+              </button>
+            </div>
+          )}
+          {inspected?.kind === 'node' ? (
           <div className="amap__detail">
             <span className="amap__detail-type">
               <span className="graph-dot" style={{ background: ARTIFACT_META[inspected.node.type].color }} />
@@ -284,10 +308,13 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
           </div>
         ) : (
           <p className="graph-hint">
-            Click an artifact card or a connection line to see its details. Cards are
-            grouped into investigation lanes left → right.
+            Hover or tap an artifact card (or a connection line) to highlight what it
+            relates to — related artifacts stay clear while unrelated ones dim. Tap an
+            artifact to lock the selection; clear it with the button above, by tapping
+            empty space, or with Escape.
           </p>
         )}
+        </div>
 
         <div className="amap__gaps">
           <div className="amap__gaps-title">Investigation gaps</div>
