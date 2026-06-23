@@ -1,9 +1,23 @@
 import { Logo } from './Logo'
 
+interface AppHeaderProps {
+  isMenuOpen: boolean
+  onToggleMenu: () => void
+}
+
 /** Top application bar: logo, product name, tagline, and the synthetic-data badge. */
-export function AppHeader() {
+export function AppHeader({ isMenuOpen, onToggleMenu }: AppHeaderProps) {
   return (
     <header className="header">
+      <button
+        type="button"
+        className="header__menu"
+        onClick={onToggleMenu}
+        aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={isMenuOpen}
+      >
+        ☰
+      </button>
       <div className="header__brand">
         <Logo />
         <span className="header__title">SOC Case Workspace</span>

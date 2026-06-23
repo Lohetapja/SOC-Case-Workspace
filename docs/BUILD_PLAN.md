@@ -212,6 +212,10 @@ in-browser; `npm run build` passes.
   provides a direct 60-second demo path, and uses clearer analyst guidance. Markdown
   reports now read as investigation summaries and only list gaps actually recorded
   on the case.
+- ☑ **Mobile layout + read-only case viewer foundation** — the app shell now has a
+  mobile menu/drawer with responsive header/sidebar/footer behavior. Case detail
+  can open a read-only, mobile-friendly case view with summary sections and
+  Markdown copy/download actions generated from local browser data.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

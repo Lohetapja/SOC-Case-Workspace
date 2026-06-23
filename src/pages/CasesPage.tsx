@@ -33,6 +33,7 @@ interface CasesPageProps {
   onCloseCase: () => void
   onOpenGraph: (id: string) => void
   onOpenReport: (id: string) => void
+  onOpenReadOnly: (id: string) => void
 }
 
 /**
@@ -45,6 +46,7 @@ export function CasesPage({
   onCloseCase,
   onOpenGraph,
   onOpenReport,
+  onOpenReadOnly,
 }: CasesPageProps) {
   const { cases, addCase, removeCase, updateCase } = useCases()
   const [showForm, setShowForm] = useState(false)
@@ -59,6 +61,7 @@ export function CasesPage({
         onBack={onCloseCase}
         onOpenGraph={() => onOpenGraph(caseId)}
         onOpenReport={() => onOpenReport(caseId)}
+        onOpenReadOnly={() => onOpenReadOnly(caseId)}
         onSaveMetadata={(input) =>
           updateCase(caseId, (socCase) => ({
             ...socCase,

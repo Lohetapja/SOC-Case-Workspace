@@ -13,4 +13,5 @@ export type SectionId =
   | 'journal'
   | 'mitre'
   | 'reports'
+  | 'viewer'
   | 'settings'

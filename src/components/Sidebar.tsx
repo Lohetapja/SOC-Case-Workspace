@@ -5,12 +5,13 @@ import { cn } from '../utils/classNames'
 interface SidebarProps {
   active: SectionId
   onSelect: (id: SectionId) => void
+  isOpen?: boolean
 }
 
 /** Left navigation listing the workspace sections. */
-export function Sidebar({ active, onSelect }: SidebarProps) {
+export function Sidebar({ active, onSelect, isOpen = false }: SidebarProps) {
   return (
-    <nav className="sidebar" aria-label="Primary">
+    <nav className={cn('sidebar', isOpen && 'sidebar--open')} aria-label="Primary">
       <div className="sidebar__heading">Workspace</div>
       <ul className="nav">
         {navItems.map((item) => (

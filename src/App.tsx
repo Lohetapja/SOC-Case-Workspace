@@ -11,6 +11,7 @@ import { TimelinePage } from './pages/TimelinePage'
 import { DecisionJournalPage } from './pages/DecisionJournalPage'
 import { MitreMappingPage } from './pages/MitreMappingPage'
 import { ReportsPage } from './pages/ReportsPage'
+import { ReadOnlyCasePage } from './pages/ReadOnlyCasePage'
 import { SettingsPage } from './pages/SettingsPage'
 import type { SectionId } from './types'
 
@@ -22,26 +23,37 @@ import type { SectionId } from './types'
 export default function App() {
   const [section, setSection] = useState<SectionId>('overview')
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   function navigate(target: SectionId) {
     // Selecting "Cases" from the nav always returns to the list.
     if (target === 'cases') setActiveCaseId(null)
     setSection(target)
+    setMobileNavOpen(false)
   }
 
   function openCaseGraph(caseId: string) {
     setActiveCaseId(caseId)
     setSection('graph')
+    setMobileNavOpen(false)
   }
 
   function openCaseReport(caseId: string) {
     setActiveCaseId(caseId)
     setSection('reports')
+    setMobileNavOpen(false)
+  }
+
+  function openReadOnlyCase(caseId: string) {
+    setActiveCaseId(caseId)
+    setSection('viewer')
+    setMobileNavOpen(false)
   }
 
   function openCaseDetail(caseId: string | null) {
     setActiveCaseId(caseId)
     setSection('cases')
+    setMobileNavOpen(false)
   }
 
   function renderSection() {
@@ -58,6 +70,7 @@ export default function App() {
             onCloseCase={() => setActiveCaseId(null)}
             onOpenGraph={openCaseGraph}
             onOpenReport={openCaseReport}
+            onOpenReadOnly={openReadOnlyCase}
           />
         )
       case 'graph':
@@ -84,6 +97,14 @@ export default function App() {
             onOpenCase={openCaseDetail}
           />
         )
+      case 'viewer':
+        return (
+          <ReadOnlyCasePage
+            activeCaseId={activeCaseId}
+            onBackToWorkspace={openCaseDetail}
+            onOpenCases={() => openCaseDetail(null)}
+          />
+        )
       case 'settings':
         return <SettingsPage />
       default:
@@ -93,9 +114,20 @@ export default function App() {
 
   return (
     <div className="app">
-      <AppHeader />
+      <AppHeader
+        isMenuOpen={mobileNavOpen}
+        onToggleMenu={() => setMobileNavOpen((isOpen) => !isOpen)}
+      />
       <div className="app__body">
-        <Sidebar active={section} onSelect={navigate} />
+        <Sidebar active={section} onSelect={navigate} isOpen={mobileNavOpen} />
+        {mobileNavOpen && (
+          <button
+            type="button"
+            className="sidebar-backdrop"
+            aria-label="Close navigation menu"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
         <main className="app__main">{renderSection()}</main>
       </div>
       <AppFooter />

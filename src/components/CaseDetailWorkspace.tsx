@@ -37,6 +37,7 @@ interface CaseDetailWorkspaceProps {
   onBack: () => void
   onOpenGraph: () => void
   onOpenReport: () => void
+  onOpenReadOnly: () => void
   onSaveMetadata: (input: CaseMetadataInput) => void
   onAddEntity: (input: NewEntityInput) => void
   onRemoveEntity: (entityId: string) => void
@@ -73,6 +74,7 @@ export function CaseDetailWorkspace({
   onBack,
   onOpenGraph,
   onOpenReport,
+  onOpenReadOnly,
   onSaveMetadata,
   onAddEntity,
   onRemoveEntity,
@@ -127,6 +129,11 @@ export function CaseDetailWorkspace({
         <div className="detail-header__dates">
           <span>Created {formatDateTime(socCase.createdAt)}</span>
           <span>Updated {formatDateTime(socCase.updatedAt)}</span>
+        </div>
+        <div className="detail-header__actions">
+          <button type="button" className="btn btn--secondary btn--sm" onClick={onOpenReadOnly}>
+            Open read-only view
+          </button>
         </div>
       </header>
 
