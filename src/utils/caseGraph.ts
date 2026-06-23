@@ -16,6 +16,27 @@ export type GraphNodeType =
   | 'mitre'
   | 'recommendation'
 
+export interface NodeTypeMeta {
+  type: GraphNodeType
+  label: string
+  color: string
+}
+
+/**
+ * Dark, Obsidian-inspired palette. Drives the Case Graph node colours and the
+ * page legend. Kept here (free of the heavy force-graph import) so the page can
+ * reference it without pulling react-force-graph into the main bundle.
+ */
+export const NODE_TYPE_META: NodeTypeMeta[] = [
+  { type: 'case', label: 'Case', color: '#f5c542' },
+  { type: 'entity', label: 'Entity', color: '#5aa9e6' },
+  { type: 'evidence', label: 'Evidence', color: '#4ade80' },
+  { type: 'timeline', label: 'Timeline', color: '#b794f6' },
+  { type: 'finding', label: 'Finding', color: '#f472b6' },
+  { type: 'mitre', label: 'ATT&CK', color: '#fb7185' },
+  { type: 'recommendation', label: 'Recommendation', color: '#38bdf8' },
+]
+
 export interface CaseGraphNode {
   id: string
   type: GraphNodeType

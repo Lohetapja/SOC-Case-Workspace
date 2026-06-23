@@ -1,8 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useCases } from '../hooks/useCases'
-import { buildCaseGraph, type CaseGraphNode, type GraphNodeType } from '../utils/caseGraph'
-import { CaseGraph, NODE_TYPE_META } from '../components/CaseGraph'
+import {
+  buildCaseGraph,
+  NODE_TYPE_META,
+  type CaseGraphNode,
+  type GraphNodeType,
+} from '../utils/caseGraph'
 import { ArtifactMap } from '../components/ArtifactMap'
+
+// The force-directed Case Graph pulls in the heavy `react-force-graph-2d`
+// dependency. Load it on demand (only when the Case Graph tab is opened) so the
+// initial bundle and the default Artifact Map stay light.
+const CaseGraph = lazy(() =>
+  import('../components/CaseGraph').then((module) => ({ default: module.CaseGraph })),
+)
 import { clearCaseLayout, loadCaseLayout, saveNodePosition } from '../utils/graphLayout'
 import { closureStatusLabels, verdictLabels } from '../data/labels'
 
@@ -187,13 +198,15 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
       ) : (
       <div className="graph-body">
         <div className="graph-canvas" ref={containerRef}>
-          <CaseGraph
-            data={graph}
-            width={size.width}
-            height={size.height}
-            onNodeClick={setSelectedNode}
-            onNodePinned={handleNodePinned}
-          />
+          <Suspense fallback={<div className="graph-loading">Loading graph…</div>}>
+            <CaseGraph
+              data={graph}
+              width={size.width}
+              height={size.height}
+              onNodeClick={setSelectedNode}
+              onNodePinned={handleNodePinned}
+            />
+          </Suspense>
         </div>
 
         <aside className="graph-panel">
