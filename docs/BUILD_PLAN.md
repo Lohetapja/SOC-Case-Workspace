@@ -8,6 +8,25 @@ Legend: ☐ not started · ◐ in progress · ☑ done
 
 ---
 
+## Current status — completed
+
+The MVP and an extensive post-MVP layer are shipped, built, and deployed. Done:
+
+- **Core case workflow** — case list/create, case detail workspace, editable case context.
+- **Investigation sections** (all editable) — Evidence, Timeline, Decision Journal,
+  Findings, MITRE Mapping, Closure classification.
+- **Markdown report export** — live preview, copy, and download.
+- **Visual investigation** — Artifact Map (default) and Case Graph.
+- **Workspace-level pages** — cross-case Evidence, Timeline, Decision Journal, MITRE.
+- **Read-only case viewer** — clean, shareable, mobile-friendly case view.
+- **Sample cases + templates/checklists** — guided demo library and starter content.
+- **Selective export / import + workspace snapshots** — versioned backups, per-case selection.
+- **GitHub Pages deployment** — GitHub Actions build + deploy.
+
+The detailed milestone and post-MVP entries below remain the source of truth.
+
+---
+
 ## Milestone 0 — Documentation & planning  ☑
 **Goal:** Define the product, scope, and build order before writing code.
 **Deliverables:**
@@ -233,10 +252,22 @@ in-browser; `npm run build` passes.
   text, and Investigation Gaps in a bottom panel across desktop and mobile.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
+---
+
+## Next — prioritized milestones
+
+These refine already-shipped features; do them in order, one at a time.
+
+1. ☐ **Artifact Map mobile layout & relationship highlighting polish** — refine the
+   Artifact Map on small screens (lane readability, touch interaction) and sharpen
+   hover/selection highlighting so a selected artifact plus its related artifacts and
+   connectors stand out while unrelated context is dimmed.
+2. ☐ **Mobile sidebar / responsive app shell** — polish the responsive shell: the
+   sidebar drawer behaviour, header/menu, and overall breakpoints on phones/tablets.
+3. ☐ **README screenshots & demo walkthrough polish** — add screenshots and a tighter
+   guided walkthrough so visitors understand the app at a glance.
+
 ### Parking lot (not scheduled)
 - Search & filter across cases.
 - Richer ATT&CK coverage and tactic grouping.
 - Only after the frontend workflow is proven: optional backend/database.
-
-> Anything in the parking lot is **out of scope** until the MVP (M1–M8) is
-> complete and reviewed.
