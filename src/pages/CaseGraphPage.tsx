@@ -6,7 +6,7 @@ import { ArtifactMap } from '../components/ArtifactMap'
 import { clearCaseLayout, loadCaseLayout, saveNodePosition } from '../utils/graphLayout'
 import { closureStatusLabels, verdictLabels } from '../data/labels'
 
-type VizMode = 'graph' | 'map'
+type VizMode = 'map' | 'graph'
 
 const COLOR_BY_TYPE = Object.fromEntries(
   NODE_TYPE_META.map((meta) => [meta.type, meta.color]),
@@ -25,7 +25,7 @@ interface CaseGraphPageProps {
  */
 export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGraphPageProps) {
   const { cases } = useCases()
-  const [viz, setViz] = useState<VizMode>('graph')
+  const [viz, setViz] = useState<VizMode>('map')
   const [selectedNode, setSelectedNode] = useState<CaseGraphNode | null>(null)
   // Bumped by "Reset layout" to rebuild the graph with cleared positions.
   const [layoutVersion, setLayoutVersion] = useState(0)
@@ -110,7 +110,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
     <div className="graph-page">
       <header className="graph-page__head">
         <div>
-          <h1 className="page__title">{viz === 'graph' ? 'Case Graph' : 'Artifact Map'}</h1>
+          <h1 className="page__title">{viz === 'map' ? 'Artifact Map' : 'Case Graph'}</h1>
           <p className="page__subtitle">
             {viz === 'graph'
               ? `Read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
@@ -165,24 +165,26 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
         <button
           type="button"
           role="tab"
-          aria-selected={viz === 'graph'}
-          className={`viz-tab${viz === 'graph' ? ' viz-tab--active' : ''}`}
-          onClick={() => setViz('graph')}
-        >
-          Case Graph
-        </button>
-        <button
-          type="button"
-          role="tab"
           aria-selected={viz === 'map'}
           className={`viz-tab${viz === 'map' ? ' viz-tab--active' : ''}`}
           onClick={() => setViz('map')}
         >
           Artifact Map
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={viz === 'graph'}
+          className={`viz-tab${viz === 'graph' ? ' viz-tab--active' : ''}`}
+          onClick={() => setViz('graph')}
+        >
+          Case Graph
+        </button>
       </div>
 
-      {viz === 'graph' ? (
+      {viz === 'map' ? (
+        activeCase && <ArtifactMap socCase={activeCase} />
+      ) : (
       <div className="graph-body">
         <div className="graph-canvas" ref={containerRef}>
           <CaseGraph
@@ -230,8 +232,6 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
           </div>
         </aside>
       </div>
-      ) : (
-        activeCase && <ArtifactMap socCase={activeCase} />
       )}
     </div>
   )

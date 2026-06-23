@@ -14,19 +14,47 @@ export interface NodePosition {
 
 export type CaseLayout = Record<string, NodePosition>
 
-type AllLayouts = Record<string, CaseLayout>
+export type AllCaseLayouts = Record<string, CaseLayout>
 
 const STORAGE_KEY = 'soc-case-workspace:graph-layout'
 
+function isNodePosition(value: unknown): value is NodePosition {
+  return (
+    Boolean(value) &&
+    typeof value === 'object' &&
+    Number.isFinite((value as NodePosition).x) &&
+    Number.isFinite((value as NodePosition).y)
+  )
+}
+
+export function isGraphLayoutsShape(value: unknown): value is AllCaseLayouts {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  return Object.values(value).every((caseLayout) => {
+    if (!caseLayout || typeof caseLayout !== 'object' || Array.isArray(caseLayout)) return false
+    return Object.values(caseLayout).every(isNodePosition)
+  })
+}
+
+/** All saved graph layouts, keyed by case id. */
+export function loadAllGraphLayouts(): AllCaseLayouts {
+  const all = readJSON<unknown>(STORAGE_KEY, {})
+  return isGraphLayoutsShape(all) ? all : {}
+}
+
+/** Replace all saved graph layouts, used by workspace snapshot import. */
+export function replaceAllGraphLayouts(layouts: AllCaseLayouts): void {
+  writeJSON(STORAGE_KEY, layouts)
+}
+
 /** Saved positions for one case (empty object if none). */
 export function loadCaseLayout(caseId: string): CaseLayout {
-  const all = readJSON<AllLayouts>(STORAGE_KEY, {})
+  const all = loadAllGraphLayouts()
   return all[caseId] ?? {}
 }
 
 /** Pin one node's position for a case. */
 export function saveNodePosition(caseId: string, nodeId: string, position: NodePosition): void {
-  const all = readJSON<AllLayouts>(STORAGE_KEY, {})
+  const all = loadAllGraphLayouts()
   const caseLayout = all[caseId] ?? {}
   caseLayout[nodeId] = position
   all[caseId] = caseLayout
@@ -35,7 +63,7 @@ export function saveNodePosition(caseId: string, nodeId: string, position: NodeP
 
 /** Clear all saved positions for one case (used by "Reset layout"). */
 export function clearCaseLayout(caseId: string): void {
-  const all = readJSON<AllLayouts>(STORAGE_KEY, {})
+  const all = loadAllGraphLayouts()
   if (all[caseId]) {
     delete all[caseId]
     writeJSON(STORAGE_KEY, all)

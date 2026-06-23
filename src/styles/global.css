@@ -1352,6 +1352,15 @@ body {
   font-size: 14px;
 }
 
+.data-management__safety {
+  margin: 10px 0 0;
+  padding: 9px 11px;
+  border-left: 3px solid #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 13px;
+}
+
 .data-management__section-title {
   margin-top: 18px;
   color: #334155;

@@ -216,6 +216,11 @@ in-browser; `npm run build` passes.
   mobile menu/drawer with responsive header/sidebar/footer behavior. Case detail
   can open a read-only, mobile-friendly case view with summary sections and
   Markdown copy/download actions generated from local browser data.
+- ☑ **Default Artifact Map + workspace snapshots** — the visual investigation
+  area now opens Artifact Map first, with Case Graph second and pinned layouts
+  preserved. Settings can export/import replayable workspace snapshots containing
+  cases, graph layout positions, and app-level settings placeholders, while still
+  accepting older case-only backups.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

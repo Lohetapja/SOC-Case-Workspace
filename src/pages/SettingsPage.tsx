@@ -1,16 +1,22 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useCases } from '../hooks/useCases'
 import {
-  buildCasesExport,
-  casesExportFilename,
   clearStorageWarning,
   clearStoredCases,
   getStorageWarning,
-  parseCasesImport,
   persistCases,
   resetToDemoCases,
 } from '../data/casesStore'
-import { clearAllGraphLayouts } from '../utils/graphLayout'
+import {
+  clearAllGraphLayouts,
+  loadAllGraphLayouts,
+  replaceAllGraphLayouts,
+} from '../utils/graphLayout'
+import {
+  buildWorkspaceSnapshot,
+  parseWorkspaceImport,
+  workspaceSnapshotFilename,
+} from '../data/workspaceSnapshot'
 
 /**
  * Data management: back up, restore, reset, and clear locally stored cases.
@@ -27,12 +33,12 @@ export function SettingsPage() {
     window.setTimeout(() => window.location.reload(), 900)
   }
 
-  function handleExport() {
+  function handleExportSnapshot() {
     setError(null)
     setMessage(null)
     try {
-      const filename = casesExportFilename()
-      const json = JSON.stringify(buildCasesExport(cases), null, 2)
+      const filename = workspaceSnapshotFilename()
+      const json = JSON.stringify(buildWorkspaceSnapshot(cases, loadAllGraphLayouts()), null, 2)
       const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
@@ -44,7 +50,7 @@ export function SettingsPage() {
       URL.revokeObjectURL(url)
       setMessage(`Export started: ${filename}`)
     } catch {
-      setError('Could not create the JSON backup. Your local cases were not changed.')
+      setError('Could not create the workspace snapshot. Your local data was not changed.')
     }
   }
 
@@ -65,20 +71,29 @@ export function SettingsPage() {
           throw new Error('The selected file is not valid JSON.')
         }
 
-        const imported = parseCasesImport(parsed)
+        const imported = parseWorkspaceImport(parsed)
+        const importedCases = imported.kind === 'snapshot' ? imported.snapshot.cases : imported.cases
+        const importLabel =
+          imported.kind === 'snapshot'
+            ? `${importedCases.length} case(s) and saved graph layouts`
+            : `${importedCases.length} case(s) from an older case-only backup`
         const ok = window.confirm(
-          `Replace all current cases with ${imported.length} case(s) from "${file.name}"? This cannot be undone.`,
+          `Replace the current workspace with ${importLabel} from "${file.name}"? This cannot be undone.`,
         )
         if (!ok) {
-          setMessage('Import canceled. Your current cases were not changed.')
+          setMessage('Import canceled. Your current workspace was not changed.')
           return
         }
 
-        persistCases(imported)
-        clearAllGraphLayouts()
+        persistCases(importedCases)
+        if (imported.kind === 'snapshot') {
+          replaceAllGraphLayouts(imported.snapshot.graphLayouts)
+        } else {
+          clearAllGraphLayouts()
+        }
         clearStorageWarning()
         setStorageWarning(null)
-        setMessage(`Imported ${imported.length} case(s) from "${file.name}". Reloading workspace...`)
+        setMessage(`Imported workspace data from "${file.name}". Reloading workspace...`)
         reloadAfterFeedback()
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : 'Could not import this file.')
@@ -132,7 +147,16 @@ export function SettingsPage() {
           <h2 className="data-management__title">Local browser storage</h2>
           <p className="data-management__help">
             SOC Case Workspace stores data locally in your browser using localStorage. No data is
-            sent to a server. Export a JSON backup before importing, resetting, or clearing data.
+            sent to a server. Export a workspace snapshot before importing, resetting, or clearing
+            data.
+          </p>
+          <p className="data-management__help">
+            Workspace snapshots let you save the current investigation state and load it later.
+            This is useful for demos, training, portfolio review, and replaying a completed case.
+          </p>
+          <p className="data-management__safety">
+            Do not export real sensitive investigation data. This portfolio demo is designed for
+            synthetic data.
           </p>
         </div>
 
@@ -165,23 +189,24 @@ export function SettingsPage() {
 
         <div className="data-action">
           <div>
-            <p className="data-action__title">Export cases JSON</p>
+            <p className="data-action__title">Export workspace snapshot</p>
             <p className="data-action__help">
-              Download all {cases.length} current case{cases.length === 1 ? '' : 's'} as a JSON
-              backup file.
+              Download all {cases.length} current case{cases.length === 1 ? '' : 's'}, saved Case
+              Graph node positions, and app-level settings as one replayable JSON snapshot.
             </p>
           </div>
-          <button type="button" className="btn data-action__btn" onClick={handleExport}>
-            Export cases JSON
+          <button type="button" className="btn data-action__btn" onClick={handleExportSnapshot}>
+            Export snapshot
           </button>
         </div>
 
         <div className="data-action">
           <div>
-            <p className="data-action__title">Import cases JSON</p>
+            <p className="data-action__title">Import workspace snapshot</p>
             <p className="data-action__help">
-              Load cases from a JSON backup. This <strong>replaces</strong> all current cases after
-              validation and confirmation.
+              Load a workspace snapshot and restore cases plus graph layouts where possible. Older
+              case-only JSON backups are still accepted. Import <strong>replaces</strong> current
+              local workspace data after validation and confirmation.
             </p>
           </div>
           <button
@@ -193,7 +218,7 @@ export function SettingsPage() {
               fileInputRef.current?.click()
             }}
           >
-            Import cases JSON
+            Import snapshot
           </button>
           <input
             ref={fileInputRef}
