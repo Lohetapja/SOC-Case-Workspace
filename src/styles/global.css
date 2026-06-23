@@ -1283,6 +1283,33 @@ body {
 }
 
 /* ---- Data management (Settings) ---- */
+.data-management__intro {
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-management__title,
+.data-management__section-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.data-management__help {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.data-management__section-title {
+  margin-top: 18px;
+  color: #334155;
+}
+
+.data-management__section-title--danger {
+  color: #991b1b;
+}
+
 .data-action {
   display: flex;
   align-items: flex-start;
@@ -1294,6 +1321,10 @@ body {
 
 .data-action:first-child {
   padding-top: 0;
+}
+
+.data-management__section-title + .data-action {
+  padding-top: 10px;
 }
 
 .data-action:last-of-type {

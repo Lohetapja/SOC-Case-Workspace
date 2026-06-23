@@ -11,14 +11,18 @@ import {
 import { clearAllGraphLayouts } from '../utils/graphLayout'
 
 /**
- * Data management: back up, restore, reset, and clear the locally stored cases.
- * All data lives in the browser's localStorage — nothing is sent anywhere.
+ * Data management: back up, restore, reset, and clear locally stored cases.
+ * All data lives in browser localStorage; nothing is sent to a server.
  */
 export function SettingsPage() {
   const { cases } = useCases()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+
+  function reloadAfterFeedback() {
+    window.setTimeout(() => window.location.reload(), 900)
+  }
 
   function handleExport() {
     setError(null)
@@ -47,6 +51,7 @@ export function SettingsPage() {
     const file = event.target.files?.[0]
     event.target.value = '' // allow re-selecting the same file
     if (!file) return
+
     const reader = new FileReader()
     reader.onload = () => {
       try {
@@ -56,6 +61,7 @@ export function SettingsPage() {
         } catch {
           throw new Error('The selected file is not valid JSON.')
         }
+
         const imported = parseCasesImport(parsed)
         const ok = window.confirm(
           `Replace all current cases with ${imported.length} case(s) from "${file.name}"? This cannot be undone.`,
@@ -64,9 +70,11 @@ export function SettingsPage() {
           setMessage('Import canceled. Your current cases were not changed.')
           return
         }
+
         persistCases(imported)
         clearAllGraphLayouts()
-        window.location.reload()
+        setMessage(`Imported ${imported.length} case(s) from "${file.name}". Reloading workspace...`)
+        reloadAfterFeedback()
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : 'Could not import this file.')
       }
@@ -78,14 +86,15 @@ export function SettingsPage() {
   function handleReset() {
     setError(null)
     setMessage(null)
-    if (!window.confirm(
+    const ok = window.confirm(
       'Reset to the original synthetic demo cases? This replaces your current cases and saved graph layouts. Export a backup first if needed. This cannot be undone.',
-    )) {
-      return
-    }
+    )
+    if (!ok) return
+
     resetToDemoCases()
     clearAllGraphLayouts()
-    window.location.reload()
+    setMessage('Demo data restored. Reloading workspace...')
+    reloadAfterFeedback()
   }
 
   function handleClear() {
@@ -95,41 +104,53 @@ export function SettingsPage() {
       'Clear all locally saved data? Your cases and graph layouts will be removed, then the app will reload with fresh demo cases. Export a backup first if needed. This cannot be undone.',
     )
     if (!ok) return
+
     clearStoredCases()
     clearAllGraphLayouts()
-    window.location.reload()
+    setMessage('Local data cleared. Reloading with fresh demo cases...')
+    reloadAfterFeedback()
   }
 
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">Settings</h1>
-        <p className="page__subtitle">
-          Back up, restore, and reset your cases. All data is stored in your browser
-          (localStorage) only — nothing is uploaded anywhere. Synthetic data only.
-        </p>
+        <h1 className="page__title">Settings / Data Management</h1>
+        <p className="page__subtitle">Back up, restore, and reset your workspace safely.</p>
       </header>
 
-      <section className="card">
+      <section className="card data-management">
+        <div className="data-management__intro">
+          <h2 className="data-management__title">Local browser storage</h2>
+          <p className="data-management__help">
+            SOC Case Workspace stores data locally in your browser using localStorage. No data is
+            sent to a server. Export a JSON backup before importing, resetting, or clearing data.
+          </p>
+        </div>
+
+        {message && <p className="action-feedback" role="status">{message}</p>}
+        {error && <p className="form__error data-action__error" role="alert">Action failed: {error}</p>}
+
+        <h3 className="data-management__section-title">Backup and restore</h3>
+
         <div className="data-action">
           <div>
-            <p className="data-action__title">Export cases</p>
+            <p className="data-action__title">Export cases JSON</p>
             <p className="data-action__help">
               Download all {cases.length} current case{cases.length === 1 ? '' : 's'} as a JSON
               backup file.
             </p>
           </div>
           <button type="button" className="btn data-action__btn" onClick={handleExport}>
-            Export cases
+            Export cases JSON
           </button>
         </div>
 
         <div className="data-action">
           <div>
-            <p className="data-action__title">Import cases</p>
+            <p className="data-action__title">Import cases JSON</p>
             <p className="data-action__help">
-              Load cases from a JSON backup. This <strong>replaces</strong> all current cases
-              (you'll be asked to confirm first).
+              Load cases from a JSON backup. This <strong>replaces</strong> all current cases after
+              validation and confirmation.
             </p>
           </div>
           <button
@@ -141,7 +162,7 @@ export function SettingsPage() {
               fileInputRef.current?.click()
             }}
           >
-            Import cases
+            Import cases JSON
           </button>
           <input
             ref={fileInputRef}
@@ -152,11 +173,13 @@ export function SettingsPage() {
           />
         </div>
 
+        <h3 className="data-management__section-title">Demo recovery</h3>
+
         <div className="data-action">
           <div>
             <p className="data-action__title">Reset demo data</p>
             <p className="data-action__help">
-              Restore the original synthetic demo / sample cases. Useful for getting the live demo
+              Restore the original synthetic demo and sample cases. Useful for getting the live demo
               back to its starting state.
             </p>
           </div>
@@ -165,21 +188,22 @@ export function SettingsPage() {
           </button>
         </div>
 
+        <h3 className="data-management__section-title data-management__section-title--danger">
+          Danger zone
+        </h3>
+
         <div className="data-action">
           <div>
             <p className="data-action__title">Clear local data</p>
             <p className="data-action__help">
-              Remove all locally saved cases and graph layouts. The app reloads and re-seeds the
-              demo cases.
+              Remove locally saved cases and graph layouts. The app reloads and re-seeds the demo
+              cases.
             </p>
           </div>
           <button type="button" className="btn btn--danger data-action__btn" onClick={handleClear}>
             Clear local data
           </button>
         </div>
-
-        {message && <p className="action-feedback" role="status">{message}</p>}
-        {error && <p className="form__error data-action__error" role="alert">Action failed: {error}</p>}
       </section>
     </div>
   )
