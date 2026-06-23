@@ -49,7 +49,7 @@ export function MitreMappingPage({ onOpenCase }: MitreMappingPageProps) {
     if (caseId !== 'all' && mapping.caseId !== caseId) return false
     if (search.trim()) {
       const haystack =
-        `${mapping.techniqueId} ${mapping.techniqueName} ${mapping.tactic} ${mapping.rationale}`.toLowerCase()
+        `${mapping.techniqueId} ${mapping.techniqueName} ${mapping.tactic} ${mapping.rationale} ${mapping.caseTitle} ${mapping.findingTitles.join(' ')} ${mapping.evidenceTitles.join(' ')}`.toLowerCase()
       if (!haystack.includes(search.trim().toLowerCase())) return false
     }
     return true
@@ -70,8 +70,8 @@ export function MitreMappingPage({ onOpenCase }: MitreMappingPageProps) {
       {items.length === 0 ? (
         <div className="empty-state">
           <p className="cases-note">
-            No MITRE mappings recorded yet. Open a case to add an analyst-authored technique with
-            rationale and confidence.
+            No MITRE mappings recorded yet. Open a case to add ATT&amp;CK techniques with rationale and
+            confidence.
           </p>
           <button type="button" className="btn btn--secondary" onClick={() => onOpenCase(cases[0]?.id ?? null)}>
             {cases.length > 0 ? 'Open a case' : 'Go to Cases'}
@@ -132,10 +132,14 @@ export function MitreMappingPage({ onOpenCase }: MitreMappingPageProps) {
                     <p className="detail-text"><strong>Rationale:</strong> {mapping.rationale}</p>
                   )}
                   {mapping.findingTitles.length > 0 && (
-                    <p className="detail-item__meta">Findings: {mapping.findingTitles.join(', ')}</p>
+                    <p className="detail-item__meta">
+                      Supporting findings: {mapping.findingTitles.join(', ')}
+                    </p>
                   )}
                   {mapping.evidenceTitles.length > 0 && (
-                    <p className="detail-item__meta">Evidence: {mapping.evidenceTitles.join(', ')}</p>
+                    <p className="detail-item__meta">
+                      Supporting evidence: {mapping.evidenceTitles.join(', ')}
+                    </p>
                   )}
                   <p className="detail-item__case">Case: {mapping.caseTitle}</p>
                 </li>
