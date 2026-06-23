@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { EvidenceItem, TimelinePhase } from '../types'
 import type { NewTimelineEventInput } from '../data/casesStore'
 import { timelinePhaseLabels } from '../data/labels'
+import { isAllowedValue, isValidDateTimeLocal } from '../utils/formValidation'
 
 const phaseOptions = Object.keys(timelinePhaseLabels) as TimelinePhase[]
 
@@ -39,6 +40,15 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }
       setError('A timestamp is required.')
       return
     }
+    if (!isValidDateTimeLocal(timestamp)) {
+      setError('Timestamp must be a valid date and time.')
+      return
+    }
+    if (!isAllowedValue(phase, phaseOptions)) {
+      setError('Choose a valid timeline phase.')
+      return
+    }
+    setError(null)
     onAdd({ title, timestamp, phase, description, relatedEvidenceId })
   }
 
@@ -118,7 +128,9 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }
       {error && <p className="form__error" role="alert">{error}</p>}
 
       <div className="form__actions">
-        <button type="submit" className="btn">{initialValue ? 'Save event' : 'Add event'}</button>
+        <button type="submit" className="btn">
+          {initialValue ? 'Save timeline event' : 'Add timeline event'}
+        </button>
         <button type="button" className="btn btn--secondary" onClick={onCancel}>
           Cancel
         </button>

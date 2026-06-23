@@ -99,6 +99,35 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
   const resolveEvidence = (ids?: string[]) =>
     (ids ?? []).map((id) => evidenceTitleById.get(id)).filter((title): title is string => Boolean(title))
 
+  if (map.nodes.length === 0) {
+    return (
+      <div className="amap">
+        <div className="amap__empty">
+          <h2>No artifacts to map yet</h2>
+          <p>
+            Add affected entities, evidence, timeline events, findings, MITRE mappings, or
+            recommendations inside the case workspace to build an investigation-flow map.
+          </p>
+        </div>
+
+        <aside className="amap__panel">
+          <p className="graph-hint">
+            Artifact Map is read-only. It reflects the selected case once investigation records
+            exist.
+          </p>
+          <div className="amap__gaps">
+            <div className="amap__gaps-title">Investigation gaps</div>
+            <ul className="amap__gaps-list">
+              {gaps.map((gap) => (
+                <li key={gap}>{gap}</li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    )
+  }
+
   return (
     <div className="amap">
       <div className="amap__scroll">

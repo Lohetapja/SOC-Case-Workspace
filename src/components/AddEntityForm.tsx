@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { EntityType } from '../types'
 import type { NewEntityInput } from '../data/casesStore'
 import { entityTypeLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const entityTypes = Object.keys(entityTypeLabels) as EntityType[]
 
@@ -23,6 +24,11 @@ export function AddEntityForm({ onAdd, onCancel }: AddEntityFormProps) {
       setError('An entity name or value is required.')
       return
     }
+    if (!isAllowedValue(type, entityTypes)) {
+      setError('Choose a valid entity type.')
+      return
+    }
+    setError(null)
     onAdd({ type, value, role, description })
   }
 

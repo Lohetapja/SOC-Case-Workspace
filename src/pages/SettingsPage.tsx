@@ -3,7 +3,9 @@ import { useCases } from '../hooks/useCases'
 import {
   buildCasesExport,
   casesExportFilename,
+  clearStorageWarning,
   clearStoredCases,
+  getStorageWarning,
   parseCasesImport,
   persistCases,
   resetToDemoCases,
@@ -19,6 +21,7 @@ export function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [storageWarning, setStorageWarning] = useState<string | null>(() => getStorageWarning())
 
   function reloadAfterFeedback() {
     window.setTimeout(() => window.location.reload(), 900)
@@ -73,6 +76,8 @@ export function SettingsPage() {
 
         persistCases(imported)
         clearAllGraphLayouts()
+        clearStorageWarning()
+        setStorageWarning(null)
         setMessage(`Imported ${imported.length} case(s) from "${file.name}". Reloading workspace...`)
         reloadAfterFeedback()
       } catch (cause) {
@@ -94,6 +99,8 @@ export function SettingsPage() {
     resetToDemoCases()
     clearAllGraphLayouts()
     setMessage('Demo data restored. Reloading workspace...')
+    clearStorageWarning()
+    setStorageWarning(null)
     reloadAfterFeedback()
   }
 
@@ -107,6 +114,8 @@ export function SettingsPage() {
 
     clearStoredCases()
     clearAllGraphLayouts()
+    clearStorageWarning()
+    setStorageWarning(null)
     setMessage('Local data cleared. Reloading with fresh demo cases...')
     reloadAfterFeedback()
   }
@@ -128,7 +137,29 @@ export function SettingsPage() {
         </div>
 
         {message && <p className="action-feedback" role="status">{message}</p>}
+        {storageWarning && (
+          <div className="data-management__warning" role="alert">
+            <p>{storageWarning}</p>
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={() => {
+                clearStorageWarning()
+                setStorageWarning(null)
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
         {error && <p className="form__error data-action__error" role="alert">Action failed: {error}</p>}
+
+        {cases.length === 0 && (
+          <p className="data-management__empty">
+            No cases are currently stored in this browser. Use Reset demo data to restore the guided
+            sample cases, or create a new case from the Cases page.
+          </p>
+        )}
 
         <h3 className="data-management__section-title">Backup and restore</h3>
 

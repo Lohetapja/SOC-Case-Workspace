@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { CaseClosure, ClassificationVerdict, ClosureStatus } from '../types'
 import type { ClosureInput } from '../data/casesStore'
 import { closureStatusLabels, verdictLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const verdictOptions: ClassificationVerdict[] = [
   'true_positive',
@@ -35,6 +36,7 @@ export function ClosureSection({ closure, onSave }: ClosureSectionProps) {
   const [rationale, setRationale] = useState(closure?.rationale ?? '')
   const [recommendedAction, setRecommendedAction] = useState(closure?.recommendedAction ?? '')
   const [impactSummary, setImpactSummary] = useState(closure?.impactSummary ?? '')
+  const [error, setError] = useState<string | null>(null)
 
   const hasAssessment = Boolean(
     closure?.verdict ||
@@ -50,11 +52,21 @@ export function ClosureSection({ closure, onSave }: ClosureSectionProps) {
     setRationale(closure?.rationale ?? '')
     setRecommendedAction(closure?.recommendedAction ?? '')
     setImpactSummary(closure?.impactSummary ?? '')
+    setError(null)
     setEditing(true)
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (verdict && !isAllowedValue(verdict, verdictOptions)) {
+      setError('Choose a valid classification.')
+      return
+    }
+    if (status && !isAllowedValue(status, statusOptions)) {
+      setError('Choose a valid closure status.')
+      return
+    }
+    setError(null)
     onSave({ verdict, closureStatus: status, rationale, recommendedAction, impactSummary })
     setEditing(false)
   }
@@ -136,9 +148,11 @@ export function ClosureSection({ closure, onSave }: ClosureSectionProps) {
             />
           </div>
 
+          {error && <p className="form__error" role="alert">{error}</p>}
+
           <div className="form__actions">
             <button type="submit" className="btn">Save</button>
-            <button type="button" className="btn btn--secondary" onClick={() => setEditing(false)}>
+            <button type="button" className="btn btn--secondary" onClick={() => { setError(null); setEditing(false) }}>
               Cancel
             </button>
           </div>

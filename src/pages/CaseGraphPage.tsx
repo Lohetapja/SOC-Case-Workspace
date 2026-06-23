@@ -93,12 +93,15 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
           <h1 className="page__title">Case Graph</h1>
           <p className="page__subtitle">Visualize the relationships inside one case.</p>
         </header>
-        <p className="cases-note">
-          No cases to visualize yet. Create a case or load a guided sample case first.
-        </p>
-        <button type="button" className="btn" onClick={() => onOpenCase(null)}>
-          Go to Cases
-        </button>
+        <div className="empty-state">
+          <p className="cases-note">
+            No cases to visualize yet. Create a case or load a guided sample case first, then come
+            back to inspect its Case Graph or Artifact Map.
+          </p>
+          <button type="button" className="btn" onClick={() => onOpenCase(null)}>
+            Go to Cases
+          </button>
+        </div>
       </div>
     )
   }

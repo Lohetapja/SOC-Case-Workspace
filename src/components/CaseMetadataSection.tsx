@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import type { SocCase } from '../types'
 import type { CaseMetadataInput } from '../data/casesStore'
 import { severityLabels, sourceLabels, statusLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 interface CaseMetadataSectionProps {
   socCase: SocCase
@@ -36,6 +37,14 @@ export function CaseMetadataSection({ socCase, onSave }: CaseMetadataSectionProp
     event.preventDefault()
     if (!title.trim()) {
       setError('A case title is required.')
+      return
+    }
+    if (
+      !isAllowedValue(source, sources) ||
+      !isAllowedValue(severity, severities) ||
+      !isAllowedValue(status, statuses)
+    ) {
+      setError('Choose valid source, severity, and status values.')
       return
     }
     onSave({ title, summary, source, severity, status, owner })

@@ -43,7 +43,7 @@ export function TimelineSection({ timeline, evidence, onAdd, onUpdate, onRemove 
             className="btn btn--secondary btn--sm"
             onClick={() => setShowForm(true)}
           >
-            Add event
+            Add timeline event
           </button>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { RecommendationCategory, RecommendationPriority, RecommendationStatus } from '../types'
 import type { NewRecommendationInput } from '../data/casesStore'
 import { priorityLabels, recommendationCategoryLabels, recommendationStatusLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const categories = Object.keys(recommendationCategoryLabels) as RecommendationCategory[]
 const priorities = Object.keys(priorityLabels) as RecommendationPriority[]
@@ -26,6 +27,15 @@ export function AddRecommendationForm({ onAdd, onCancel }: AddRecommendationForm
       setError('A recommendation title or action is required.')
       return
     }
+    if (
+      !isAllowedValue(category, categories) ||
+      !isAllowedValue(priority, priorities) ||
+      !isAllowedValue(status, statuses)
+    ) {
+      setError('Choose valid recommendation category, priority, and status values.')
+      return
+    }
+    setError(null)
     onAdd({ title, category, priority, status, description })
   }
 

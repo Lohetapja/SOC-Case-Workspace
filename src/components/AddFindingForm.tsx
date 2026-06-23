@@ -14,6 +14,7 @@ import {
   findingStatusLabels,
   severityLabels,
 } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const categoryOptions = Object.keys(findingCategoryLabels) as FindingCategory[]
 const severityOptions = Object.keys(severityLabels) as Severity[]
@@ -50,6 +51,16 @@ export function AddFindingForm({ evidence, timeline, onAdd, onCancel, initialVal
       setError('A finding title is required.')
       return
     }
+    if (
+      !isAllowedValue(category, categoryOptions) ||
+      !isAllowedValue(severity, severityOptions) ||
+      !isAllowedValue(confidence, confidenceOptions) ||
+      !isAllowedValue(status, statusOptions)
+    ) {
+      setError('Choose valid finding category, severity, confidence, and status values.')
+      return
+    }
+    setError(null)
     onAdd({
       title,
       category,

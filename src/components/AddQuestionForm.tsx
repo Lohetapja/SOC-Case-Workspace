@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { QuestionStatus } from '../types'
 import type { NewQuestionInput } from '../data/casesStore'
 import { questionStatusLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const statusOptions = Object.keys(questionStatusLabels) as QuestionStatus[]
 
@@ -25,6 +26,11 @@ export function AddQuestionForm({ onAdd, onCancel, initialValue }: AddQuestionFo
       setError('A question is required.')
       return
     }
+    if (!isAllowedValue(status, statusOptions)) {
+      setError('Choose a valid question status.')
+      return
+    }
+    setError(null)
     onAdd({ question, status, answer, rationale })
   }
 

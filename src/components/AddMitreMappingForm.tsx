@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { Confidence, EvidenceItem, Finding } from '../types'
 import type { NewMitreInput } from '../data/casesStore'
 import { confidenceLabels } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const confidenceOptions = Object.keys(confidenceLabels) as Confidence[]
 
@@ -34,6 +35,11 @@ export function AddMitreMappingForm({ findings, evidence, onAdd, onCancel, initi
       setError('Technique ID and name are required.')
       return
     }
+    if (!isAllowedValue(confidence, confidenceOptions)) {
+      setError('Choose a valid confidence value.')
+      return
+    }
+    setError(null)
     onAdd({
       techniqueId,
       techniqueName,

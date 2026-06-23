@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { EvidenceType } from '../types'
 import type { NewEvidenceInput } from '../data/casesStore'
 import { evidenceTypeLabels } from '../data/labels'
+import { isAllowedValue, isValidOptionalDateTimeLocal } from '../utils/formValidation'
 
 const evidenceTypeOptions = Object.keys(evidenceTypeLabels) as EvidenceType[]
 
@@ -26,6 +27,15 @@ export function AddEvidenceForm({ onAdd, onCancel, initialValue }: AddEvidenceFo
       setError('An evidence title is required.')
       return
     }
+    if (!isAllowedValue(type, evidenceTypeOptions)) {
+      setError('Choose a valid evidence type.')
+      return
+    }
+    if (!isValidOptionalDateTimeLocal(observedAt)) {
+      setError('Observed time must be a valid date and time.')
+      return
+    }
+    setError(null)
     onAdd({ title, type, source, observedAt, detail })
   }
 

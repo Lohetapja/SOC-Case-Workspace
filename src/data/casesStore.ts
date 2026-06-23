@@ -34,9 +34,35 @@ import { demoCases } from './demoCases'
 import { getCaseTemplate, type CaseTemplate } from './caseTemplates'
 
 const STORAGE_KEY = 'soc-case-workspace:cases'
+const STORAGE_WARNING_KEY = 'soc-case-workspace:storage-warning'
+const VALID_CASE_SOURCES: CaseSource[] = [
+  'edr',
+  'siem',
+  'email_gateway',
+  'identity_provider',
+  'firewall',
+  'cloud',
+  'user_report',
+  'threat_intel',
+  'other',
+]
+const VALID_SEVERITIES: Severity[] = ['informational', 'low', 'medium', 'high', 'critical']
+const VALID_CASE_STATUSES: CaseStatus[] = ['new', 'triage', 'investigating', 'closed']
 
 /** Bump if the persisted/exported case shape changes incompatibly. */
 export const CASES_SCHEMA_VERSION = 1
+
+export function getStorageWarning(): string | null {
+  return readJSON<string | null>(STORAGE_WARNING_KEY, null)
+}
+
+export function clearStorageWarning(): void {
+  removeKey(STORAGE_WARNING_KEY)
+}
+
+function setStorageWarning(message: string): void {
+  writeJSON(STORAGE_WARNING_KEY, message)
+}
 
 /**
  * Load cases from localStorage. On first run (no stored value yet) the store is
@@ -44,8 +70,28 @@ export const CASES_SCHEMA_VERSION = 1
  * An explicitly emptied list (`[]`) is respected and not re-seeded.
  */
 export function loadCases(): SocCase[] {
-  const stored = readJSON<SocCase[] | null>(STORAGE_KEY, null)
-  if (stored && Array.isArray(stored)) return stored
+  let stored: unknown
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (raw === null) {
+      clearStorageWarning()
+      writeJSON(STORAGE_KEY, demoCases)
+      return demoCases
+    }
+    stored = JSON.parse(raw)
+  } catch {
+    setStorageWarning('Saved case data could not be read safely, so the demo cases were restored.')
+    writeJSON(STORAGE_KEY, demoCases)
+    return demoCases
+  }
+
+  if (Array.isArray(stored) && stored.every(isValidCaseShape)) {
+    clearStorageWarning()
+    return stored as SocCase[]
+  }
+
+  setStorageWarning('Saved case data had an unexpected shape, so the demo cases were restored.')
   writeJSON(STORAGE_KEY, demoCases)
   return demoCases
 }
@@ -106,6 +152,13 @@ function isValidCaseShape(value: unknown): boolean {
   return (
     typeof candidate.id === 'string' &&
     typeof candidate.title === 'string' &&
+    typeof candidate.summary === 'string' &&
+    typeof candidate.owner === 'string' &&
+    typeof candidate.createdAt === 'string' &&
+    typeof candidate.updatedAt === 'string' &&
+    VALID_CASE_SOURCES.includes(candidate.source as CaseSource) &&
+    VALID_SEVERITIES.includes(candidate.severity as Severity) &&
+    VALID_CASE_STATUSES.includes(candidate.status as CaseStatus) &&
     requiredArrays.every((key) => Array.isArray(candidate[key]))
   )
 }

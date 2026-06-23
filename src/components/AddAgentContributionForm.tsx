@@ -11,6 +11,7 @@ import {
   agentContributionTypeLabels,
   confidenceLabels,
 } from '../data/labels'
+import { isAllowedValue } from '../utils/formValidation'
 
 const typeOptions = Object.keys(agentContributionTypeLabels) as AgentContributionType[]
 const statusOptions = Object.keys(agentContributionStatusLabels) as AgentContributionStatus[]
@@ -50,6 +51,15 @@ export function AddAgentContributionForm({
       setError('Agent/tool name and pasted output are required.')
       return
     }
+    if (!isAllowedValue(type, typeOptions) || !isAllowedValue(status, statusOptions)) {
+      setError('Choose valid contribution type and review status values.')
+      return
+    }
+    if (confidence && !isAllowedValue(confidence, confidenceOptions)) {
+      setError('Choose a valid confidence value or leave it unset.')
+      return
+    }
+    setError(null)
     onAdd({ agentName, type, output, confidence, status, relatedEvidenceIds: evidenceIds })
   }
 

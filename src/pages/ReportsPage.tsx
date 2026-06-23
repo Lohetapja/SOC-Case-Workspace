@@ -177,7 +177,10 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
       {actionFeedback && <p className="action-feedback" role="status">{actionFeedback}</p>}
 
       {filteredCases.length === 0 ? (
-        <p className="cases-note">No report-ready cases match your filters.</p>
+        <p className="cases-note">
+          No cases match your report filters. Clear filters or open Cases to add more investigation
+          data before exporting a report.
+        </p>
       ) : (
         <div className="case-list">
           {filteredCases.map((socCase) => {

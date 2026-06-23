@@ -3,6 +3,7 @@ import type { CaseSource, Severity } from '../types'
 import type { NewCaseInput } from '../data/casesStore'
 import { severityLabels, sourceLabels } from '../data/labels'
 import { caseTemplates, getCaseTemplate } from '../data/caseTemplates'
+import { isAllowedValue } from '../utils/formValidation'
 
 interface CreateCaseFormProps {
   onCreate: (input: NewCaseInput) => void
@@ -30,6 +31,11 @@ export function CreateCaseForm({ onCreate, onCancel }: CreateCaseFormProps) {
       setError('A case title is required.')
       return
     }
+    if (!isAllowedValue(source, sourceOptions) || !isAllowedValue(severity, severityOptions)) {
+      setError('Choose a valid source and severity.')
+      return
+    }
+    setError(null)
     onCreate({ title, summary, source, severity, owner, templateId: templateId || undefined })
   }
 

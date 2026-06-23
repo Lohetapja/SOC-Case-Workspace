@@ -284,10 +284,17 @@ export function CasesPage({
       )}
 
       {cases.length === 0 ? (
-        <p className="cases-note">
-          No cases in this browser yet. Create a blank or template-based case above, or load a
-          guided case from Sample Cases.
-        </p>
+        <div className="empty-state empty-state--stacked">
+          <p className="cases-note">
+            No cases in this browser yet. Create a blank or template-based case here, or load a
+            guided synthetic case from Sample Cases to explore the full workflow.
+          </p>
+          {!showForm && (
+            <button type="button" className="btn btn--secondary" onClick={() => setShowForm(true)}>
+              New case
+            </button>
+          )}
+        </div>
       ) : (
         <div className="case-list">
           {cases.map((socCase) => (
