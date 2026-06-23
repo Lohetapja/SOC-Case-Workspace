@@ -144,10 +144,10 @@ export function ReadOnlyCasePage({
         </p>
         <div className="viewer-actions">
           <button type="button" className="btn" onClick={() => handleCopyReport(socCase)}>
-            Copy Markdown report
+            Copy Markdown
           </button>
           <button type="button" className="btn btn--secondary" onClick={() => handleDownloadReport(socCase)}>
-            Download Markdown
+            Download .md
           </button>
         </div>
         {feedback && <p className="action-feedback" role="status">{feedback}</p>}

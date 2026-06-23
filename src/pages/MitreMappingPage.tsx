@@ -58,7 +58,7 @@ export function MitreMappingPage({ onOpenCase }: MitreMappingPageProps) {
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">MITRE ATT&CK mapping</h1>
+        <h1 className="page__title">MITRE ATT&CK Mapping</h1>
         <p className="page__subtitle">
           Analyst-authored ATT&CK mappings across your cases ({items.length}{' '}
           {items.length === 1 ? 'mapping' : 'mappings'}). These are analyst conclusions, not

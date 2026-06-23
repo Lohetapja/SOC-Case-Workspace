@@ -19,7 +19,7 @@ export const navItems: NavItem[] = [
   { id: 'evidence', label: 'Evidence', description: 'Review collected evidence across all cases.' },
   { id: 'timeline', label: 'Timeline', description: 'Review investigation events chronologically.' },
   { id: 'journal', label: 'Decision Journal', description: 'Review analyst questions and decisions.' },
-  { id: 'mitre', label: 'MITRE Mapping', description: 'Review analyst-authored ATT&CK mappings.' },
+  { id: 'mitre', label: 'MITRE ATT&CK Mapping', description: 'Review analyst-authored ATT&CK mappings.' },
   { id: 'reports', label: 'Reports', description: 'Preview, copy, or download a Markdown report.' },
   { id: 'settings', label: 'Settings', description: 'Back up, restore, or reset your local data.' },
 ]

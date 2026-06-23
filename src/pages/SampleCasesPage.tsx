@@ -40,7 +40,7 @@ export function SampleCasesPage({ onOpenCase }: SampleCasesPageProps) {
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">Sample cases</h1>
+        <h1 className="page__title">Sample Cases</h1>
         <p className="page__subtitle">
           A guided demo library of fully-populated synthetic cases. Load one and explore how an
           investigation is structured end to end.
