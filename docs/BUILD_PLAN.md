@@ -221,6 +221,11 @@ in-browser; `npm run build` passes.
   preserved. Settings can export/import replayable workspace snapshots containing
   cases, graph layout positions, and app-level settings placeholders, while still
   accepting older case-only backups.
+- ☑ **Responsive Artifact Map + selective workspace export** — Artifact Map keeps
+  the lane flow readable on smaller screens by moving details/gaps below the map,
+  while hover/selection highlighting clarifies relationships. Settings can export
+  the full workspace, one selected case, or multiple selected cases, with optional
+  graph-layout and sample-case inclusion.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ### Parking lot (not scheduled)

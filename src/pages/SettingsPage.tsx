@@ -1,4 +1,5 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useMemo, useRef, useState, type ChangeEvent } from 'react'
+import type { SocCase } from '../types'
 import { useCases } from '../hooks/useCases'
 import {
   clearStorageWarning,
@@ -16,6 +17,7 @@ import {
   buildWorkspaceSnapshot,
   parseWorkspaceImport,
   workspaceSnapshotFilename,
+  type WorkspaceSnapshotExportType,
 } from '../data/workspaceSnapshot'
 
 /**
@@ -28,6 +30,20 @@ export function SettingsPage() {
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [storageWarning, setStorageWarning] = useState<string | null>(() => getStorageWarning())
+  const [exportType, setExportType] = useState<WorkspaceSnapshotExportType>('whole-workspace')
+  const [selectedCaseId, setSelectedCaseId] = useState(() => cases[0]?.id ?? '')
+  const [selectedCaseIds, setSelectedCaseIds] = useState<string[]>(() =>
+    cases[0] ? [cases[0].id] : [],
+  )
+  const [includeGraphLayouts, setIncludeGraphLayouts] = useState(true)
+  const [includeDemoCases, setIncludeDemoCases] = useState(true)
+  const [includeAppSettings, setIncludeAppSettings] = useState(true)
+
+  const selectedExportIds = useMemo(() => {
+    if (exportType === 'selected-case') return selectedCaseId ? [selectedCaseId] : []
+    if (exportType === 'selected-cases') return selectedCaseIds
+    return cases.map((socCase) => socCase.id)
+  }, [cases, exportType, selectedCaseId, selectedCaseIds])
 
   function reloadAfterFeedback() {
     window.setTimeout(() => window.location.reload(), 900)
@@ -37,8 +53,29 @@ export function SettingsPage() {
     setError(null)
     setMessage(null)
     try {
-      const filename = workspaceSnapshotFilename()
-      const json = JSON.stringify(buildWorkspaceSnapshot(cases, loadAllGraphLayouts()), null, 2)
+      if (cases.length === 0) {
+        setError('There are no cases to export yet.')
+        return
+      }
+      if (exportType !== 'whole-workspace' && selectedExportIds.length === 0) {
+        setError('Choose at least one case before exporting a selected-case snapshot.')
+        return
+      }
+
+      const snapshot = buildWorkspaceSnapshot(cases, loadAllGraphLayouts(), {
+        exportType,
+        selectedCaseIds: selectedExportIds,
+        includeGraphLayouts,
+        includeDemoCases,
+        includeAppSettings,
+      })
+      if (snapshot.cases.length === 0) {
+        setError('No cases matched the current export options. Adjust the selected cases or include demo/sample cases.')
+        return
+      }
+
+      const filename = workspaceSnapshotFilename(snapshot)
+      const json = JSON.stringify(snapshot, null, 2)
       const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
@@ -48,7 +85,7 @@ export function SettingsPage() {
       anchor.click()
       document.body.removeChild(anchor)
       URL.revokeObjectURL(url)
-      setMessage(`Export started: ${filename}`)
+      setMessage(`Export started: ${filename} (${snapshot.cases.length} case${snapshot.cases.length === 1 ? '' : 's'}).`)
     } catch {
       setError('Could not create the workspace snapshot. Your local data was not changed.')
     }
@@ -73,22 +110,44 @@ export function SettingsPage() {
 
         const imported = parseWorkspaceImport(parsed)
         const importedCases = imported.kind === 'snapshot' ? imported.snapshot.cases : imported.cases
-        const importLabel =
-          imported.kind === 'snapshot'
-            ? `${importedCases.length} case(s) and saved graph layouts`
-            : `${importedCases.length} case(s) from an older case-only backup`
-        const ok = window.confirm(
-          `Replace the current workspace with ${importLabel} from "${file.name}"? This cannot be undone.`,
-        )
-        if (!ok) {
-          setMessage('Import canceled. Your current workspace was not changed.')
-          return
+        if (importedCases.length === 0) {
+          throw new Error('The import file does not contain any cases.')
         }
 
-        persistCases(importedCases)
         if (imported.kind === 'snapshot') {
-          replaceAllGraphLayouts(imported.snapshot.graphLayouts)
+          if (imported.snapshot.exportType === 'whole-workspace') {
+            const ok = window.confirm(
+              `Replace the current workspace with ${importedCases.length} case(s) and saved graph layouts from "${file.name}"? This cannot be undone.`,
+            )
+            if (!ok) {
+              setMessage('Import canceled. Your current workspace was not changed.')
+              return
+            }
+            persistCases(importedCases)
+            replaceAllGraphLayouts(imported.snapshot.graphLayouts)
+          } else {
+            const ok = window.confirm(
+              `Add or merge ${importedCases.length} selected case(s) from "${file.name}" into the current workspace? Cases with matching IDs will be replaced.`,
+            )
+            if (!ok) {
+              setMessage('Import canceled. Your current workspace was not changed.')
+              return
+            }
+            persistCases(mergeCasesById(cases, importedCases))
+            replaceAllGraphLayouts({
+              ...loadAllGraphLayouts(),
+              ...imported.snapshot.graphLayouts,
+            })
+          }
         } else {
+          const ok = window.confirm(
+            `Replace the current workspace with ${importedCases.length} case(s) from older case-only backup "${file.name}"? This cannot be undone.`,
+          )
+          if (!ok) {
+            setMessage('Import canceled. Your current workspace was not changed.')
+            return
+          }
+          persistCases(importedCases)
           clearAllGraphLayouts()
         }
         clearStorageWarning()
@@ -101,6 +160,12 @@ export function SettingsPage() {
     }
     reader.onerror = () => setError('Could not read the selected file.')
     reader.readAsText(file)
+  }
+
+  function toggleSelectedCase(caseId: string, checked: boolean) {
+    setSelectedCaseIds((current) =>
+      checked ? [...new Set([...current, caseId])] : current.filter((id) => id !== caseId),
+    )
   }
 
   function handleReset() {
@@ -154,6 +219,10 @@ export function SettingsPage() {
             Workspace snapshots let you save the current investigation state and load it later.
             This is useful for demos, training, portfolio review, and replaying a completed case.
           </p>
+          <p className="data-management__help">
+            Use full workspace export to replay an entire demo. Use selected case export when you
+            want to share or preserve only one investigation.
+          </p>
           <p className="data-management__safety">
             Do not export real sensitive investigation data. This portfolio demo is designed for
             synthetic data.
@@ -191,9 +260,83 @@ export function SettingsPage() {
           <div>
             <p className="data-action__title">Export workspace snapshot</p>
             <p className="data-action__help">
-              Download all {cases.length} current case{cases.length === 1 ? '' : 's'}, saved Case
-              Graph node positions, and app-level settings as one replayable JSON snapshot.
+              Download the whole workspace or selected case snapshots as replayable JSON. Full
+              exports are best for demos; selected exports are best for preserving one
+              investigation.
             </p>
+            <div className="export-options" aria-label="Export options">
+              <label className="form__label">
+                Export scope
+                <select
+                  value={exportType}
+                  onChange={(event) => setExportType(event.target.value as WorkspaceSnapshotExportType)}
+                >
+                  <option value="whole-workspace">Export whole workspace</option>
+                  <option value="selected-case">Export selected case</option>
+                  <option value="selected-cases">Export selected cases</option>
+                </select>
+              </label>
+
+              {exportType === 'selected-case' && (
+                <label className="form__label">
+                  Case to export
+                  <select
+                    value={selectedCaseId || cases[0]?.id || ''}
+                    onChange={(event) => setSelectedCaseId(event.target.value)}
+                    disabled={cases.length === 0}
+                  >
+                    {cases.map((socCase) => (
+                      <option key={socCase.id} value={socCase.id}>
+                        {socCase.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {exportType === 'selected-cases' && (
+                <fieldset className="export-options__cases">
+                  <legend>Cases to export</legend>
+                  {cases.map((socCase) => (
+                    <label key={socCase.id} className="export-options__check">
+                      <input
+                        type="checkbox"
+                        checked={selectedCaseIds.includes(socCase.id)}
+                        onChange={(event) => toggleSelectedCase(socCase.id, event.target.checked)}
+                      />
+                      <span>{socCase.title}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+
+              <div className="export-options__toggles">
+                <label className="export-options__check">
+                  <input
+                    type="checkbox"
+                    checked={includeGraphLayouts}
+                    onChange={(event) => setIncludeGraphLayouts(event.target.checked)}
+                  />
+                  <span>Include graph layout positions</span>
+                </label>
+                <label className="export-options__check">
+                  <input
+                    type="checkbox"
+                    checked={includeDemoCases}
+                    onChange={(event) => setIncludeDemoCases(event.target.checked)}
+                  />
+                  <span>Include demo/sample cases</span>
+                </label>
+                <label className="export-options__check">
+                  <input
+                    type="checkbox"
+                    checked={includeAppSettings}
+                    onChange={(event) => setIncludeAppSettings(event.target.checked)}
+                  />
+                  <span>Include templates/settings placeholders</span>
+                </label>
+              </div>
+            </div>
           </div>
           <button type="button" className="btn data-action__btn" onClick={handleExportSnapshot}>
             Export snapshot
@@ -204,9 +347,9 @@ export function SettingsPage() {
           <div>
             <p className="data-action__title">Import workspace snapshot</p>
             <p className="data-action__help">
-              Load a workspace snapshot and restore cases plus graph layouts where possible. Older
-              case-only JSON backups are still accepted. Import <strong>replaces</strong> current
-              local workspace data after validation and confirmation.
+              Load a workspace snapshot and restore cases plus graph layouts where possible.
+              Whole-workspace snapshots replace current data after confirmation; selected-case
+              snapshots are added or merged. Older case-only JSON backups are still accepted.
             </p>
           </div>
           <button
@@ -263,4 +406,9 @@ export function SettingsPage() {
       </section>
     </div>
   )
+}
+
+function mergeCasesById(currentCases: SocCase[], importedCases: SocCase[]): SocCase[] {
+  const importedIds = new Set(importedCases.map((socCase) => socCase.id))
+  return [...importedCases, ...currentCases.filter((socCase) => !importedIds.has(socCase.id))]
 }

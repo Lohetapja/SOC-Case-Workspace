@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { AllCaseLayouts } from '../utils/graphLayout'
 import { demoCases } from './demoCases'
 import { sampleLibrary } from './sampleLibrary'
 import {
@@ -10,6 +11,7 @@ import {
   WORKSPACE_SNAPSHOT_SCHEMA_VERSION,
   buildWorkspaceSnapshot,
   parseWorkspaceImport,
+  workspaceSnapshotFilename,
 } from './workspaceSnapshot'
 
 describe('case import, export, and bundled samples', () => {
@@ -29,7 +31,7 @@ describe('case import, export, and bundled samples', () => {
   })
 
   it('builds and parses a replayable workspace snapshot', () => {
-    const graphLayouts = {
+    const graphLayouts: AllCaseLayouts = {
       [demoCases[0].id]: {
         'case:demo-node': { x: 12, y: -8 },
       },
@@ -38,9 +40,43 @@ describe('case import, export, and bundled samples', () => {
     const parsed = parseWorkspaceImport(snapshot)
 
     expect(snapshot.schemaVersion).toBe(WORKSPACE_SNAPSHOT_SCHEMA_VERSION)
-    expect(snapshot.exportType).toBe('soc-case-workspace-snapshot')
+    expect(snapshot.format).toBe('soc-case-workspace-snapshot')
+    expect(snapshot.exportType).toBe('whole-workspace')
     expect(snapshot.exportedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
     expect(parsed).toEqual({ kind: 'snapshot', snapshot })
+  })
+
+  it('builds selected-case snapshots with only that case and layout', () => {
+    const graphLayouts: AllCaseLayouts = {
+      [demoCases[0].id]: {
+        'case:demo-node': { x: 12, y: -8 },
+      },
+      [demoCases[1].id]: {
+        'case:other-node': { x: 1, y: 2 },
+      },
+    }
+    const snapshot = buildWorkspaceSnapshot(demoCases, graphLayouts, {
+      exportType: 'selected-case',
+      selectedCaseIds: [demoCases[0].id],
+    })
+
+    expect(snapshot.exportType).toBe('selected-case')
+    expect(snapshot.cases.map((socCase) => socCase.id)).toEqual([demoCases[0].id])
+    expect(snapshot.selectedCaseIds).toEqual([demoCases[0].id])
+    expect(Object.keys(snapshot.graphLayouts)).toEqual([demoCases[0].id])
+    expect(workspaceSnapshotFilename(snapshot)).toMatch(
+      /^soc-case-workspace-case-suspicious-powershell-launched-from-outlook-\d{4}-\d{2}-\d{2}\.json$/,
+    )
+  })
+
+  it('can exclude bundled sample cases from a full export', () => {
+    const customCase = { ...demoCases[0], id: 'case-custom-review', title: 'Custom Review Case' }
+    const snapshot = buildWorkspaceSnapshot([demoCases[0], customCase], {}, {
+      includeDemoCases: false,
+    })
+
+    expect(snapshot.exportType).toBe('whole-workspace')
+    expect(snapshot.cases.map((socCase) => socCase.id)).toEqual(['case-custom-review'])
   })
 
   it('keeps old case-only imports working through the workspace import path', () => {

@@ -56,12 +56,56 @@ interface ArtifactMapProps {
 export function ArtifactMap({ socCase }: ArtifactMapProps) {
   const map = useMemo(() => buildArtifactMap(socCase), [socCase])
   const [selection, setSelection] = useState<Selection>(null)
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
+  const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null)
 
   const evidenceTitleById = useMemo(
     () => new Map(socCase.evidence.map((item) => [item.id, item.title])),
     [socCase],
   )
   const nodeById = useMemo(() => new Map(map.nodes.map((node) => [node.id, node])), [map])
+  const edgeById = useMemo(() => new Map(map.edges.map((edge) => [edge.id, edge])), [map])
+
+  const inspected = useMemo<Selection>(() => {
+    if (selection) return selection
+    if (hoveredEdgeId) {
+      const edge = edgeById.get(hoveredEdgeId)
+      if (edge) return { kind: 'edge', edge }
+    }
+    if (hoveredNodeId) {
+      const node = nodeById.get(hoveredNodeId)
+      if (node) return { kind: 'node', node }
+    }
+    return null
+  }, [edgeById, hoveredEdgeId, hoveredNodeId, nodeById, selection])
+
+  const highlighted = useMemo(() => {
+    const nodeIds = new Set<string>()
+    const edgeIds = new Set<string>()
+
+    if (inspected?.kind === 'edge') {
+      nodeIds.add(inspected.edge.source)
+      nodeIds.add(inspected.edge.target)
+      edgeIds.add(inspected.edge.id)
+    }
+
+    if (inspected?.kind === 'node') {
+      nodeIds.add(inspected.node.id)
+      for (const edge of map.edges) {
+        if (edge.source === inspected.node.id || edge.target === inspected.node.id) {
+          edgeIds.add(edge.id)
+          nodeIds.add(edge.source)
+          nodeIds.add(edge.target)
+        }
+      }
+    }
+
+    return {
+      hasFocus: Boolean(inspected),
+      nodeIds,
+      edgeIds,
+    }
+  }, [inspected, map.edges])
 
   // Deterministic positions: lane index → column, order-in-lane → row.
   const { positions, width, height } = useMemo(() => {
@@ -139,7 +183,7 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
           ))}
         </div>
 
-        <div className="amap__canvas" style={{ width, height }}>
+        <div className="amap__canvas" style={{ width, height }} onClick={() => setSelection(null)}>
           <svg className="amap__edges" width={width} height={height}>
             {map.edges.map((edge) => {
               const a = center(edge.source)
@@ -147,15 +191,24 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
               if (!a || !b) return null
               const dx = (b.x - a.x) * 0.4
               const d = `M ${a.x} ${a.y} C ${a.x + dx} ${a.y}, ${b.x - dx} ${b.y}, ${b.x} ${b.y}`
-              const active = selection?.kind === 'edge' && selection.edge.id === edge.id
+              const active = highlighted.edgeIds.has(edge.id)
+              const dimmed = highlighted.hasFocus && !active
               return (
                 <g key={edge.id} className="amap__edge">
                   <path
                     className="amap__edge-hit"
                     d={d}
-                    onClick={() => setSelection({ kind: 'edge', edge })}
+                    onMouseEnter={() => setHoveredEdgeId(edge.id)}
+                    onMouseLeave={() => setHoveredEdgeId((current) => (current === edge.id ? null : current))}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      setSelection({ kind: 'edge', edge })
+                    }}
                   />
-                  <path className={`amap__edge-line${active ? ' amap__edge-line--active' : ''}`} d={d} />
+                  <path
+                    className={`amap__edge-line${active ? ' amap__edge-line--active' : ''}${dimmed ? ' amap__edge-line--dimmed' : ''}`}
+                    d={d}
+                  />
                 </g>
               )
             })}
@@ -165,14 +218,22 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
             const p = positions.get(node.id)
             if (!p) return null
             const meta = ARTIFACT_META[node.type]
-            const active = selection?.kind === 'node' && selection.node.id === node.id
+            const selected = selection?.kind === 'node' && selection.node.id === node.id
+            const active = inspected?.kind === 'node' && inspected.node.id === node.id
+            const related = highlighted.nodeIds.has(node.id) && !active
+            const dimmed = highlighted.hasFocus && !highlighted.nodeIds.has(node.id)
             return (
               <button
                 key={node.id}
                 type="button"
-                className={`amap__card${active ? ' amap__card--selected' : ''}`}
+                className={`amap__card${selected ? ' amap__card--selected' : ''}${active ? ' amap__card--active' : ''}${related ? ' amap__card--related' : ''}${dimmed ? ' amap__card--dimmed' : ''}`}
                 style={{ left: p.x, top: p.y, width: CARD_W, height: CARD_H, borderLeftColor: meta.color }}
-                onClick={() => setSelection({ kind: 'node', node })}
+                onMouseEnter={() => setHoveredNodeId(node.id)}
+                onMouseLeave={() => setHoveredNodeId((current) => (current === node.id ? null : current))}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setSelection({ kind: 'node', node })
+                }}
               >
                 <span className="amap__card-type" style={{ color: meta.color }}>
                   {meta.label}
@@ -185,39 +246,39 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
       </div>
 
       <aside className="amap__panel">
-        {selection?.kind === 'node' ? (
+        {inspected?.kind === 'node' ? (
           <div className="amap__detail">
             <span className="amap__detail-type">
-              <span className="graph-dot" style={{ background: ARTIFACT_META[selection.node.type].color }} />
-              {ARTIFACT_META[selection.node.type].label}
+              <span className="graph-dot" style={{ background: ARTIFACT_META[inspected.node.type].color }} />
+              {ARTIFACT_META[inspected.node.type].label}
             </span>
-            <h3 className="amap__detail-title">{selection.node.title}</h3>
-            <p className="amap__detail-text">{selection.node.description}</p>
-            {selection.node.timestamp && (
-              <p className="amap__detail-meta">When: {formatDateTime(selection.node.timestamp)}</p>
+            <h3 className="amap__detail-title">{inspected.node.title}</h3>
+            <p className="amap__detail-text">{inspected.node.description}</p>
+            {inspected.node.timestamp && (
+              <p className="amap__detail-meta">When: {formatDateTime(inspected.node.timestamp)}</p>
             )}
-            {resolveEvidence(selection.node.relatedEvidenceIds).length > 0 && (
+            {resolveEvidence(inspected.node.relatedEvidenceIds).length > 0 && (
               <p className="amap__detail-meta">
-                Evidence: {resolveEvidence(selection.node.relatedEvidenceIds).join(', ')}
+                Evidence: {resolveEvidence(inspected.node.relatedEvidenceIds).join(', ')}
               </p>
             )}
             <p className="amap__detail-meta">
-              {selection.node.degree ?? 0}{' '}
-              {(selection.node.degree ?? 0) === 1 ? 'connection' : 'connections'}
+              {inspected.node.degree ?? 0}{' '}
+              {(inspected.node.degree ?? 0) === 1 ? 'connection' : 'connections'}
             </p>
           </div>
-        ) : selection?.kind === 'edge' ? (
+        ) : inspected?.kind === 'edge' ? (
           <div className="amap__detail">
             <span className="amap__detail-type">Relationship</span>
-            <h3 className="amap__detail-title">{selection.edge.label}</h3>
+            <h3 className="amap__detail-title">{inspected.edge.label}</h3>
             <p className="amap__detail-text">
-              <strong>{nodeById.get(selection.edge.source)?.title ?? selection.edge.source}</strong>
+              <strong>{nodeById.get(inspected.edge.source)?.title ?? inspected.edge.source}</strong>
               {' → '}
-              <strong>{nodeById.get(selection.edge.target)?.title ?? selection.edge.target}</strong>
+              <strong>{nodeById.get(inspected.edge.target)?.title ?? inspected.edge.target}</strong>
             </p>
-            {resolveEvidence(selection.edge.supportingEvidenceIds).length > 0 && (
+            {resolveEvidence(inspected.edge.supportingEvidenceIds).length > 0 && (
               <p className="amap__detail-meta">
-                Supporting evidence: {resolveEvidence(selection.edge.supportingEvidenceIds).join(', ')}
+                Supporting evidence: {resolveEvidence(inspected.edge.supportingEvidenceIds).join(', ')}
               </p>
             )}
           </div>
