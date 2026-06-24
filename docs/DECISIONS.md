@@ -177,3 +177,33 @@ lightweight development dependency and no production runtime cost. Full browser
 and accessibility testing remain future work if the project needs them. The test
 setup uses patched Node-18-compatible tool lines (Vitest 3.2.6+ and Vite 6.4.3+);
 the dependency audit reports no known vulnerabilities at this milestone.
+
+---
+
+## ADR-0011 — `SocCase` as the investigation source of truth
+**Date:** 2026-06-24 · **Status:** Accepted
+
+**Context:** The app now has many projections of the same investigation data:
+case detail, workspace-level Evidence / Timeline / Decision Journal / MITRE
+pages, Artifact Map, Case Graph, read-only viewer, reports, and workspace
+snapshot export/import. If those views drift into separate storage, users would
+have to enter the same investigation facts more than once.
+
+**Decision:** The persisted `SocCase` aggregate in browser `localStorage` remains
+the single source of truth for investigation content: evidence, timeline events,
+decision journal questions, findings, MITRE mappings, closure/classification,
+affected entities, recommendations, checklist state, and optional agent
+contributions. Case-detail edits must continue to use the shared
+`useCases().updateCase` flow. Workspace pages, visual transforms, reports,
+read-only views, and JSON exports are projections of the same case object.
+
+Graph node positions are the one separate persisted concern because they are UI
+layout preferences rather than investigation facts. They stay in
+`soc-case-workspace:graph-layout` and are included in workspace snapshots when
+requested.
+
+**Consequences:** Users can add or update case information once and expect it to
+appear everywhere that renders that case. Import/export stays replayable because
+the case object carries the investigation content and the optional graph-layout
+store carries only pinned canvas positions. New investigation sections should be
+added to `SocCase` first, not to page-specific storage.

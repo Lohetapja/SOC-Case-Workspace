@@ -250,6 +250,14 @@ in-browser; `npm run build` passes.
 - ☑ **Artifact Map bottom details panel** — Artifact Map now uses the full
   available width for the lane map, with artifact/relationship details, helper
   text, and Investigation Gaps in a bottom panel across desktop and mobile.
+- ☑ **README screenshots & demo walkthrough polish** — README now opens with a
+  clearer first-time visitor summary, live demo / GitHub Pages note,
+  synthetic-data guardrails, "What this demonstrates", a 10-step demo
+  walkthrough, screenshot placeholders, non-goals, and a practical roadmap.
+- ☑ **Cross-page data synchronization audit** — confirmed investigation content
+  uses `SocCase` / `updateCase` / localStorage as the source of truth across
+  detail, workspace pages, visuals, viewer, reports, and export/import; added a
+  regression test and ADR note documenting the contract.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ---
@@ -264,8 +272,8 @@ These refine already-shipped features; do them in order, one at a time.
    connectors stand out while unrelated context is dimmed.
 2. ☐ **Mobile sidebar / responsive app shell** — polish the responsive shell: the
    sidebar drawer behaviour, header/menu, and overall breakpoints on phones/tablets.
-3. ☐ **README screenshots & demo walkthrough polish** — add screenshots and a tighter
-   guided walkthrough so visitors understand the app at a glance.
+3. ☐ **Capture and commit README screenshots** — add the recommended screenshot
+   set under `docs/screenshots/` once final portfolio captures are ready.
 
 ### Parking lot (not scheduled)
 - Search & filter across cases.
