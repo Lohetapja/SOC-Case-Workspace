@@ -152,16 +152,6 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
               ))}
             </select>
           </label>
-          {viz === 'graph' && (
-            <button
-              type="button"
-              className="btn btn--secondary btn--sm"
-              onClick={handleResetLayout}
-              title="Clear pinned positions for this case and re-run the layout"
-            >
-              Reset layout
-            </button>
-          )}
           <button
             type="button"
             className="btn btn--sm"
@@ -209,29 +199,40 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
           </Suspense>
         </div>
 
-        <aside className="graph-panel">
-          {selectedNode ? (
-            <div className="graph-detail">
-              <span className="graph-detail__type">
-                <span
-                  className="graph-dot"
-                  style={{ background: COLOR_BY_TYPE[selectedNode.type] }}
-                />
-                {selectedNode.typeLabel}
-              </span>
-              <h2 className="graph-detail__title">{selectedNode.label}</h2>
-              <p className="graph-detail__text">{selectedNode.detail}</p>
-              <p className="graph-detail__meta">
-                {selectedNode.degree ?? 0}{' '}
-                {(selectedNode.degree ?? 0) === 1 ? 'connection' : 'connections'}
+        <aside className="graph-panel" aria-label="Case graph details and legend">
+          <div className="graph-panel__details">
+            {selectedNode ? (
+              <div className="graph-detail">
+                <span className="graph-detail__type">
+                  <span
+                    className="graph-dot"
+                    style={{ background: COLOR_BY_TYPE[selectedNode.type] }}
+                  />
+                  {selectedNode.typeLabel}
+                </span>
+                <h2 className="graph-detail__title">{selectedNode.label}</h2>
+                <p className="graph-detail__text">{selectedNode.detail}</p>
+                <p className="graph-detail__meta">
+                  {selectedNode.degree ?? 0}{' '}
+                  {(selectedNode.degree ?? 0) === 1 ? 'connection' : 'connections'}
+                </p>
+              </div>
+            ) : (
+              <p className="graph-hint">
+                Click a node for details. Drag a node to pin it (positions are saved
+                per case); scroll to zoom; drag the background to pan.
               </p>
-            </div>
-          ) : (
-            <p className="graph-hint">
-              Click a node for details. Drag a node to pin it (positions are saved
-              per case); scroll to zoom; drag the background to pan.
-            </p>
-          )}
+            )}
+
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm graph-reset"
+              onClick={handleResetLayout}
+              title="Clear pinned positions for this case and re-run the layout"
+            >
+              Reset layout
+            </button>
+          </div>
 
           <div className="graph-legend">
             <div className="graph-legend__title">Legend</div>

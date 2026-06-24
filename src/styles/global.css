@@ -699,8 +699,8 @@ body {
 
 .graph-body {
   display: flex;
-  height: calc(100vh - 300px);
-  min-height: 440px;
+  flex-direction: column;
+  min-height: calc(100vh - 300px);
   overflow: hidden;
   background: #0b0e14;
   border: 1px solid #1e2430;
@@ -709,8 +709,10 @@ body {
 
 .graph-canvas {
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
+  min-height: 440px;
   overflow: hidden;
 }
 
@@ -725,24 +727,26 @@ body {
 }
 
 .graph-panel {
-  width: 300px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 18px;
+  width: 100%;
   flex-shrink: 0;
   padding: 16px;
-  overflow-y: auto;
   background: #0d111a;
-  border-left: 1px solid #1e2430;
+  border-top: 1px solid #1e2430;
   color: #cbd5e1;
 }
 
 .graph-hint {
-  margin: 0 0 16px;
+  margin: 0;
   color: #64748b;
   font-size: 14px;
   line-height: 1.5;
 }
 
 .graph-detail {
-  margin-bottom: 18px;
+  margin: 0;
 }
 
 .graph-detail__type {
@@ -787,8 +791,20 @@ body {
 }
 
 .graph-legend {
-  padding-top: 14px;
-  border-top: 1px solid #1e2430;
+  padding-left: 18px;
+  border-left: 1px solid #1e2430;
+}
+
+.graph-panel__details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.graph-reset {
+  margin-top: auto;
 }
 
 .graph-legend__title {
@@ -2182,6 +2198,17 @@ body {
   .detail-header__actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .graph-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-legend {
+    padding-left: 0;
+    padding-top: 14px;
+    border-left: 0;
+    border-top: 1px solid #1e2430;
   }
 
   .filters__search {
