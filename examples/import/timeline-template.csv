@@ -1,0 +1,4 @@
+caseId,id,timestamp,phase,title,description,relatedEvidenceIds
+case-import-generic-alert-001,tl-template-001,2026-06-24T09:11:40Z,detection,Alert generated,Generic detection flagged suspicious command execution,ev-template-001
+case-import-generic-alert-001,tl-template-002,2026-06-24T09:12:00Z,attacker_activity,Encoded command executed,PowerShell command execution observed on the affected workstation,ev-template-001
+case-import-generic-alert-001,tl-template-003,2026-06-24T09:13:00Z,attacker_activity,Outbound connection observed,Network telemetry followed command execution,ev-template-002

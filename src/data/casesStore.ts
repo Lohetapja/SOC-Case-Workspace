@@ -119,17 +119,22 @@ export function casesExportFilename(): string {
 }
 
 /**
- * Validate parsed JSON and extract the cases. Accepts either an export envelope
- * (`{ cases: [...] }`) or a bare array of cases. Throws a clear error otherwise.
+ * Validate parsed JSON and extract the cases. Accepts a workspace/case export
+ * envelope (`{ cases: [...] }`), a bare array of cases, or a single SocCase
+ * object. Throws a clear error otherwise.
  */
 export function parseCasesImport(raw: unknown): SocCase[] {
   const cases = Array.isArray(raw)
     ? raw
     : raw && typeof raw === 'object' && Array.isArray((raw as { cases?: unknown }).cases)
       ? (raw as { cases: unknown[] }).cases
+      : isValidCaseShape(raw)
+        ? [raw]
       : null
   if (!cases) {
-    throw new Error('Expected a JSON array of cases, or an object with a "cases" array.')
+    throw new Error(
+      'Expected a single case object, a JSON array of cases, or an object with a "cases" array.',
+    )
   }
   if (!cases.every(isValidCaseShape)) {
     throw new Error('One or more cases are missing required fields (id, title, and the section arrays).')

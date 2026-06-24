@@ -128,7 +128,7 @@ README are below; add images under `docs/screenshots/` when captures are ready.
   agent output remains separate from evidence.
 - Read-only case viewer for clean review.
 - Live Markdown report preview with copy and `.md` download.
-- JSON backup/import and demo-data reset controls.
+- JSON backup/import, documented import schema, and demo-data reset controls.
 - Responsive layout with a mobile navigation drawer.
 - Browser `localStorage` persistence with no accounts or server.
 
@@ -157,7 +157,6 @@ reasoning visible, reviewable, and exportable.
 
 Practical next items:
 
-- Better sample cases with stronger walkthrough value.
 - More report polish, including clearer executive-summary wording and optional
   formatting refinements.
 - Accessibility pass for keyboard flow, focus states, contrast, and screen-reader
@@ -209,6 +208,8 @@ npm run preview
 - [Product specification](docs/PRODUCT_SPEC.md)
 - [Build plan](docs/BUILD_PLAN.md)
 - [Architecture decisions](docs/DECISIONS.md)
+- [Import schema](docs/IMPORT_SCHEMA.md)
+- [Integration guide](docs/INTEGRATION_GUIDE.md)
 - [AI-assisted development guidance](AGENTS.md)
 
 ## Author

@@ -207,3 +207,8 @@ appear everywhere that renders that case. Import/export stays replayable because
 the case object carries the investigation content and the optional graph-layout
 store carries only pinned canvas positions. New investigation sections should be
 added to `SocCase` first, not to page-specific storage.
+
+**Import implication:** File-based imports should normalize external exports
+into `SocCase` or a workspace snapshot containing `SocCase` records. This keeps
+future adapters human-reviewed and local-first. Live connectors, API keys, and
+backend sync remain out of scope unless the project scope explicitly changes.

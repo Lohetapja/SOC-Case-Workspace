@@ -140,15 +140,26 @@ export function SettingsPage() {
             })
           }
         } else {
-          const ok = window.confirm(
-            `Replace the current workspace with ${importedCases.length} case(s) from older case-only backup "${file.name}"? This cannot be undone.`,
-          )
-          if (!ok) {
-            setMessage('Import canceled. Your current workspace was not changed.')
-            return
+          if (importedCases.length === 1) {
+            const ok = window.confirm(
+              `Add or merge case "${importedCases[0].title}" from "${file.name}" into the current workspace? A case with the same ID will be replaced.`,
+            )
+            if (!ok) {
+              setMessage('Import canceled. Your current workspace was not changed.')
+              return
+            }
+            persistCases(mergeCasesById(cases, importedCases))
+          } else {
+            const ok = window.confirm(
+              `Replace the current workspace with ${importedCases.length} case(s) from older case-only backup "${file.name}"? This cannot be undone.`,
+            )
+            if (!ok) {
+              setMessage('Import canceled. Your current workspace was not changed.')
+              return
+            }
+            persistCases(importedCases)
+            clearAllGraphLayouts()
           }
-          persistCases(importedCases)
-          clearAllGraphLayouts()
         }
         clearStorageWarning()
         setStorageWarning(null)
@@ -349,7 +360,8 @@ export function SettingsPage() {
             <p className="data-action__help">
               Load a workspace snapshot and restore cases plus graph layouts where possible.
               Whole-workspace snapshots replace current data after confirmation; selected-case
-              snapshots are added or merged. Older case-only JSON backups are still accepted.
+              snapshots and single-case JSON files are added or merged. Older multi-case JSON
+              backups are still accepted.
             </p>
           </div>
           <button

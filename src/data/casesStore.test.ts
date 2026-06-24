@@ -27,7 +27,12 @@ describe('case import, export, and bundled samples', () => {
     expect(() => parseCasesImport({ cases: [{ id: 'broken', title: 'Missing arrays' }] })).toThrow(
       /missing required fields/i,
     )
-    expect(() => parseCasesImport({ unexpected: true })).toThrow(/expected a JSON array/i)
+    expect(() => parseCasesImport({ unexpected: true })).toThrow(/single case object/i)
+  })
+
+  it('accepts a single SocCase object as a one-case import', () => {
+    expect(parseCasesImport(demoCases[0])).toEqual([demoCases[0]])
+    expect(parseWorkspaceImport(demoCases[0])).toEqual({ kind: 'cases', cases: [demoCases[0]] })
   })
 
   it('builds and parses a replayable workspace snapshot', () => {
@@ -65,7 +70,7 @@ describe('case import, export, and bundled samples', () => {
     expect(snapshot.selectedCaseIds).toEqual([demoCases[0].id])
     expect(Object.keys(snapshot.graphLayouts)).toEqual([demoCases[0].id])
     expect(workspaceSnapshotFilename(snapshot)).toMatch(
-      /^soc-case-workspace-case-suspicious-powershell-launched-from-outlook-\d{4}-\d{2}-\d{2}\.json$/,
+      /^soc-case-workspace-case-phishing-to-powershell-execution-\d{4}-\d{2}-\d{2}\.json$/,
     )
   })
 

@@ -1,0 +1,195 @@
+{
+  "format": "soc-case-workspace-snapshot",
+  "exportType": "selected-case",
+  "schemaVersion": 1,
+  "exportedAt": "2026-06-24T12:00:00.000Z",
+  "selectedCaseIds": ["case-import-phishing-review-001"],
+  "selectedCaseTitles": ["Imported Example - Suspicious Email Review"],
+  "cases": [
+    {
+      "id": "case-import-phishing-review-001",
+      "title": "Imported Example - Suspicious Email Review",
+      "summary": "Synthetic selected-case snapshot showing how exported email, process, and network observations can be normalized into a complete SOC case.",
+      "source": "email_gateway",
+      "sourceDetail": "Synthetic secure email gateway export",
+      "severity": "high",
+      "status": "investigating",
+      "owner": "analyst.training",
+      "affectedEntities": [
+        {
+          "id": "entity-import-mailbox-001",
+          "type": "mailbox",
+          "value": "training.user@example.test",
+          "role": "Recipient mailbox",
+          "description": "Synthetic mailbox that received the suspicious message."
+        },
+        {
+          "id": "entity-import-host-002",
+          "type": "host",
+          "value": "WS-SYNTH-022",
+          "role": "Endpoint where follow-on execution was observed",
+          "description": "Synthetic workstation used for the import example."
+        },
+        {
+          "id": "entity-import-url-001",
+          "type": "url",
+          "value": "hxxps://payload.example.test/download",
+          "role": "Defanged URL from message body",
+          "description": "Synthetic defanged URL used to demonstrate artifact relationships."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "ev-import-email-001",
+          "type": "email",
+          "title": "Suspicious email delivered to mailbox",
+          "detail": "Synthetic gateway export shows an email with an external sender, finance-themed subject, and a defanged link.",
+          "source": "Email gateway message export",
+          "observedAt": "2026-06-24T08:45:00Z",
+          "relatedEntityIds": ["entity-import-mailbox-001", "entity-import-url-001"]
+        },
+        {
+          "id": "ev-import-process-002",
+          "type": "process",
+          "title": "Office process spawned script interpreter",
+          "detail": "Synthetic endpoint telemetry shows a document viewer process launching powershell.exe with a download-style command.",
+          "source": "Endpoint process telemetry export",
+          "observedAt": "2026-06-24T08:52:00Z",
+          "relatedEntityIds": ["entity-import-host-002"]
+        },
+        {
+          "id": "ev-import-network-002",
+          "type": "network",
+          "title": "Endpoint contacted defanged URL host",
+          "detail": "Synthetic proxy log shows WS-SYNTH-022 requesting hxxps://payload.example.test/download after script execution.",
+          "source": "Proxy log export",
+          "observedAt": "2026-06-24T08:53:00Z",
+          "relatedEntityIds": ["entity-import-host-002", "entity-import-url-001"]
+        }
+      ],
+      "timeline": [
+        {
+          "id": "tl-import-email-001",
+          "timestamp": "2026-06-24T08:45:00Z",
+          "title": "Suspicious email delivered",
+          "description": "Email gateway recorded delivery of the synthetic suspicious message.",
+          "phase": "detection",
+          "relatedEvidenceIds": ["ev-import-email-001"]
+        },
+        {
+          "id": "tl-import-process-002",
+          "timestamp": "2026-06-24T08:52:00Z",
+          "title": "Script interpreter launched",
+          "description": "Endpoint telemetry recorded Office-to-PowerShell process behavior.",
+          "phase": "attacker_activity",
+          "relatedEvidenceIds": ["ev-import-process-002"]
+        },
+        {
+          "id": "tl-import-network-002",
+          "timestamp": "2026-06-24T08:53:00Z",
+          "title": "Network request followed execution",
+          "description": "Proxy telemetry recorded a request to the defanged URL host.",
+          "phase": "attacker_activity",
+          "relatedEvidenceIds": ["ev-import-network-002"]
+        },
+        {
+          "id": "tl-import-containment-001",
+          "timestamp": "2026-06-24T09:10:00Z",
+          "title": "Mailbox and host queued for review",
+          "description": "Analyst marked the mailbox and workstation for containment validation.",
+          "phase": "analyst_action",
+          "relatedEvidenceIds": ["ev-import-email-001", "ev-import-process-002"]
+        }
+      ],
+      "analystQuestions": [
+        {
+          "id": "q-import-phish-001",
+          "question": "Did the recipient interact with the link or attachment?",
+          "status": "answered",
+          "answer": "Endpoint telemetry indicates script execution shortly after message delivery.",
+          "rationale": "Process and proxy evidence align within the same synthetic investigation window.",
+          "createdAt": "2026-06-24T09:00:00Z",
+          "answeredAt": "2026-06-24T09:15:00Z"
+        },
+        {
+          "id": "q-import-phish-002",
+          "question": "Are additional recipients affected?",
+          "status": "open",
+          "rationale": "Message search results have not yet been imported into this synthetic example.",
+          "createdAt": "2026-06-24T09:05:00Z"
+        }
+      ],
+      "findings": [
+        {
+          "id": "finding-import-phish-001",
+          "title": "Phishing delivery led to suspicious script execution",
+          "description": "Email, process, and proxy evidence support a sequence from suspicious message delivery to endpoint script execution and outbound connection.",
+          "confidence": "high",
+          "category": "malicious_activity",
+          "severity": "high",
+          "status": "confirmed",
+          "relatedEvidenceIds": ["ev-import-email-001", "ev-import-process-002", "ev-import-network-002"],
+          "relatedTimelineEventIds": ["tl-import-email-001", "tl-import-process-002", "tl-import-network-002"]
+        }
+      ],
+      "mitreMappings": [
+        {
+          "id": "mitre-import-phish-001",
+          "tactic": "Initial Access",
+          "techniqueId": "T1566.002",
+          "techniqueName": "Phishing: Spearphishing Link",
+          "rationale": "The synthetic email evidence includes a defanged URL that appears to initiate the follow-on activity.",
+          "confidence": "medium",
+          "relatedFindingIds": ["finding-import-phish-001"],
+          "relatedEvidenceIds": ["ev-import-email-001"]
+        },
+        {
+          "id": "mitre-import-phish-002",
+          "tactic": "Execution",
+          "techniqueId": "T1059.001",
+          "techniqueName": "PowerShell",
+          "rationale": "Endpoint telemetry shows PowerShell execution following suspicious email interaction.",
+          "confidence": "high",
+          "relatedFindingIds": ["finding-import-phish-001"],
+          "relatedEvidenceIds": ["ev-import-process-002"]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "rec-import-phish-001",
+          "title": "Quarantine related messages and review endpoint",
+          "description": "Search for matching synthetic message indicators, quarantine any matching messages, and review the endpoint for persistence or downloaded artifacts.",
+          "priority": "high",
+          "category": "containment",
+          "status": "proposed"
+        },
+        {
+          "id": "rec-import-phish-002",
+          "title": "Collect full message headers and proxy context",
+          "description": "Import complete email headers and related proxy events to close remaining investigation gaps.",
+          "priority": "medium",
+          "category": "monitoring",
+          "status": "proposed"
+        }
+      ],
+      "closure": {
+        "verdict": "true_positive",
+        "closureStatus": "monitoring",
+        "rationale": "The synthetic evidence chain supports suspicious email delivery leading to script execution. Additional recipient scoping remains open.",
+        "recommendedAction": "Complete message search and endpoint review before final closure.",
+        "impactSummary": "One synthetic mailbox and one synthetic workstation are currently in scope."
+      },
+      "createdAt": "2026-06-24T08:40:00Z",
+      "updatedAt": "2026-06-24T09:20:00Z"
+    }
+  ],
+  "graphLayouts": {
+    "case-import-phishing-review-001": {
+      "case:case-import-phishing-review-001": { "x": 0, "y": 0 },
+      "evidence:ev-import-email-001": { "x": -150, "y": -20 },
+      "evidence:ev-import-process-002": { "x": 0, "y": 120 },
+      "finding:finding-import-phish-001": { "x": 160, "y": 60 }
+    }
+  },
+  "appSettings": {}
+}

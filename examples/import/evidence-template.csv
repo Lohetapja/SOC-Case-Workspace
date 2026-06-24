@@ -1,0 +1,3 @@
+caseId,id,type,title,source,observedAt,detail,analystNote,relatedEntityIds
+case-import-generic-alert-001,ev-template-001,process,Suspicious encoded command,Generic EDR export,2026-06-24T09:12:00Z,Synthetic process event showing encoded command execution,Decode command before final classification,entity-import-user-001;entity-import-host-001
+case-import-generic-alert-001,ev-template-002,network,Outbound connection after execution,Generic proxy export,2026-06-24T09:13:00Z,Synthetic connection to 198.51.100.77 over TCP 443,Validate whether destination is expected,entity-import-host-001;entity-import-ip-001

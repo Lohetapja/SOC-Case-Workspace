@@ -1,0 +1,133 @@
+{
+  "id": "case-import-generic-alert-001",
+  "title": "Generic SIEM Alert - Suspicious Encoded Command",
+  "summary": "Synthetic example normalized from a generic alert export. The case models a user workstation launching an encoded command that requires analyst review.",
+  "source": "siem",
+  "sourceDetail": "Generic SIEM JSON export",
+  "severity": "medium",
+  "status": "triage",
+  "owner": "analyst.training",
+  "affectedEntities": [
+    {
+      "id": "entity-import-user-001",
+      "type": "user",
+      "value": "user.alpha@example.test",
+      "role": "Signed-in user",
+      "description": "Synthetic user account used in the imported alert example."
+    },
+    {
+      "id": "entity-import-host-001",
+      "type": "host",
+      "value": "WS-SYNTH-014",
+      "role": "Affected workstation",
+      "description": "Synthetic workstation that generated the process telemetry."
+    },
+    {
+      "id": "entity-import-ip-001",
+      "type": "ip_address",
+      "value": "198.51.100.77",
+      "role": "Destination address",
+      "description": "Reserved documentation IP used for a synthetic network observation."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-import-process-001",
+      "type": "process",
+      "title": "Encoded PowerShell command observed",
+      "detail": "Synthetic process event: powershell.exe launched with an encoded command argument from a user context.",
+      "source": "Generic SIEM process event export",
+      "observedAt": "2026-06-24T09:12:00Z",
+      "analystNote": "The command line needs decoding and validation before concluding malicious execution.",
+      "relatedEntityIds": ["entity-import-user-001", "entity-import-host-001"]
+    },
+    {
+      "id": "ev-import-network-001",
+      "type": "network",
+      "title": "Outbound connection after script execution",
+      "detail": "Synthetic network event: workstation connected to 198.51.100.77 over TCP 443 shortly after the command launched.",
+      "source": "Generic SIEM network event export",
+      "observedAt": "2026-06-24T09:13:00Z",
+      "relatedEntityIds": ["entity-import-host-001", "entity-import-ip-001"]
+    }
+  ],
+  "timeline": [
+    {
+      "id": "tl-import-alert-001",
+      "timestamp": "2026-06-24T09:11:40Z",
+      "title": "SIEM alert generated",
+      "description": "Generic detection flagged suspicious encoded command execution.",
+      "phase": "detection",
+      "relatedEvidenceIds": ["ev-import-process-001"]
+    },
+    {
+      "id": "tl-import-command-001",
+      "timestamp": "2026-06-24T09:12:00Z",
+      "title": "Encoded command executed",
+      "description": "PowerShell command execution was observed on the affected workstation.",
+      "phase": "attacker_activity",
+      "relatedEvidenceIds": ["ev-import-process-001"]
+    },
+    {
+      "id": "tl-import-network-001",
+      "timestamp": "2026-06-24T09:13:00Z",
+      "title": "Network connection observed",
+      "description": "Outbound connection followed the suspicious command execution.",
+      "phase": "attacker_activity",
+      "relatedEvidenceIds": ["ev-import-network-001"]
+    }
+  ],
+  "analystQuestions": [
+    {
+      "id": "q-import-001",
+      "question": "Can the encoded command be decoded and tied to legitimate administration?",
+      "status": "open",
+      "rationale": "The command line is suspicious, but the payload content must be reviewed before classification.",
+      "createdAt": "2026-06-24T09:20:00Z"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-import-001",
+      "title": "Suspicious script execution requires validation",
+      "description": "A user-context encoded command was followed by outbound network activity. This is suspicious until the script content and business context are reviewed.",
+      "confidence": "medium",
+      "category": "suspicious_activity",
+      "severity": "medium",
+      "status": "draft",
+      "relatedEvidenceIds": ["ev-import-process-001", "ev-import-network-001"],
+      "relatedTimelineEventIds": ["tl-import-command-001", "tl-import-network-001"]
+    }
+  ],
+  "mitreMappings": [
+    {
+      "id": "mitre-import-001",
+      "tactic": "Execution",
+      "techniqueId": "T1059.001",
+      "techniqueName": "PowerShell",
+      "rationale": "PowerShell execution with encoded content was observed. This mapping remains analyst-authored and should be confirmed against decoded command content.",
+      "confidence": "medium",
+      "relatedFindingIds": ["finding-import-001"],
+      "relatedEvidenceIds": ["ev-import-process-001"]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-import-001",
+      "title": "Decode command and review endpoint context",
+      "description": "Decode the command, review parent process context, and confirm whether the activity is expected administration before closure.",
+      "priority": "medium",
+      "category": "monitoring",
+      "status": "proposed"
+    }
+  ],
+  "closure": {
+    "verdict": "undetermined",
+    "closureStatus": "open",
+    "rationale": "Additional evidence is required before assigning a final classification.",
+    "recommendedAction": "Collect decoded command content and endpoint script logs.",
+    "impactSummary": "Potential suspicious execution on one synthetic workstation."
+  },
+  "createdAt": "2026-06-24T09:10:00Z",
+  "updatedAt": "2026-06-24T09:30:00Z"
+}

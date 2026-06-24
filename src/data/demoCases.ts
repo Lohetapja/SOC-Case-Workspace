@@ -5,16 +5,16 @@ import type { SocCase } from '../types'
  * Cases view. SYNTHETIC DATA ONLY:
  * - IPs are from reserved documentation ranges (TEST-NET-1/2/3, RFC 5737).
  * - Domains use the reserved ".example" TLD and are defanged with [.].
- * - "contoso" is a fictional organization; usernames are invented.
+ * - Usernames, mailboxes, and hostnames are invented.
  * - File hashes are obvious placeholders, not real samples.
  * Nothing here is a real indicator of compromise.
  */
 
 const suspiciousPowerShell: SocCase = {
   id: 'case-ps-outlook',
-  title: 'Suspicious PowerShell launched from Outlook',
+  title: 'Phishing to PowerShell Execution',
   summary:
-    'A finance workstation ran an encoded PowerShell command spawned from Outlook/Word after a phishing email. PowerShell attempted to download a remote payload and made a short outbound connection. Investigation ongoing.',
+    'A synthetic finance-themed phishing alert progressed from email delivery to macro execution, Office spawning encoded PowerShell, and a short outbound connection to a TEST-NET host. The analyst confirmed phishing-driven execution, isolated the workstation, mapped the observed behavior to ATT&CK, and escalated because payload execution could not yet be fully ruled out.',
   source: 'edr',
   sourceDetail: 'EDR — endpoint detection & response',
   severity: 'high',
@@ -37,7 +37,7 @@ const suspiciousPowerShell: SocCase = {
     {
       id: 'c1-ent-mailbox',
       type: 'mailbox',
-      value: 'jordan.doe@contoso.example',
+      value: 'jordan.doe@training.example',
       role: 'Recipient of the phishing email',
     },
     {
@@ -122,6 +122,17 @@ const suspiciousPowerShell: SocCase = {
       analystNote: 'Hash recorded for hunting; value is synthetic for this exercise.',
       relatedEntityIds: ['c1-ent-file'],
     },
+    {
+      id: 'c1-ev-containment',
+      type: 'log',
+      title: 'Endpoint isolation action',
+      detail:
+        'EDR response log shows FIN-WS-014 was placed into network isolation after triage confirmed Office-spawned PowerShell.',
+      source: 'EDR response action log',
+      observedAt: '2026-06-18T10:12:00Z',
+      analystNote: 'Containment was performed before payload execution could be fully confirmed.',
+      relatedEntityIds: ['c1-ent-host'],
+    },
   ],
   timeline: [
     {
@@ -129,6 +140,7 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:12:00Z',
       title: 'Phishing email delivered',
       description: 'Finance-themed email with a macro-enabled attachment delivered to jordan.doe.',
+      phase: 'attacker_activity',
       relatedEvidenceIds: ['c1-ev-email'],
     },
     {
@@ -136,6 +148,7 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:14:00Z',
       title: 'Attachment opened, macro executed',
       description: 'User opened Invoice_4471.docm and the macro ran.',
+      phase: 'attacker_activity',
       relatedEvidenceIds: ['c1-ev-proctree'],
     },
     {
@@ -143,6 +156,7 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:14:05Z',
       title: 'PowerShell spawned from Office',
       description: 'WINWORD spawned powershell.exe with an encoded command.',
+      phase: 'attacker_activity',
       relatedEvidenceIds: ['c1-ev-proctree', 'c1-ev-decoded'],
     },
     {
@@ -150,6 +164,7 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:14:08Z',
       title: 'Outbound beacon attempt',
       description: 'PowerShell attempted a payload download and connected to 203.0.113.66.',
+      phase: 'attacker_activity',
       relatedEvidenceIds: ['c1-ev-decoded', 'c1-ev-netconn'],
     },
     {
@@ -157,6 +172,7 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:20:00Z',
       title: 'EDR alert raised',
       description: 'Behavioral rule "Office spawning script interpreter" triggered.',
+      phase: 'detection',
       relatedEvidenceIds: ['c1-ev-proctree'],
     },
     {
@@ -164,6 +180,15 @@ const suspiciousPowerShell: SocCase = {
       timestamp: '2026-06-18T09:35:00Z',
       title: 'Triage started',
       description: 'Analyst opened the case and began triage.',
+      phase: 'analyst_action',
+    },
+    {
+      id: 'c1-tl-7',
+      timestamp: '2026-06-18T10:12:00Z',
+      title: 'Workstation isolated',
+      description: 'FIN-WS-014 was isolated while the analyst validated whether a payload completed execution.',
+      phase: 'containment',
+      relatedEvidenceIds: ['c1-ev-containment'],
     },
   ],
   analystQuestions: [
@@ -186,9 +211,11 @@ const suspiciousPowerShell: SocCase = {
     {
       id: 'c1-q-3',
       question: 'Are other endpoints showing the same Office-spawns-PowerShell pattern?',
-      status: 'open',
-      rationale: 'Fleet-wide hunt queued.',
+      status: 'answered',
+      answer: 'No matching executions were found outside FIN-WS-014 during the initial hunt window.',
+      rationale: 'The first fleet-wide hunt did not identify the same parent/child process pattern elsewhere.',
       createdAt: '2026-06-18T10:05:00Z',
+      answeredAt: '2026-06-18T11:10:00Z',
     },
   ],
   findings: [
@@ -198,7 +225,11 @@ const suspiciousPowerShell: SocCase = {
       description:
         'A finance-themed phishing email led the user to open a macro-enabled document that executed code.',
       confidence: 'high',
+      category: 'malicious_activity',
+      severity: 'high',
+      status: 'confirmed',
       relatedEvidenceIds: ['c1-ev-email', 'c1-ev-proctree'],
+      relatedTimelineEventIds: ['c1-tl-1', 'c1-tl-2', 'c1-tl-3'],
     },
     {
       id: 'c1-f-2',
@@ -206,7 +237,11 @@ const suspiciousPowerShell: SocCase = {
       description:
         'The spawned PowerShell decoded to a remote download and beaconed to a low-reputation host; full compromise is not yet confirmed.',
       confidence: 'medium',
+      category: 'malicious_activity',
+      severity: 'high',
+      status: 'confirmed',
       relatedEvidenceIds: ['c1-ev-decoded', 'c1-ev-netconn'],
+      relatedTimelineEventIds: ['c1-tl-3', 'c1-tl-4'],
     },
   ],
   mitreMappings: [
@@ -217,6 +252,7 @@ const suspiciousPowerShell: SocCase = {
       techniqueName: 'Phishing: Spearphishing Attachment',
       rationale: 'A malicious macro-enabled attachment was delivered via an email lure.',
       confidence: 'high',
+      relatedFindingIds: ['c1-f-1'],
       relatedEvidenceIds: ['c1-ev-email'],
     },
     {
@@ -226,6 +262,7 @@ const suspiciousPowerShell: SocCase = {
       techniqueName: 'User Execution: Malicious File',
       rationale: 'The user opened the attachment, triggering macro execution.',
       confidence: 'high',
+      relatedFindingIds: ['c1-f-1'],
       relatedEvidenceIds: ['c1-ev-proctree'],
     },
     {
@@ -235,6 +272,7 @@ const suspiciousPowerShell: SocCase = {
       techniqueName: 'Command and Scripting Interpreter: PowerShell',
       rationale: 'An encoded PowerShell command executed from an Office parent process.',
       confidence: 'high',
+      relatedFindingIds: ['c1-f-1', 'c1-f-2'],
       relatedEvidenceIds: ['c1-ev-proctree', 'c1-ev-decoded'],
     },
     {
@@ -244,6 +282,7 @@ const suspiciousPowerShell: SocCase = {
       techniqueName: 'Ingress Tool Transfer',
       rationale: 'PowerShell attempted to download a remote payload over HTTPS.',
       confidence: 'medium',
+      relatedFindingIds: ['c1-f-2'],
       relatedEvidenceIds: ['c1-ev-decoded', 'c1-ev-netconn'],
     },
   ],
@@ -254,24 +293,32 @@ const suspiciousPowerShell: SocCase = {
       description:
         'Manually isolate the host from the network pending confirmation that no payload executed.',
       priority: 'high',
+      category: 'containment',
+      status: 'completed',
     },
     {
       id: 'c1-rec-2',
       title: 'Reset credentials for jordan.doe',
       description: 'Force a password reset and revoke active sessions as a precaution.',
       priority: 'high',
+      category: 'recovery',
+      status: 'in_progress',
     },
     {
       id: 'c1-rec-3',
       title: 'Block indicators at the perimeter',
       description: 'Block 203.0.113.66 and updates.fake-cdn[.]example at the proxy/firewall.',
       priority: 'medium',
+      category: 'containment',
+      status: 'in_progress',
     },
     {
       id: 'c1-rec-4',
       title: 'Fleet-wide hunt',
       description: 'Hunt for Office processes spawning script interpreters across all endpoints.',
       priority: 'medium',
+      category: 'monitoring',
+      status: 'completed',
     },
   ],
   closure: {
@@ -290,9 +337,9 @@ const suspiciousPowerShell: SocCase = {
 
 const impossibleTravel: SocCase = {
   id: 'case-impossible-travel',
-  title: 'Impossible travel login that may be VPN-related',
+  title: 'Impossible Travel / Suspicious Login',
   summary:
-    'Two successful sign-ins for one user from distant locations 17 minutes apart triggered an impossible-travel alert. Investigation found the second login came from a corporate VPN egress IP; closed as a benign true positive.',
+    'A synthetic impossible-travel alert fired after one account signed in from Tallinn and then a Frankfurt IP 17 minutes later. The analyst correlated the second IP to documented VPN egress, verified MFA details, reviewed post-login activity, confirmed the user had connected to VPN, and closed the case as a benign true positive.',
   source: 'identity_provider',
   sourceDetail: 'Cloud identity provider sign-in risk',
   severity: 'medium',
@@ -308,7 +355,7 @@ const impossibleTravel: SocCase = {
     {
       id: 'c2-ent-account',
       type: 'cloud_account',
-      value: 'maria.santos@contoso.example',
+      value: 'maria.santos@training.example',
       role: 'Cloud identity',
     },
     {
@@ -379,6 +426,17 @@ const impossibleTravel: SocCase = {
       analystNote: 'Absence of follow-on activity supports the benign explanation.',
       relatedEntityIds: ['c2-ent-account'],
     },
+    {
+      id: 'c2-ev-user-confirm',
+      type: 'note',
+      title: 'User confirmed VPN session',
+      detail:
+        'Analyst contacted the user through an internal support channel; user confirmed they connected to the corporate VPN before opening cloud apps. Synthetic note only.',
+      source: 'Analyst contact note',
+      observedAt: '2026-06-19T09:05:00Z',
+      analystNote: 'Human confirmation supports the VPN explanation but is not the only evidence used.',
+      relatedEntityIds: ['c2-ent-user', 'c2-ent-ip-2'],
+    },
   ],
   timeline: [
     {
@@ -386,6 +444,7 @@ const impossibleTravel: SocCase = {
       timestamp: '2026-06-19T08:02:00Z',
       title: 'Sign-in from Tallinn',
       description: 'Successful MFA sign-in from 198.51.100.23.',
+      phase: 'other',
       relatedEvidenceIds: ['c2-ev-signin1'],
     },
     {
@@ -393,6 +452,7 @@ const impossibleTravel: SocCase = {
       timestamp: '2026-06-19T08:19:00Z',
       title: 'Sign-in from Frankfurt (flagged)',
       description: 'Successful MFA sign-in from 203.0.113.140; impossible-travel risk raised.',
+      phase: 'other',
       relatedEvidenceIds: ['c2-ev-signin2'],
     },
     {
@@ -400,6 +460,7 @@ const impossibleTravel: SocCase = {
       timestamp: '2026-06-19T08:25:00Z',
       title: 'Risk alert generated',
       description: 'Identity provider raised an impossible-travel alert for maria.santos.',
+      phase: 'detection',
       relatedEvidenceIds: ['c2-ev-signin2'],
     },
     {
@@ -407,7 +468,24 @@ const impossibleTravel: SocCase = {
       timestamp: '2026-06-19T08:55:00Z',
       title: 'IP correlated to VPN egress',
       description: 'Analyst matched the Frankfurt IP to the corporate VPN egress range.',
+      phase: 'analyst_action',
       relatedEvidenceIds: ['c2-ev-vpn'],
+    },
+    {
+      id: 'c2-tl-5',
+      timestamp: '2026-06-19T09:05:00Z',
+      title: 'User confirmed VPN use',
+      description: 'User confirmed the suspicious location was caused by a corporate VPN session.',
+      phase: 'analyst_action',
+      relatedEvidenceIds: ['c2-ev-user-confirm'],
+    },
+    {
+      id: 'c2-tl-6',
+      timestamp: '2026-06-19T09:30:00Z',
+      title: 'Audit review found no follow-on abuse',
+      description: 'Analyst reviewed mailbox, file access, and role-change activity after the flagged login.',
+      phase: 'analyst_action',
+      relatedEvidenceIds: ['c2-ev-postlogin'],
     },
   ],
   analystQuestions: [
@@ -438,6 +516,15 @@ const impossibleTravel: SocCase = {
       createdAt: '2026-06-19T08:35:00Z',
       answeredAt: '2026-06-19T09:30:00Z',
     },
+    {
+      id: 'c2-q-4',
+      question: 'Should this alert remain open as a suspected account compromise?',
+      status: 'answered',
+      answer: 'No. The evidence supports a benign VPN-driven impossible-travel alert.',
+      rationale: 'VPN egress match, clean MFA, user confirmation, and clean audit review all support benign closure.',
+      createdAt: '2026-06-19T09:32:00Z',
+      answeredAt: '2026-06-19T09:40:00Z',
+    },
   ],
   findings: [
     {
@@ -446,7 +533,11 @@ const impossibleTravel: SocCase = {
       description:
         'The second sign-in originated from a corporate VPN egress IP, accounting for the impossible-travel distance.',
       confidence: 'high',
+      category: 'benign',
+      severity: 'low',
+      status: 'confirmed',
       relatedEvidenceIds: ['c2-ev-signin2', 'c2-ev-vpn'],
+      relatedTimelineEventIds: ['c2-tl-2', 'c2-tl-4', 'c2-tl-5'],
     },
     {
       id: 'c2-f-2',
@@ -454,7 +545,11 @@ const impossibleTravel: SocCase = {
       description:
         'MFA was satisfied legitimately and no anomalous post-login activity was observed.',
       confidence: 'high',
-      relatedEvidenceIds: ['c2-ev-mfa', 'c2-ev-postlogin'],
+      category: 'benign',
+      severity: 'informational',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c2-ev-mfa', 'c2-ev-postlogin', 'c2-ev-user-confirm'],
+      relatedTimelineEventIds: ['c2-tl-5', 'c2-tl-6'],
     },
   ],
   mitreMappings: [
@@ -466,6 +561,7 @@ const impossibleTravel: SocCase = {
       rationale:
         'Considered because impossible-travel can indicate stolen-credential use; ruled out after evidence showed legitimate VPN egress and clean MFA.',
       confidence: 'low',
+      relatedFindingIds: ['c2-f-1', 'c2-f-2'],
       relatedEvidenceIds: ['c2-ev-signin2', 'c2-ev-vpn'],
     },
   ],
@@ -476,12 +572,25 @@ const impossibleTravel: SocCase = {
       description:
         'Add corporate VPN egress IPs to the impossible-travel known-network list to reduce false positives.',
       priority: 'medium',
+      category: 'prevention',
+      status: 'proposed',
     },
     {
       id: 'c2-rec-2',
       title: 'Maintain VPN egress documentation',
       description: 'Keep the VPN egress IP inventory current and accessible to triage analysts.',
       priority: 'low',
+      category: 'monitoring',
+      status: 'in_progress',
+    },
+    {
+      id: 'c2-rec-3',
+      title: 'Document benign true positive rationale',
+      description:
+        'Attach the VPN, MFA, user-confirmation, and audit-review evidence to the alert record for future tuning review.',
+      priority: 'low',
+      category: 'prevention',
+      status: 'completed',
     },
   ],
   closure: {
@@ -502,9 +611,9 @@ const impossibleTravel: SocCase = {
 
 const malwareEdrAlert: SocCase = {
   id: 'case-malware-edr',
-  title: 'EDR detected malicious file on a developer workstation',
+  title: 'Malware / EDR Alert',
   summary:
-    'An EDR alert flagged a malicious executable on a developer workstation. The file executed, established a registry run-key persistence, and beaconed to a remote host. The host was isolated and reimaged; closed as a true positive.',
+    'A synthetic EDR alert flagged a masqueraded executable on a developer workstation. The analyst confirmed user execution from Downloads, registry Run-key persistence, and outbound beaconing to TEST-NET infrastructure, then isolated and reimaged the host. A fleet-wide hunt found no additional affected endpoints, supporting true-positive closure with limited impact.',
   source: 'edr',
   sourceDetail: 'EDR — endpoint detection & response',
   severity: 'high',
@@ -587,7 +696,7 @@ const malwareEdrAlert: SocCase = {
       type: 'registry',
       title: 'Registry run-key persistence',
       detail:
-        'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater set to the dropper path for persistence.',
+        'User Run key named Updater set to the dropper path for persistence.',
       source: 'EDR registry telemetry',
       observedAt: '2026-06-20T13:40:25Z',
       analystNote: 'Classic autostart persistence via a Run key.',
@@ -603,6 +712,28 @@ const malwareEdrAlert: SocCase = {
       observedAt: '2026-06-20T13:41:00Z',
       analystNote: 'Regular small outbound beacons consistent with command-and-control.',
       relatedEntityIds: ['c3-ent-proc', 'c3-ent-ip', 'c3-ent-domain'],
+    },
+    {
+      id: 'c3-ev-hunt',
+      type: 'log',
+      title: 'Fleet-wide hash and persistence hunt',
+      detail:
+        'EDR advanced hunt found no other hosts with the placeholder hash, svchost-update.exe path, or matching HKCU Run-key value.',
+      source: 'EDR advanced hunt',
+      observedAt: '2026-06-20T14:35:00Z',
+      analystNote: 'Scope check supports single-host containment.',
+      relatedEntityIds: ['c3-ent-file'],
+    },
+    {
+      id: 'c3-ev-reimage',
+      type: 'note',
+      title: 'Reimage completed',
+      detail:
+        'Endpoint support ticket records DEV-WS-221 reimaged from a known-good baseline and returned to inventory after validation. Synthetic ticket note only.',
+      source: 'Endpoint support ticket',
+      observedAt: '2026-06-20T15:05:00Z',
+      analystNote: 'Recovery action completed after isolation.',
+      relatedEntityIds: ['c3-ent-host'],
     },
   ],
   timeline: [
@@ -652,6 +783,23 @@ const malwareEdrAlert: SocCase = {
       title: 'Host isolated',
       description: 'Analyst isolated DEV-WS-221 and began remediation.',
       phase: 'containment',
+      relatedEvidenceIds: ['c3-ev-detection'],
+    },
+    {
+      id: 'c3-tl-7',
+      timestamp: '2026-06-20T14:35:00Z',
+      title: 'Fleet-wide hunt completed',
+      description: 'Analyst found no other endpoints with the same hash, path, or persistence indicator.',
+      phase: 'analyst_action',
+      relatedEvidenceIds: ['c3-ev-hunt'],
+    },
+    {
+      id: 'c3-tl-8',
+      timestamp: '2026-06-20T15:05:00Z',
+      title: 'Workstation reimaged',
+      description: 'DEV-WS-221 was rebuilt from a known-good image after containment.',
+      phase: 'containment',
+      relatedEvidenceIds: ['c3-ev-reimage'],
     },
   ],
   analystQuestions: [
@@ -682,6 +830,15 @@ const malwareEdrAlert: SocCase = {
       createdAt: '2026-06-20T13:55:00Z',
       answeredAt: '2026-06-20T14:10:00Z',
     },
+    {
+      id: 'c3-q-4',
+      question: 'Did the same malware appear on any other endpoints?',
+      status: 'answered',
+      answer: 'No. A fleet-wide hunt found no matching hash, path, or persistence value.',
+      rationale: 'EDR advanced hunt results scoped the incident to one workstation.',
+      createdAt: '2026-06-20T14:20:00Z',
+      answeredAt: '2026-06-20T14:35:00Z',
+    },
   ],
   findings: [
     {
@@ -706,6 +863,18 @@ const malwareEdrAlert: SocCase = {
       status: 'confirmed',
       relatedEvidenceIds: ['c3-ev-network'],
       relatedTimelineEventIds: ['c3-tl-4'],
+    },
+    {
+      id: 'c3-f-3',
+      title: 'No evidence of spread beyond one workstation',
+      description:
+        'Fleet-wide hunting found no additional endpoints with the same executable hash, suspicious path, or Run-key persistence.',
+      confidence: 'medium',
+      category: 'benign',
+      severity: 'low',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c3-ev-hunt'],
+      relatedTimelineEventIds: ['c3-tl-7'],
     },
   ],
   mitreMappings: [
@@ -746,24 +915,32 @@ const malwareEdrAlert: SocCase = {
       title: 'Isolate and reimage DEV-WS-221',
       description: 'Host isolated; rebuild from a known-good image and restore from backup.',
       priority: 'high',
+      category: 'recovery',
+      status: 'completed',
     },
     {
       id: 'c3-rec-2',
       title: 'Block indicators at the perimeter',
       description: 'Block the file hash, 203.0.113.200, and cdn-sync.fake-malware[.]example.',
       priority: 'high',
+      category: 'containment',
+      status: 'completed',
     },
     {
       id: 'c3-rec-3',
       title: 'Fleet-wide hash hunt',
       description: 'Hunt for the dropper hash and the Run-key persistence across all endpoints.',
       priority: 'medium',
+      category: 'monitoring',
+      status: 'completed',
     },
     {
       id: 'c3-rec-4',
       title: 'User-awareness follow-up',
       description: 'Remind the user about unapproved software downloads and developer endpoint policy.',
       priority: 'low',
+      category: 'prevention',
+      status: 'proposed',
     },
   ],
   closure: {

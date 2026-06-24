@@ -247,6 +247,10 @@ in-browser; `npm run build` passes.
   while hover/selection highlighting clarifies relationships. Settings can export
   the full workspace, one selected case, or multiple selected cases, with optional
   graph-layout and sample-case inclusion.
+- ☑ **Integration-ready import schema and examples** — documented the supported
+  JSON import shapes, safe file-based normalization workflow, synthetic example
+  files, and future adapter ideas. Import now also accepts a single `SocCase`
+  JSON object and adds/merges it into the current workspace after confirmation.
 - ☑ **Artifact Map bottom details panel** — Artifact Map now uses the full
   available width for the lane map, with artifact/relationship details, helper
   text, and Investigation Gaps in a bottom panel across desktop and mobile.
@@ -258,6 +262,10 @@ in-browser; `npm run build` passes.
   uses `SocCase` / `updateCase` / localStorage as the source of truth across
   detail, workspace pages, visuals, viewer, reports, and export/import; added a
   regression test and ADR note documenting the contract.
+- ☑ **Improved sample case stories** — the three built-in demo cases now better
+  demonstrate the full alert-to-report workflow with richer synthetic evidence,
+  timeline checkpoints, analyst questions, evidence-backed findings, MITRE
+  rationale, closure reasoning, and response recommendations.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ---
