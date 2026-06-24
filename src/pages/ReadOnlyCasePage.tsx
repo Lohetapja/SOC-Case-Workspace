@@ -8,6 +8,8 @@ import {
   evidenceTypeLabels,
   findingCategoryLabels,
   findingStatusLabels,
+  labDisclosureStateLabels,
+  labWriteupStatusLabels,
   priorityLabels,
   questionStatusLabels,
   recommendationCategoryLabels,
@@ -19,6 +21,7 @@ import {
   verdictLabels,
 } from '../data/labels'
 import { buildCaseReport, reportFilename } from '../utils/caseReport'
+import { reviewCaseQuality } from '../utils/caseQuality'
 import { formatDateTime } from '../utils/format'
 
 interface ReadOnlyCasePageProps {
@@ -109,6 +112,7 @@ export function ReadOnlyCasePage({
 
   const openQuestions = socCase.analystQuestions.filter((question) => question.status === 'open')
   const markdown = buildCaseReport(socCase)
+  const quality = reviewCaseQuality(socCase)
 
   return (
     <div className="page viewer-page">
@@ -136,6 +140,7 @@ export function ReadOnlyCasePage({
           <span className="chip">
             Closure: {socCase.closure?.closureStatus ? closureStatusLabels[socCase.closure.closureStatus] : 'Not set'}
           </span>
+          {socCase.lab?.enabled && <span className="chip chip--open">Lab / training case</span>}
         </div>
         <p className="viewer-summary">{socCase.summary || 'No case summary has been recorded.'}</p>
         <p className="viewer-share-note">
@@ -160,6 +165,51 @@ export function ReadOnlyCasePage({
           aria-hidden="true"
         />
       </header>
+
+      <section className="card viewer-section">
+        <h2 className="detail-section__title">Case quality summary</h2>
+        <div className="viewer-chips">
+          <span className="quality-summary quality-summary--pass">
+            {quality.completion.complete} / {quality.completion.total} checks complete
+          </span>
+          <span className="quality-summary quality-summary--warning">
+            {quality.counts.warning} needs attention
+          </span>
+          <span className="quality-summary quality-summary--missing">
+            {quality.counts.missing} missing
+          </span>
+          <span className="chip">{quality.completion.label}</span>
+        </div>
+        <p className="viewer-share-note">
+          This is advisory only. The analyst should resolve missing evidence, weak reasoning, and
+          closure gaps before treating the report as final.
+        </p>
+      </section>
+
+      {socCase.lab?.enabled && (
+        <section className="card viewer-section">
+          <h2 className="detail-section__title">Lab / training context</h2>
+          <div className="viewer-chips">
+            {socCase.lab.platform && <span className="chip">{socCase.lab.platform}</span>}
+            {socCase.lab.labName && <span className="chip">{socCase.lab.labName}</span>}
+            <span className="chip">
+              Writeup: {labWriteupStatusLabels[socCase.lab.writeupStatus ?? 'not_started']}
+            </span>
+            <span className="chip">
+              Public writeup: {labDisclosureStateLabels[socCase.lab.publicWriteupAllowed ?? 'unknown']}
+            </span>
+            <span className="chip">
+              Spoiler-sensitive: {labDisclosureStateLabels[socCase.lab.spoilerSensitive ?? 'unknown']}
+            </span>
+          </div>
+          {socCase.lab.scenarioSummary && <p className="detail-text">{socCase.lab.scenarioSummary}</p>}
+          {socCase.lab.learningNotes && (
+            <p className="viewer-share-note">
+              Learning notes: {socCase.lab.learningNotes}
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="card viewer-section">
         <h2 className="detail-section__title">Affected entities {sectionCount(socCase.affectedEntities.length)}</h2>

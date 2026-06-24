@@ -16,8 +16,8 @@ const GROUPS: { id: QualityCheckGroup; title: string }[] = [
 ]
 
 const STATUS_META: Record<QualityCheckStatus, { label: string; symbol: string }> = {
-  pass: { label: 'Pass', symbol: '✓' },
-  warning: { label: 'Warning', symbol: '!' },
+  pass: { label: 'Complete', symbol: '✓' },
+  warning: { label: 'Needs attention', symbol: '!' },
   missing: { label: 'Missing', symbol: '×' },
 }
 
@@ -64,22 +64,74 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
       </div>
 
       <div className="quality-review__summary" aria-label="Quality review summary">
-        <span className="quality-summary quality-summary--pass">{review.counts.pass} passed</span>
+        <span className="quality-summary quality-summary--pass">
+          Case quality: {review.completion.complete} / {review.completion.total} checks complete
+        </span>
         <span className="quality-summary quality-summary--warning">
-          {review.counts.warning} warnings
+          {review.counts.warning} needs attention
         </span>
         <span className="quality-summary quality-summary--missing">
           {review.counts.missing} missing
         </span>
-        <strong className="quality-review__verdict">
-          {review.ready ? 'Ready for final analyst review' : 'Investigation needs attention'}
-        </strong>
+        <strong className="quality-review__verdict">{review.completion.label}</strong>
       </div>
 
       <p className="quality-review__note">
         Only information saved to the case counts. External suggestions should be reviewed and
         linked to evidence before they are treated as conclusions.
       </p>
+
+      <div className="quality-review__coach">
+        <section className="quality-coach">
+          <h3 className="quality-group__title">Missing Data Coach</h3>
+          {review.coachSuggestions.length > 0 ? (
+            <ul className="quality-coach__list">
+              {review.coachSuggestions.map((suggestion) => (
+                <li key={suggestion}>{suggestion}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="quality-review__intro">
+              No major gaps detected. Review the report wording before final handoff.
+            </p>
+          )}
+        </section>
+
+        <section className="quality-coach">
+          <h3 className="quality-group__title">Senior review snapshot</h3>
+          <ul className="quality-coach__list">
+            <li>
+              Unsupported findings:{' '}
+              {review.seniorReview.unsupportedFindings.length > 0
+                ? review.seniorReview.unsupportedFindings.join(', ')
+                : 'none flagged'}
+            </li>
+            <li>
+              Open questions:{' '}
+              {review.seniorReview.openQuestions.length > 0
+                ? review.seniorReview.openQuestions.join(', ')
+                : 'none'}
+            </li>
+            <li>
+              Closure rationale:{' '}
+              {review.seniorReview.missingClosureRationale ? 'missing' : 'documented'}
+            </li>
+            <li>
+              MITRE rationale:{' '}
+              {review.seniorReview.missingMitreRationale.length > 0
+                ? review.seniorReview.missingMitreRationale.join(', ')
+                : 'documented where mappings exist'}
+            </li>
+            <li>
+              Recommendations: {review.seniorReview.missingRecommendations ? 'missing' : 'recorded'}
+            </li>
+            <li>
+              Report readiness:{' '}
+              {review.seniorReview.reportReady ? 'ready for final review' : 'needs analyst review'}
+            </li>
+          </ul>
+        </section>
+      </div>
 
       <div className="quality-review__groups">
         {GROUPS.map((group) => {

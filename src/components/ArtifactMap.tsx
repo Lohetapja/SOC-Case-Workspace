@@ -7,6 +7,7 @@ import {
   type ArtifactNode,
   type ArtifactType,
 } from '../utils/artifactMap'
+import { reviewCaseQuality } from '../utils/caseQuality'
 import { formatDateTime } from '../utils/format'
 
 /** Colour + label per artifact type (drives card accent and details panel). */
@@ -148,7 +149,13 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
     const openQuestions = socCase.analystQuestions
       .filter((question) => question.status === 'open')
       .map((question) => question.question)
-    return openQuestions.length > 0 ? openQuestions : FALLBACK_GAPS
+    const qualitySignals = reviewCaseQuality(socCase).checks
+      .filter((check) => check.status !== 'pass')
+      .map((check) => check.guidance)
+      .filter((guidance) => !openQuestions.includes(guidance))
+      .slice(0, 4)
+    const combinedGaps = [...openQuestions, ...qualitySignals]
+    return combinedGaps.length > 0 ? combinedGaps : FALLBACK_GAPS
   }, [socCase])
 
   const center = (id: string) => {

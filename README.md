@@ -120,6 +120,10 @@ README are below; add images under `docs/screenshots/` when captures are ready.
 - Evidence and timeline references that show what supports each conclusion.
 - Case Quality Review with pass, warning, and missing checks for investigation
   readiness.
+- Guided Analyst Mode with static local tips for evidence, timelines, decisions,
+  findings, ATT&CK mapping, closure, and reports.
+- Optional lab / training mode metadata and a short local Analyst Guide for
+  ethical practice investigations.
 - Artifact Map and Case Graph views for exploring relationships and
   investigation flow.
 - Workspace-level Evidence, Timeline, Decision Journal, and MITRE views across

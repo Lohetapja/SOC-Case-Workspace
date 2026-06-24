@@ -3,6 +3,7 @@ import type { CaseClosure, ClassificationVerdict, ClosureStatus } from '../types
 import type { ClosureInput } from '../data/casesStore'
 import { closureStatusLabels, verdictLabels } from '../data/labels'
 import { isAllowedValue } from '../utils/formValidation'
+import { GuidedTip } from './GuidedTip'
 
 const verdictOptions: ClassificationVerdict[] = [
   'true_positive',
@@ -23,13 +24,14 @@ function statusChipClass(status: ClosureStatus): string {
 interface ClosureSectionProps {
   closure?: CaseClosure
   onSave: (input: ClosureInput) => void
+  guidedMode?: boolean
 }
 
 /**
  * Editable classification & closure assessment. Can be filled progressively —
  * the case does not need to be closed to classify it.
  */
-export function ClosureSection({ closure, onSave }: ClosureSectionProps) {
+export function ClosureSection({ closure, onSave, guidedMode = false }: ClosureSectionProps) {
   const [editing, setEditing] = useState(false)
   const [verdict, setVerdict] = useState<ClassificationVerdict | ''>(closure?.verdict ?? '')
   const [status, setStatus] = useState<ClosureStatus | ''>(closure?.closureStatus ?? '')
@@ -81,6 +83,12 @@ export function ClosureSection({ closure, onSave }: ClosureSectionProps) {
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          Closure should explain why the case is true positive, benign, false positive, suspicious, or undetermined.
+        </GuidedTip>
+      )}
 
       {editing ? (
         <form className="form closure-form" onSubmit={handleSubmit} aria-label="Classification and closure">

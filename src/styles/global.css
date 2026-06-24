@@ -542,6 +542,13 @@ body {
   gap: 16px;
 }
 
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* ---- Forms ---- */
 .form {
   display: flex;
@@ -1599,6 +1606,45 @@ body {
   font-weight: 600;
 }
 
+/* ---- Guided Analyst Mode ---- */
+.guided-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.guided-toggle input {
+  margin: 0;
+}
+
+.guided-tip {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+.guided-tip__label {
+  display: inline-block;
+  margin-right: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 11px;
+}
+
 /* ---- Markdown report export ---- */
 .report-center__preview {
   margin-top: 18px;
@@ -1751,6 +1797,31 @@ body {
   background: #f8fafc;
 }
 
+.quality-review__coach {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.quality-coach {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.quality-coach__list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.quality-coach__list li {
+  margin-bottom: 5px;
+}
+
 .quality-review__groups {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1833,8 +1904,53 @@ body {
 
 @media (max-width: 760px) {
   .quality-review__groups { grid-template-columns: 1fr; }
+  .quality-review__coach { grid-template-columns: 1fr; }
   .quality-group:last-child { grid-column: auto; }
   .quality-review__verdict { width: 100%; margin-left: 0; }
+}
+
+/* ---- Lab / training mode ---- */
+.lab-section__safety {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-left: 3px solid #f59e0b;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #78350f;
+  font-size: 13px;
+}
+
+.lab-form {
+  margin-top: 12px;
+}
+
+.lab-section__summary .detail-text {
+  margin-top: 10px;
+}
+
+/* ---- Analyst Guide ---- */
+.guide-intro {
+  border-left: 3px solid var(--accent);
+}
+
+.guide-intro__title,
+.guide-card__title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.guide-card__body {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .detail-list {

@@ -3,12 +3,14 @@ import type { AnalystQuestion } from '../types'
 import type { NewQuestionInput } from '../data/casesStore'
 import { questionStatusLabels } from '../data/labels'
 import { AddQuestionForm } from './AddQuestionForm'
+import { GuidedTip } from './GuidedTip'
 
 interface DecisionJournalSectionProps {
   questions: AnalystQuestion[]
   onAdd: (input: NewQuestionInput) => void
   onUpdate: (questionId: string, input: NewQuestionInput) => void
   onRemove: (questionId: string) => void
+  guidedMode?: boolean
 }
 
 function statusChipClass(status: AnalystQuestion['status']): string {
@@ -22,7 +24,13 @@ function statusChipClass(status: AnalystQuestion['status']): string {
  * ones (with status, answer, rationale), and remove. Open questions also feed the
  * Artifact Map's "Investigation gaps" panel.
  */
-export function DecisionJournalSection({ questions, onAdd, onUpdate, onRemove }: DecisionJournalSectionProps) {
+export function DecisionJournalSection({
+  questions,
+  onAdd,
+  onUpdate,
+  onRemove,
+  guidedMode = false,
+}: DecisionJournalSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -49,6 +57,12 @@ export function DecisionJournalSection({ questions, onAdd, onUpdate, onRemove }:
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          Use this section to record analyst reasoning: what you asked, what you concluded, and what still needs confirmation.
+        </GuidedTip>
+      )}
 
       {showForm && (
         <AddQuestionForm

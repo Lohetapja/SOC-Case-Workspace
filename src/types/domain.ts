@@ -250,6 +250,12 @@ export type ClassificationVerdict =
 /** Where the case sits in the response lifecycle. */
 export type ClosureStatus = 'open' | 'monitoring' | 'escalated' | 'closed'
 
+/** Progress state for optional public/private lab writeups. */
+export type LabWriteupStatus = 'not_started' | 'draft' | 'complete'
+
+/** Three-state answer for lab sharing/sensitivity questions. */
+export type LabDisclosureState = 'yes' | 'no' | 'unknown'
+
 /**
  * Classification & closure assessment. All fields are optional so an analyst can
  * fill it in progressively — a case does not have to be closed to classify it.
@@ -264,6 +270,19 @@ export interface CaseClosure {
   impactSummary?: string
   closedAt?: string
   closedBy?: string
+}
+
+/** Optional metadata for training/lab investigations. */
+export interface LabMetadata {
+  enabled: boolean
+  platform?: string
+  labName?: string
+  scenarioSummary?: string
+  toolsUsed?: string
+  learningNotes?: string
+  writeupStatus?: LabWriteupStatus
+  publicWriteupAllowed?: LabDisclosureState
+  spoilerSensitive?: LabDisclosureState
 }
 
 /** Metadata attached to an exported report (used by the report export feature). */
@@ -316,6 +335,8 @@ export interface SocCase {
   closure?: CaseClosure
   /** Present once a report has been generated for the case. */
   reportMetadata?: ReportMetadata
+  /** Optional training/lab context for sanctioned practice investigations. */
+  lab?: LabMetadata
   /** Id of the template the case was created from, if any. */
   templateId?: string
   /** Investigation checklist seeded from a template. */

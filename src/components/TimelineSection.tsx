@@ -4,6 +4,7 @@ import type { NewTimelineEventInput } from '../data/casesStore'
 import { timelinePhaseLabels } from '../data/labels'
 import { formatDateTime } from '../utils/format'
 import { AddTimelineEventForm } from './AddTimelineEventForm'
+import { GuidedTip } from './GuidedTip'
 
 interface TimelineSectionProps {
   timeline: TimelineEvent[]
@@ -12,10 +13,18 @@ interface TimelineSectionProps {
   onAdd: (input: NewTimelineEventInput) => void
   onUpdate: (eventId: string, input: NewTimelineEventInput) => void
   onRemove: (eventId: string) => void
+  guidedMode?: boolean
 }
 
 /** Editable Timeline section: chronological list, add, and remove. */
-export function TimelineSection({ timeline, evidence, onAdd, onUpdate, onRemove }: TimelineSectionProps) {
+export function TimelineSection({
+  timeline,
+  evidence,
+  onAdd,
+  onUpdate,
+  onRemove,
+  guidedMode = false,
+}: TimelineSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -47,6 +56,12 @@ export function TimelineSection({ timeline, evidence, onAdd, onUpdate, onRemove 
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          Timeline events help reconstruct the sequence of activity: initial access, execution, network activity, detection, response, and closure.
+        </GuidedTip>
+      )}
 
       {showForm && (
         <AddTimelineEventForm

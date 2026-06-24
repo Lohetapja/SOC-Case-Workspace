@@ -2,6 +2,7 @@ import type { AgentContributionStatus, SocCase } from '../types'
 import type {
   CaseMetadataInput,
   ClosureInput,
+  LabMetadataInput,
   NewAgentContributionInput,
   NewEntityInput,
   NewEvidenceInput,
@@ -31,6 +32,9 @@ import { AgentContributionsSection } from './AgentContributionsSection'
 import { CaseMetadataSection } from './CaseMetadataSection'
 import { AffectedEntitiesSection } from './AffectedEntitiesSection'
 import { RecommendationsSection } from './RecommendationsSection'
+import { GuidedModeToggle } from './GuidedModeToggle'
+import { useGuidedMode } from '../hooks/useGuidedMode'
+import { LabTrainingSection } from './LabTrainingSection'
 
 interface CaseDetailWorkspaceProps {
   socCase: SocCase
@@ -65,6 +69,7 @@ interface CaseDetailWorkspaceProps {
   onAddRecommendation: (input: NewRecommendationInput) => void
   onRemoveRecommendation: (recommendationId: string) => void
   onSaveClosure: (input: ClosureInput) => void
+  onSaveLabMetadata: (input: LabMetadataInput) => void
   onToggleChecklistItem: (itemId: string) => void
 }
 
@@ -99,8 +104,11 @@ export function CaseDetailWorkspace({
   onAddRecommendation,
   onRemoveRecommendation,
   onSaveClosure,
+  onSaveLabMetadata,
   onToggleChecklistItem,
 }: CaseDetailWorkspaceProps) {
+  const { guidedMode, setGuidedMode } = useGuidedMode()
+
   return (
     <div className="detail">
       <button type="button" className="btn btn--secondary detail__back" onClick={onBack}>
@@ -131,6 +139,7 @@ export function CaseDetailWorkspace({
           <span>Updated {formatDateTime(socCase.updatedAt)}</span>
         </div>
         <div className="detail-header__actions">
+          <GuidedModeToggle enabled={guidedMode} onChange={setGuidedMode} />
           <button type="button" className="btn btn--secondary btn--sm" onClick={onOpenReadOnly}>
             Open read-only view
           </button>
@@ -145,7 +154,9 @@ export function CaseDetailWorkspace({
         <ChecklistSection checklist={socCase.checklist} onToggle={onToggleChecklistItem} />
       )}
 
-      <ClosureSection closure={socCase.closure} onSave={onSaveClosure} />
+      <ClosureSection closure={socCase.closure} onSave={onSaveClosure} guidedMode={guidedMode} />
+
+      <LabTrainingSection lab={socCase.lab} onSave={onSaveLabMetadata} />
 
       <AffectedEntitiesSection
         entities={socCase.affectedEntities}
@@ -158,6 +169,7 @@ export function CaseDetailWorkspace({
         onAdd={onAddEvidence}
         onUpdate={onUpdateEvidence}
         onRemove={onRemoveEvidence}
+        guidedMode={guidedMode}
       />
 
       <TimelineSection
@@ -166,6 +178,7 @@ export function CaseDetailWorkspace({
         onAdd={onAddTimelineEvent}
         onUpdate={onUpdateTimelineEvent}
         onRemove={onRemoveTimelineEvent}
+        guidedMode={guidedMode}
       />
 
       <DecisionJournalSection
@@ -173,6 +186,7 @@ export function CaseDetailWorkspace({
         onAdd={onAddQuestion}
         onUpdate={onUpdateQuestion}
         onRemove={onRemoveQuestion}
+        guidedMode={guidedMode}
       />
 
       <AgentContributionsSection
@@ -190,6 +204,7 @@ export function CaseDetailWorkspace({
         onAdd={onAddFinding}
         onUpdate={onUpdateFinding}
         onRemove={onRemoveFinding}
+        guidedMode={guidedMode}
       />
 
       <MitreMappingSection
@@ -199,6 +214,7 @@ export function CaseDetailWorkspace({
         onAdd={onAddMitre}
         onUpdate={onUpdateMitre}
         onRemove={onRemoveMitre}
+        guidedMode={guidedMode}
       />
 
       <RecommendationsSection

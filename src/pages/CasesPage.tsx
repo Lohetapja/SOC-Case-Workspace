@@ -5,6 +5,7 @@ import { CaseDetailWorkspace } from '../components/CaseDetailWorkspace'
 import { useCases } from '../hooks/useCases'
 import {
   buildClosure,
+  buildLabMetadata,
   createAgentContribution,
   createAnalystQuestion,
   createEntity,
@@ -237,6 +238,12 @@ export function CasesPage({
           updateCase(caseId, (socCase) => ({
             ...socCase,
             closure: buildClosure(socCase.closure, input),
+          }))
+        }
+        onSaveLabMetadata={(input) =>
+          updateCase(caseId, (socCase) => ({
+            ...socCase,
+            lab: buildLabMetadata(input),
           }))
         }
         onToggleChecklistItem={(itemId) =>

@@ -4,6 +4,8 @@ import { useCases } from '../hooks/useCases'
 import { severityLabels, statusLabels, verdictLabels, closureStatusLabels } from '../data/labels'
 import { ReportSection } from '../components/ReportSection'
 import { WorkspaceFilters } from '../components/WorkspaceFilters'
+import { GuidedModeToggle } from '../components/GuidedModeToggle'
+import { useGuidedMode } from '../hooks/useGuidedMode'
 import { buildCaseReport, reportFilename } from '../utils/caseReport'
 import { formatDateTime } from '../utils/format'
 
@@ -46,6 +48,7 @@ function closureLabel(socCase: SocCase): string {
 /** Workspace report center plus Markdown preview/export for one selected case. */
 export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsPageProps) {
   const { cases } = useCases()
+  const { guidedMode, setGuidedMode } = useGuidedMode()
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
   const [severity, setSeverity] = useState('all')
@@ -132,13 +135,16 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
           </p>
         </div>
         {activeCase && (
-          <button
-            type="button"
-            className="btn btn--sm"
-            onClick={() => onOpenCase(activeCase.id)}
-          >
-            Open selected case
-          </button>
+          <div className="page-header__actions">
+            <GuidedModeToggle enabled={guidedMode} onChange={setGuidedMode} />
+            <button
+              type="button"
+              className="btn btn--sm"
+              onClick={() => onOpenCase(activeCase.id)}
+            >
+              Open selected case
+            </button>
+          </div>
         )}
       </header>
 
@@ -237,7 +243,7 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
               <p className="detail-item__meta">Selected case: {activeCase.title}</p>
             </div>
           </div>
-          <ReportSection socCase={activeCase} />
+          <ReportSection socCase={activeCase} guidedMode={guidedMode} />
         </section>
       ) : (
         <p className="cases-note">Select a case to preview its Markdown report.</p>

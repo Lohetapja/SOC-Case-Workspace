@@ -4,6 +4,7 @@ import { AppFooter } from './components/AppFooter'
 import { Sidebar } from './components/Sidebar'
 import { OverviewPage } from './pages/OverviewPage'
 import { SampleCasesPage } from './pages/SampleCasesPage'
+import { AnalystGuidePage } from './pages/AnalystGuidePage'
 import { CasesPage } from './pages/CasesPage'
 import { CaseGraphPage } from './pages/CaseGraphPage'
 import { EvidencePage } from './pages/EvidencePage'
@@ -62,6 +63,8 @@ export default function App() {
         return <OverviewPage onNavigate={navigate} />
       case 'samples':
         return <SampleCasesPage onOpenCase={openCaseDetail} />
+      case 'guide':
+        return <AnalystGuidePage />
       case 'cases':
         return (
           <CasesPage

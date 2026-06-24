@@ -4,16 +4,18 @@ import type { NewEvidenceInput } from '../data/casesStore'
 import { evidenceTypeLabels } from '../data/labels'
 import { formatDateTime } from '../utils/format'
 import { AddEvidenceForm } from './AddEvidenceForm'
+import { GuidedTip } from './GuidedTip'
 
 interface EvidenceSectionProps {
   evidence: EvidenceItem[]
   onAdd: (input: NewEvidenceInput) => void
   onUpdate: (evidenceId: string, input: NewEvidenceInput) => void
   onRemove: (evidenceId: string) => void
+  guidedMode?: boolean
 }
 
 /** Editable Evidence section: list existing items, add new ones, remove items. */
-export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove }: EvidenceSectionProps) {
+export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove, guidedMode = false }: EvidenceSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -42,6 +44,12 @@ export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove }: Evidenc
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          Evidence should answer what was observed, where it came from, and why it matters. Findings should not rely on unsupported claims.
+        </GuidedTip>
+      )}
 
       {showForm && (
         <AddEvidenceForm

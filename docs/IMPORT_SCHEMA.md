@@ -110,6 +110,7 @@ Optional top-level fields include:
 - `sourceDetail`
 - `agentContributions`
 - `closure`
+- `lab`
 - `reportMetadata`
 - `templateId`
 - `checklist`
@@ -158,6 +159,14 @@ them as complete.
 ### Closure `closureStatus`
 
 `open`, `monitoring`, `escalated`, `closed`
+
+### Lab `writeupStatus`
+
+`not_started`, `draft`, `complete`
+
+### Lab sharing fields
+
+`publicWriteupAllowed` and `spoilerSensitive` use `yes`, `no`, or `unknown`.
 
 ## Cross-reference fields
 

@@ -3,6 +3,7 @@ import type { EvidenceItem, Finding, MitreMapping } from '../types'
 import type { NewMitreInput } from '../data/casesStore'
 import { confidenceLabels } from '../data/labels'
 import { AddMitreMappingForm } from './AddMitreMappingForm'
+import { GuidedTip } from './GuidedTip'
 
 interface MitreMappingSectionProps {
   mappings: MitreMapping[]
@@ -11,13 +12,22 @@ interface MitreMappingSectionProps {
   onAdd: (input: NewMitreInput) => void
   onUpdate: (mappingId: string, input: NewMitreInput) => void
   onRemove: (mappingId: string) => void
+  guidedMode?: boolean
 }
 
 /**
  * Editable MITRE ATT&CK section: analyst-authored, evidence-backed mappings.
  * List with rationale, add, and remove.
  */
-export function MitreMappingSection({ mappings, findings, evidence, onAdd, onUpdate, onRemove }: MitreMappingSectionProps) {
+export function MitreMappingSection({
+  mappings,
+  findings,
+  evidence,
+  onAdd,
+  onUpdate,
+  onRemove,
+  guidedMode = false,
+}: MitreMappingSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const findingTitleById = new Map(findings.map((finding) => [finding.id, finding.title]))
@@ -46,6 +56,12 @@ export function MitreMappingSection({ mappings, findings, evidence, onAdd, onUpd
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          MITRE mappings should include rationale. Do not map a technique only because it sounds similar; explain what behavior supports it.
+        </GuidedTip>
+      )}
 
       {showForm && (
         <AddMitreMappingForm

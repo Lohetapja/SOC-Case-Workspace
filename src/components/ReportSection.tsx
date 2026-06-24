@@ -1,13 +1,15 @@
 import { useMemo, useRef, useState } from 'react'
 import type { SocCase } from '../types'
 import { buildCaseReport, reportFilename } from '../utils/caseReport'
+import { GuidedTip } from './GuidedTip'
 
 interface ReportSectionProps {
   socCase: SocCase
+  guidedMode?: boolean
 }
 
 /** Generated Markdown report for one case, with Copy and Download. */
-export function ReportSection({ socCase }: ReportSectionProps) {
+export function ReportSection({ socCase, guidedMode = false }: ReportSectionProps) {
   const markdown = useMemo(() => buildCaseReport(socCase), [socCase])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
@@ -53,6 +55,11 @@ export function ReportSection({ socCase }: ReportSectionProps) {
 
   return (
     <div className="report">
+      {guidedMode && (
+        <GuidedTip>
+          A good report should explain what happened, what supports the conclusion, what remains uncertain, and what should happen next.
+        </GuidedTip>
+      )}
       <div className="report__actions">
         <button type="button" className="btn" onClick={handleCopy}>
           {copyFeedback?.startsWith('Markdown copied') ? 'Copied!' : 'Copy Markdown'}

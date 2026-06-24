@@ -8,6 +8,7 @@ import {
   severityLabels,
 } from '../data/labels'
 import { AddFindingForm } from './AddFindingForm'
+import { GuidedTip } from './GuidedTip'
 
 interface FindingsSectionProps {
   findings: Finding[]
@@ -16,6 +17,7 @@ interface FindingsSectionProps {
   onAdd: (input: NewFindingInput) => void
   onUpdate: (findingId: string, input: NewFindingInput) => void
   onRemove: (findingId: string) => void
+  guidedMode?: boolean
 }
 
 function statusChipClass(status: NonNullable<Finding['status']>): string {
@@ -29,7 +31,15 @@ function statusChipClass(status: NonNullable<Finding['status']>): string {
  * category, severity, confidence, status, and selectable supporting evidence /
  * timeline events), and remove.
  */
-export function FindingsSection({ findings, evidence, timeline, onAdd, onUpdate, onRemove }: FindingsSectionProps) {
+export function FindingsSection({
+  findings,
+  evidence,
+  timeline,
+  onAdd,
+  onUpdate,
+  onRemove,
+  guidedMode = false,
+}: FindingsSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const evidenceTitleById = new Map(evidence.map((item) => [item.id, item.title]))
@@ -60,6 +70,12 @@ export function FindingsSection({ findings, evidence, timeline, onAdd, onUpdate,
           </button>
         )}
       </div>
+
+      {guidedMode && (
+        <GuidedTip>
+          A finding should be supported by evidence. Include confidence and avoid conclusions that cannot be traced back to observations.
+        </GuidedTip>
+      )}
 
       {showForm && (
         <AddFindingForm

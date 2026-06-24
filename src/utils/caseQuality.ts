@@ -22,6 +22,20 @@ export interface CaseQualityCheck {
 export interface CaseQualityReview {
   checks: CaseQualityCheck[]
   counts: Record<QualityCheckStatus, number>
+  completion: {
+    complete: number
+    total: number
+    label: 'Complete' | 'Needs attention' | 'Missing'
+  }
+  coachSuggestions: string[]
+  seniorReview: {
+    unsupportedFindings: string[]
+    openQuestions: string[]
+    missingClosureRationale: boolean
+    missingMitreRationale: string[]
+    missingRecommendations: boolean
+    reportReady: boolean
+  }
   ready: boolean
 }
 
@@ -162,6 +176,19 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
 
   const openQuestions = socCase.analystQuestions.filter((question) => question.status === 'open')
   add({
+    id: 'decision-journal',
+    group: 'reasoning',
+    status: socCase.analystQuestions.length > 0 ? 'pass' : 'missing',
+    title:
+      socCase.analystQuestions.length > 0
+        ? `${socCase.analystQuestions.length} decision journal ${socCase.analystQuestions.length === 1 ? 'entry' : 'entries'} recorded`
+        : 'No decision journal entries recorded',
+    guidance:
+      socCase.analystQuestions.length > 0
+        ? 'Analyst reasoning is captured alongside the evidence.'
+        : 'Record at least one question, decision, or uncertainty so the reasoning trail is visible.',
+  })
+  add({
     id: 'open-questions',
     group: 'reasoning',
     status: openQuestions.length > 0 ? 'warning' : 'pass',
@@ -191,36 +218,43 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
   })
 
   const confirmedFindings = socCase.findings.filter((finding) => finding.status === 'confirmed')
-  const unsupportedFindings = confirmedFindings.filter(
+  const unsupportedFindings = socCase.findings.filter(
+    (finding) => finding.status !== 'rejected' && !finding.relatedEvidenceIds?.length,
+  )
+  const unsupportedConfirmedFindings = confirmedFindings.filter(
     (finding) => !finding.relatedEvidenceIds?.length,
   )
+  const findingSupportTitle =
+    socCase.findings.length === 0
+      ? 'Finding support cannot be assessed'
+      : confirmedFindings.length === 0
+        ? 'No findings are explicitly confirmed'
+        : unsupportedConfirmedFindings.length > 0
+          ? `${unsupportedConfirmedFindings.length} confirmed ${unsupportedConfirmedFindings.length === 1 ? 'finding has' : 'findings have'} no linked evidence`
+          : unsupportedFindings.length > 0
+            ? `${unsupportedFindings.length} ${unsupportedFindings.length === 1 ? 'finding has' : 'findings have'} no linked evidence`
+            : 'Confirmed findings are evidence-backed'
+  const findingSupportGuidance =
+    socCase.findings.length === 0
+      ? 'Add findings before evaluating their supporting evidence.'
+      : confirmedFindings.length === 0
+        ? 'Confirm or reject draft findings so the report distinguishes conclusions from hypotheses.'
+        : unsupportedFindings.length > 0
+          ? unsupportedFindings.length === 1
+            ? 'This finding has no supporting evidence linked. Connect the artifact that supports the conclusion.'
+            : 'These findings have no supporting evidence linked. Connect the artifacts that support each conclusion.'
+          : 'Each confirmed conclusion links back to supporting evidence.'
   add({
     id: 'finding-support',
     group: 'reasoning',
     status:
       socCase.findings.length === 0
         ? 'missing'
-        : confirmedFindings.length === 0 || unsupportedFindings.length > 0
+        : unsupportedFindings.length > 0 || confirmedFindings.length === 0
           ? 'warning'
           : 'pass',
-    title:
-      socCase.findings.length === 0
-        ? 'Finding support cannot be assessed'
-        : confirmedFindings.length === 0
-          ? 'No findings are explicitly confirmed'
-          : unsupportedFindings.length > 0
-            ? `${unsupportedFindings.length} confirmed ${unsupportedFindings.length === 1 ? 'finding has' : 'findings have'} no linked evidence`
-            : 'Confirmed findings are evidence-backed',
-    guidance:
-      socCase.findings.length === 0
-        ? 'Add findings before evaluating their supporting evidence.'
-        : confirmedFindings.length === 0
-          ? 'Confirm or reject draft findings so the report distinguishes conclusions from hypotheses.'
-          : unsupportedFindings.length > 0
-            ? unsupportedFindings.length === 1
-              ? 'This finding has no supporting evidence linked. Connect the artifact that supports the conclusion.'
-              : 'These findings have no supporting evidence linked. Connect the artifacts that support each conclusion.'
-            : 'Each confirmed conclusion links back to supporting evidence.',
+    title: findingSupportTitle,
+    guidance: findingSupportGuidance,
     detail:
       unsupportedFindings.length > 0
         ? unsupportedFindings.map((finding) => finding.title).join(' • ')
@@ -315,6 +349,40 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     detail:
       weakMappings.length > 0
         ? weakMappings.map((mapping) => `${mapping.techniqueId} ${mapping.techniqueName}`).join(' • ')
+        : undefined,
+  })
+
+  const mappingsWithoutRationale = socCase.mitreMappings.filter(
+    (mapping) => !mapping.rationale?.trim(),
+  )
+  add({
+    id: 'mitre-rationale',
+    group: 'mitre',
+    status:
+      socCase.mitreMappings.length === 0
+        ? attackerBehavior
+          ? 'missing'
+          : 'pass'
+        : mappingsWithoutRationale.length > 0
+          ? 'warning'
+          : 'pass',
+    title:
+      socCase.mitreMappings.length === 0
+        ? attackerBehavior
+          ? 'No ATT&CK rationale available'
+          : 'No ATT&CK rationale needed yet'
+        : mappingsWithoutRationale.length > 0
+          ? `${mappingsWithoutRationale.length} ATT&CK ${mappingsWithoutRationale.length === 1 ? 'mapping has' : 'mappings have'} no rationale`
+          : 'ATT&CK mappings have written rationale',
+    guidance:
+      mappingsWithoutRationale.length > 0
+        ? 'MITRE mappings should include rationale. Explain the observed behavior that supports the technique.'
+        : 'Each current mapping explains why the technique applies.',
+    detail:
+      mappingsWithoutRationale.length > 0
+        ? mappingsWithoutRationale
+            .map((mapping) => `${mapping.techniqueId} ${mapping.techniqueName}`)
+            .join(' • ')
         : undefined,
   })
 
@@ -427,6 +495,21 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
       : 'Explain why the evidence supports the selected classification before closure.',
   })
 
+  const isClosed = socCase.status === 'closed' || closure?.closureStatus === 'closed'
+  add({
+    id: 'closed-open-questions',
+    group: 'closure',
+    status: isClosed && openQuestions.length > 0 ? 'warning' : 'pass',
+    title:
+      isClosed && openQuestions.length > 0
+        ? 'Case is closed with unresolved analyst questions'
+        : 'Closed-case question state is acceptable',
+    guidance:
+      isClosed && openQuestions.length > 0
+        ? 'This case is marked closed but still has open analyst questions. Resolve or mark them not applicable.'
+        : 'Closed or near-closure cases should not leave unresolved questions unexplained.',
+  })
+
   const hasNextAction = Boolean(closure?.recommendedAction?.trim() || socCase.recommendations.length)
   add({
     id: 'next-action',
@@ -436,6 +519,20 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     guidance: hasNextAction
       ? 'The report can explain what should happen after the investigation.'
       : 'Add a concrete containment, monitoring, escalation, or prevention action for the response owner.',
+  })
+
+  add({
+    id: 'recommendations',
+    group: 'closure',
+    status: socCase.recommendations.length > 0 ? 'pass' : 'warning',
+    title:
+      socCase.recommendations.length > 0
+        ? `${socCase.recommendations.length} response ${socCase.recommendations.length === 1 ? 'recommendation' : 'recommendations'} recorded`
+        : 'No recommendations have been added yet',
+    guidance:
+      socCase.recommendations.length > 0
+        ? 'Response owners have concrete follow-up actions to review.'
+        : 'No recommendations have been added yet. Add containment, monitoring, escalation, recovery, or prevention guidance.',
   })
 
   add({
@@ -454,5 +551,32 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     { pass: 0, warning: 0, missing: 0 },
   )
 
-  return { checks, counts, ready: counts.warning === 0 && counts.missing === 0 }
+  const total = checks.length
+  const complete = counts.pass
+  const label =
+    counts.missing > 0 ? 'Missing' : counts.warning > 0 ? 'Needs attention' : 'Complete'
+  const ready = counts.warning === 0 && counts.missing === 0
+  const coachSuggestions = checks
+    .filter((check) => check.status !== 'pass')
+    .map((check) => check.guidance)
+    .slice(0, 6)
+  const seniorReview = {
+    unsupportedFindings: unsupportedFindings.map((finding) => finding.title),
+    openQuestions: openQuestions.map((question) => question.question),
+    missingClosureRationale: !closure?.rationale?.trim(),
+    missingMitreRationale: mappingsWithoutRationale.map(
+      (mapping) => `${mapping.techniqueId} ${mapping.techniqueName}`,
+    ),
+    missingRecommendations: socCase.recommendations.length === 0,
+    reportReady: ready,
+  }
+
+  return {
+    checks,
+    counts,
+    completion: { complete, total, label },
+    coachSuggestions,
+    seniorReview,
+    ready,
+  }
 }

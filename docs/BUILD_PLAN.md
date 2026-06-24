@@ -251,6 +251,11 @@ in-browser; `npm run build` passes.
   JSON import shapes, safe file-based normalization workflow, synthetic example
   files, and future adapter ideas. Import now also accepts a single `SocCase`
   JSON object and adds/merges it into the current workspace after confirmation.
+- ☑ **Guided Analyst Mode + Lab Mode foundation** — added a local, static Guided
+  Analyst Mode toggle with section tips, strengthened Case Quality Review with a
+  completion score, Missing Data Coach, and senior-review snapshot, added optional
+  lab/training metadata, surfaced quality in the read-only viewer/report, and added
+  a short local Analyst Guide page.
 - ☑ **Artifact Map bottom details panel** — Artifact Map now uses the full
   available width for the lane map, with artifact/relationship details, helper
   text, and Investigation Gaps in a bottom panel across desktop and mobile.

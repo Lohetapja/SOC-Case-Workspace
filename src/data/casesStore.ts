@@ -18,6 +18,9 @@ import type {
   Finding,
   FindingCategory,
   FindingStatus,
+  LabDisclosureState,
+  LabMetadata,
+  LabWriteupStatus,
   MitreMapping,
   QuestionStatus,
   Recommendation,
@@ -533,6 +536,35 @@ export function buildClosure(existing: CaseClosure | undefined, input: ClosureIn
     closure.closedAt = new Date().toISOString()
   }
   return closure
+}
+
+/** Fields collected from the lab / training metadata form. */
+export interface LabMetadataInput {
+  enabled: boolean
+  platform: string
+  labName: string
+  scenarioSummary: string
+  toolsUsed: string
+  learningNotes: string
+  writeupStatus: LabWriteupStatus
+  publicWriteupAllowed: LabDisclosureState
+  spoilerSensitive: LabDisclosureState
+}
+
+/** Build optional lab metadata. Empty disabled input clears the lab section. */
+export function buildLabMetadata(input: LabMetadataInput): LabMetadata | undefined {
+  if (!input.enabled) return undefined
+  return {
+    enabled: true,
+    platform: input.platform.trim() || undefined,
+    labName: input.labName.trim() || undefined,
+    scenarioSummary: input.scenarioSummary.trim() || undefined,
+    toolsUsed: input.toolsUsed.trim() || undefined,
+    learningNotes: input.learningNotes.trim() || undefined,
+    writeupStatus: input.writeupStatus,
+    publicWriteupAllowed: input.publicWriteupAllowed,
+    spoilerSensitive: input.spoilerSensitive,
+  }
 }
 
 /** datetime-local has no timezone; treat the entered value as UTC (synthetic). */

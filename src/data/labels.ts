@@ -11,6 +11,8 @@ import type {
   EvidenceType,
   FindingCategory,
   FindingStatus,
+  LabDisclosureState,
+  LabWriteupStatus,
   QuestionStatus,
   RecommendationCategory,
   RecommendationPriority,
@@ -161,6 +163,18 @@ export const findingStatusLabels: Record<FindingStatus, string> = {
   draft: 'Draft',
   confirmed: 'Confirmed',
   rejected: 'Rejected',
+}
+
+export const labWriteupStatusLabels: Record<LabWriteupStatus, string> = {
+  not_started: 'Not started',
+  draft: 'Draft',
+  complete: 'Complete',
+}
+
+export const labDisclosureStateLabels: Record<LabDisclosureState, string> = {
+  yes: 'Yes',
+  no: 'No',
+  unknown: 'Unknown',
 }
 
 export const agentContributionTypeLabels: Record<AgentContributionType, string> = {

@@ -235,8 +235,8 @@ export function SettingsPage() {
             want to share or preserve only one investigation.
           </p>
           <p className="data-management__safety">
-            Do not export real sensitive investigation data. This portfolio demo is designed for
-            synthetic data.
+            This project is designed for synthetic, sanitized, or training data. Do not import or
+            export real sensitive investigation data into a public or shared browser environment.
           </p>
         </div>
 

@@ -14,6 +14,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { id: 'overview', label: 'Overview', description: 'Project summary and starting point.' },
   { id: 'samples', label: 'Sample Cases', description: 'Load a guided synthetic demo case to explore.' },
+  { id: 'guide', label: 'Analyst Guide', description: 'Short practical guidance for SOC case writing.' },
   { id: 'cases', label: 'Cases', description: 'Build and assess structured investigations.' },
   { id: 'graph', label: 'Case Graph', description: 'Explore relationships in Case Graph or Artifact Map.' },
   { id: 'evidence', label: 'Evidence', description: 'Review collected evidence across all cases.' },

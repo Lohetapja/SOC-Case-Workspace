@@ -212,3 +212,23 @@ added to `SocCase` first, not to page-specific storage.
 into `SocCase` or a workspace snapshot containing `SocCase` records. This keeps
 future adapters human-reviewed and local-first. Live connectors, API keys, and
 backend sync remain out of scope unless the project scope explicitly changes.
+
+---
+
+## ADR-0012 — Human-led guidance and optional lab metadata
+**Date:** 2026-06-24 · **Status:** Accepted
+
+**Context:** The app is useful for portfolio review, junior analyst practice, and
+lab/training writeups. Guidance should help users think like analysts without
+turning the app into an AI investigation system or a course platform.
+
+**Decision:** Add static, local Guided Analyst Mode tips and a short local
+Analyst Guide page. Persist the guided-mode preference in browser `localStorage`.
+Add optional `lab` metadata to `SocCase` for sanctioned training cases, including
+platform, lab name, learning notes, writeup status, and spoiler/public-writeup
+flags.
+
+**Consequences:** The app can support labs and senior review while staying
+frontend-only, browser-first, and human-led. Guidance is not generated, no
+external APIs are called, and lab metadata remains optional case context rather
+than a separate storage system.
