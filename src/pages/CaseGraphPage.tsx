@@ -31,8 +31,9 @@ interface CaseGraphPageProps {
 }
 
 /**
- * Read-only Case Graph view. Visualizes the relationships inside ONE case
- * (the shared active case, or the first stored case). No editing.
+ * Investigation Visuals for ONE case (the shared active case, or the first stored
+ * case): an Artifact Map with safe quick editing of source-backed items, plus a
+ * read-only Case Graph relationship view.
  */
 export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGraphPageProps) {
   const { cases, updateCase } = useCases()
@@ -127,7 +128,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
           <p className="page__subtitle">
             {viz === 'graph'
               ? `Read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
-              : 'Read-only investigation-flow view: artifacts grouped into lanes.'}
+              : 'Investigation-flow view: artifacts grouped into lanes. Select a card to inspect or quick-edit.'}
           </p>
           {(activeCase?.closure?.verdict || activeCase?.closure?.closureStatus) && (
             <p className="graph-classification">
@@ -190,6 +191,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
           <ArtifactMap
             socCase={activeCase}
             onUpdateCase={(updater) => updateCase(activeCase.id, updater)}
+            onOpenFullCase={() => onOpenCase(activeCase.id)}
           />
         )
       ) : (
@@ -222,6 +224,10 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
                 <p className="graph-detail__meta">
                   {selectedNode.degree ?? 0}{' '}
                   {(selectedNode.degree ?? 0) === 1 ? 'connection' : 'connections'}
+                </p>
+                <p className="graph-detail__meta">
+                  Case Graph is read-only. Open the full case to edit source data, or use the
+                  Artifact Map for quick edits.
                 </p>
               </div>
             ) : (

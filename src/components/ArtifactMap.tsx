@@ -47,10 +47,12 @@ function truncate(value: string, max: number): string {
 interface ArtifactMapProps {
   socCase: SocCase
   onUpdateCase?: (updater: (socCase: SocCase) => SocCase) => void
+  /** Opens the full case workspace for deeper edits than the quick-edit panel. */
+  onOpenFullCase?: () => void
 }
 
 /** Structured investigation-flow map for one case. Source-backed cards can be quick-edited. */
-export function ArtifactMap({ socCase, onUpdateCase }: ArtifactMapProps) {
+export function ArtifactMap({ socCase, onUpdateCase, onOpenFullCase }: ArtifactMapProps) {
   const map = useMemo(() => buildArtifactMap(socCase), [socCase])
   const [selection, setSelection] = useState<Selection>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
@@ -291,19 +293,24 @@ export function ArtifactMap({ socCase, onUpdateCase }: ArtifactMapProps) {
       <aside className="amap__panel">
         <div className="amap__panel-detail">
           <p className="amap__sync-note">
-            Artifact Map edits update the selected case and are reflected across reports,
-            read-only view, and workspace pages.
+            Investigation visuals help review relationships and gaps. Quick edits update the
+            selected case and are reflected across workspace pages, reports, and read-only view.
           </p>
 
           {selection && (
             <div className="amap__detail-actions">
-              {selectedNode && !editingNodeId && (
+              {selectedNode && selectedNode.source && onUpdateCase && !editingNodeId && (
                 <button
                   type="button"
                   className="btn btn--secondary btn--sm"
                   onClick={() => setEditingNodeId(selectedNode.id)}
                 >
                   Edit
+                </button>
+              )}
+              {selectedNode && !editingNodeId && onOpenFullCase && (
+                <button type="button" className="btn-link" onClick={() => onOpenFullCase()}>
+                  Open full case
                 </button>
               )}
               <button type="button" className="btn-link" onClick={() => clearSelection()}>
@@ -341,9 +348,9 @@ export function ArtifactMap({ socCase, onUpdateCase }: ArtifactMapProps) {
                 {inspectedNode.degree ?? 0}{' '}
                 {(inspectedNode.degree ?? 0) === 1 ? 'connection' : 'connections'}
               </p>
-              {selection?.kind === 'node' && selection.nodeId === inspectedNode.id && (
+              {inspectedNode.source && selection?.kind === 'node' && selection.nodeId === inspectedNode.id && (
                 <p className="amap__detail-meta">
-                  Edit here or open the full case for detailed changes.
+                  Use Edit for quick changes, or open the full case for detailed edits.
                 </p>
               )}
               {!inspectedNode.source && selection?.kind === 'node' && selection.nodeId === inspectedNode.id && (
