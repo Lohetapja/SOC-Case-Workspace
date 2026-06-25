@@ -38,6 +38,13 @@ function sectionCount(count: number) {
   return <span className="detail-section__count">{count}</span>
 }
 
+function joinTitles(ids: string[] | undefined, titlesById: Map<string, string>): string {
+  return (ids ?? [])
+    .map((id) => titlesById.get(id))
+    .filter((title): title is string => Boolean(title))
+    .join(', ')
+}
+
 /** Clean read-only case summary for reviewers and mobile inspection. */
 export function ReadOnlyCasePage({
   activeCaseId,
@@ -110,9 +117,10 @@ export function ReadOnlyCasePage({
     )
   }
 
+  const quality = reviewCaseQuality(socCase)
   const openQuestions = socCase.analystQuestions.filter((question) => question.status === 'open')
   const markdown = buildCaseReport(socCase)
-  const quality = reviewCaseQuality(socCase)
+  const closure = socCase.closure
 
   return (
     <div className="page viewer-page">
@@ -125,24 +133,23 @@ export function ReadOnlyCasePage({
       <header className="card viewer-hero">
         <div className="viewer-hero__top">
           <div>
-            <p className="viewer-kicker">Read-only case view</p>
+            <p className="viewer-kicker">Read-only case review</p>
             <h1 className="viewer-title">{socCase.title}</h1>
           </div>
           <span className={`sev sev--${socCase.severity}`}>{severityLabels[socCase.severity]}</span>
         </div>
         <div className="viewer-chips">
           <span className="chip">Status: {statusLabels[socCase.status]}</span>
-          <span className="chip">Source: {sourceLabels[socCase.source]}</span>
-          <span className="chip">Owner: {socCase.owner}</span>
           <span className="chip">
-            Classification: {socCase.closure?.verdict ? verdictLabels[socCase.closure.verdict] : 'Not set'}
+            Classification: {closure?.verdict ? verdictLabels[closure.verdict] : 'Not set'}
           </span>
           <span className="chip">
-            Closure: {socCase.closure?.closureStatus ? closureStatusLabels[socCase.closure.closureStatus] : 'Not set'}
+            Closure: {closure?.closureStatus ? closureStatusLabels[closure.closureStatus] : 'Not set'}
           </span>
           {socCase.lab?.enabled && <span className="chip chip--open">Lab / training case</span>}
         </div>
-        <p className="viewer-summary">{socCase.summary || 'No case summary has been recorded.'}</p>
+        <h2 className="viewer-section-label">Executive summary</h2>
+        <p className="viewer-summary">{socCase.summary || 'No executive summary has been recorded.'}</p>
         <p className="viewer-share-note">
           Read-only view is generated from local browser data. Export Markdown or JSON to share
           outside this browser.
@@ -167,54 +174,22 @@ export function ReadOnlyCasePage({
       </header>
 
       <section className="card viewer-section">
-        <h2 className="detail-section__title">Case quality summary</h2>
-        <div className="viewer-chips">
-          <span className="quality-summary quality-summary--pass">
-            {quality.completion.complete} / {quality.completion.total} checks complete
-          </span>
-          <span className="quality-summary quality-summary--warning">
-            {quality.counts.warning} needs attention
-          </span>
-          <span className="quality-summary quality-summary--missing">
-            {quality.counts.missing} missing
-          </span>
-          <span className="chip">{quality.completion.label}</span>
+        <h2 className="detail-section__title">Case metadata</h2>
+        <div className="viewer-metadata-grid">
+          <span><strong>Case ID:</strong> {socCase.id}</span>
+          <span><strong>Source:</strong> {sourceLabels[socCase.source]}{socCase.sourceDetail ? ` (${socCase.sourceDetail})` : ''}</span>
+          <span><strong>Severity:</strong> {severityLabels[socCase.severity]}</span>
+          <span><strong>Status:</strong> {statusLabels[socCase.status]}</span>
+          <span><strong>Owner:</strong> {socCase.owner}</span>
+          <span><strong>Created:</strong> {formatDateTime(socCase.createdAt)}</span>
+          <span><strong>Updated:</strong> {formatDateTime(socCase.updatedAt)}</span>
         </div>
-        <p className="viewer-share-note">
-          This is advisory only. The analyst should resolve missing evidence, weak reasoning, and
-          closure gaps before treating the report as final.
-        </p>
       </section>
-
-      {socCase.lab?.enabled && (
-        <section className="card viewer-section">
-          <h2 className="detail-section__title">Lab / training context</h2>
-          <div className="viewer-chips">
-            {socCase.lab.platform && <span className="chip">{socCase.lab.platform}</span>}
-            {socCase.lab.labName && <span className="chip">{socCase.lab.labName}</span>}
-            <span className="chip">
-              Writeup: {labWriteupStatusLabels[socCase.lab.writeupStatus ?? 'not_started']}
-            </span>
-            <span className="chip">
-              Public writeup: {labDisclosureStateLabels[socCase.lab.publicWriteupAllowed ?? 'unknown']}
-            </span>
-            <span className="chip">
-              Spoiler-sensitive: {labDisclosureStateLabels[socCase.lab.spoilerSensitive ?? 'unknown']}
-            </span>
-          </div>
-          {socCase.lab.scenarioSummary && <p className="detail-text">{socCase.lab.scenarioSummary}</p>}
-          {socCase.lab.learningNotes && (
-            <p className="viewer-share-note">
-              Learning notes: {socCase.lab.learningNotes}
-            </p>
-          )}
-        </section>
-      )}
 
       <section className="card viewer-section">
         <h2 className="detail-section__title">Affected entities {sectionCount(socCase.affectedEntities.length)}</h2>
         {socCase.affectedEntities.length === 0 ? (
-          <EmptySection>No affected entities recorded.</EmptySection>
+          <EmptySection>No affected entities recorded. Add the user, host, account, IP, file, or system in scope.</EmptySection>
         ) : (
           <ul className="viewer-list">
             {socCase.affectedEntities.map((entity) => (
@@ -232,9 +207,61 @@ export function ReadOnlyCasePage({
       </section>
 
       <section className="card viewer-section">
-        <h2 className="detail-section__title">Evidence summary {sectionCount(socCase.evidence.length)}</h2>
+        <h2 className="detail-section__title">Key findings {sectionCount(socCase.findings.length)}</h2>
+        <p className="viewer-section-help">
+          Findings are the analyst conclusions. They should be traceable to evidence.
+        </p>
+        {socCase.findings.length === 0 ? (
+          <EmptySection>No analytical findings recorded.</EmptySection>
+        ) : (
+          <ul className="viewer-list">
+            {socCase.findings.map((finding) => {
+              const evidence = joinTitles(finding.relatedEvidenceIds, evidenceTitleById)
+              const events = joinTitles(finding.relatedTimelineEventIds, timelineTitleById)
+              return (
+                <li key={finding.id}>
+                  <strong>{finding.title}</strong>
+                  <span className="viewer-meta">
+                    {finding.category ? `${findingCategoryLabels[finding.category]} · ` : ''}
+                    {confidenceLabels[finding.confidence]} confidence
+                    {finding.status ? ` · ${findingStatusLabels[finding.status]}` : ''}
+                  </span>
+                  <p>{finding.description}</p>
+                  {evidence && <span className="viewer-meta">Supporting evidence: {evidence}</span>}
+                  {events && <span className="viewer-meta">Related timeline: {events}</span>}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="card viewer-section">
+        <h2 className="detail-section__title">Timeline {sectionCount(socCase.timeline.length)}</h2>
+        {socCase.timeline.length === 0 ? (
+          <EmptySection>No timeline events recorded. A reviewer cannot yet follow the sequence of activity.</EmptySection>
+        ) : (
+          <ol className="viewer-timeline">
+            {[...socCase.timeline].sort((a, b) => a.timestamp.localeCompare(b.timestamp)).map((event) => {
+              const linkedEvidence = joinTitles(event.relatedEvidenceIds, evidenceTitleById)
+              return (
+                <li key={event.id}>
+                  <time>{formatDateTime(event.timestamp)}</time>
+                  <strong>{event.title}</strong>
+                  {event.phase && <span className="chip">{timelinePhaseLabels[event.phase]}</span>}
+                  <p>{event.description}</p>
+                  {linkedEvidence && <span className="viewer-meta">Evidence: {linkedEvidence}</span>}
+                </li>
+              )
+            })}
+          </ol>
+        )}
+      </section>
+
+      <section className="card viewer-section">
+        <h2 className="detail-section__title">Evidence reviewed {sectionCount(socCase.evidence.length)}</h2>
         {socCase.evidence.length === 0 ? (
-          <EmptySection>No evidence recorded.</EmptySection>
+          <EmptySection>No evidence recorded. Findings should not rely on unsupported claims.</EmptySection>
         ) : (
           <ul className="viewer-list">
             {socCase.evidence.map((item) => (
@@ -246,6 +273,7 @@ export function ReadOnlyCasePage({
                   {item.observedAt ? ` · ${formatDateTime(item.observedAt)}` : ''}
                 </span>
                 <p>{item.detail}</p>
+                {item.analystNote && <p className="viewer-note">Analyst note: {item.analystNote}</p>}
               </li>
             ))}
           </ul>
@@ -253,37 +281,11 @@ export function ReadOnlyCasePage({
       </section>
 
       <section className="card viewer-section">
-        <h2 className="detail-section__title">Timeline {sectionCount(socCase.timeline.length)}</h2>
-        {socCase.timeline.length === 0 ? (
-          <EmptySection>No timeline events recorded.</EmptySection>
-        ) : (
-          <ol className="viewer-timeline">
-            {[...socCase.timeline].sort((a, b) => a.timestamp.localeCompare(b.timestamp)).map((event) => {
-              const linkedEvidence = (event.relatedEvidenceIds ?? [])
-                .map((id) => evidenceTitleById.get(id))
-                .filter((title): title is string => Boolean(title))
-              return (
-                <li key={event.id}>
-                  <time>{formatDateTime(event.timestamp)}</time>
-                  <strong>{event.title}</strong>
-                  {event.phase && <span className="chip">{timelinePhaseLabels[event.phase]}</span>}
-                  <p>{event.description}</p>
-                  {linkedEvidence.length > 0 && (
-                    <span className="viewer-meta">Evidence: {linkedEvidence.join(', ')}</span>
-                  )}
-                </li>
-              )
-            })}
-          </ol>
-        )}
-      </section>
-
-      <section className="card viewer-section">
         <h2 className="detail-section__title">
-          Decision journal {sectionCount(socCase.analystQuestions.length)}
+          Decision journal / open questions {sectionCount(socCase.analystQuestions.length)}
         </h2>
         {socCase.analystQuestions.length === 0 ? (
-          <EmptySection>No analyst questions recorded.</EmptySection>
+          <EmptySection>No analyst questions recorded. Add decisions or uncertainties before final review.</EmptySection>
         ) : (
           <ul className="viewer-list">
             {socCase.analystQuestions.map((question) => (
@@ -297,56 +299,26 @@ export function ReadOnlyCasePage({
           </ul>
         )}
         {openQuestions.length > 0 && (
-          <p className="viewer-warning">{openQuestions.length} open question(s) remain unresolved.</p>
-        )}
-      </section>
-
-      <section className="card viewer-section">
-        <h2 className="detail-section__title">Findings {sectionCount(socCase.findings.length)}</h2>
-        {socCase.findings.length === 0 ? (
-          <EmptySection>No analytical findings recorded.</EmptySection>
-        ) : (
-          <ul className="viewer-list">
-            {socCase.findings.map((finding) => {
-              const evidence = (finding.relatedEvidenceIds ?? [])
-                .map((id) => evidenceTitleById.get(id))
-                .filter((title): title is string => Boolean(title))
-              const events = (finding.relatedTimelineEventIds ?? [])
-                .map((id) => timelineTitleById.get(id))
-                .filter((title): title is string => Boolean(title))
-              return (
-                <li key={finding.id}>
-                  <strong>{finding.title}</strong>
-                  <span className="viewer-meta">
-                    {finding.category ? `${findingCategoryLabels[finding.category]} · ` : ''}
-                    {confidenceLabels[finding.confidence]} confidence
-                    {finding.status ? ` · ${findingStatusLabels[finding.status]}` : ''}
-                  </span>
-                  <p>{finding.description}</p>
-                  {evidence.length > 0 && <span className="viewer-meta">Evidence: {evidence.join(', ')}</span>}
-                  {events.length > 0 && <span className="viewer-meta">Timeline: {events.join(', ')}</span>}
-                </li>
-              )
-            })}
-          </ul>
+          <p className="viewer-warning">
+            {openQuestions.length} open question(s) remain unresolved before final closure.
+          </p>
         )}
       </section>
 
       <section className="card viewer-section">
         <h2 className="detail-section__title">
-          MITRE ATT&amp;CK mappings {sectionCount(socCase.mitreMappings.length)}
+          MITRE ATT&CK mappings {sectionCount(socCase.mitreMappings.length)}
         </h2>
+        <p className="viewer-section-help">
+          These mappings are analyst-authored and should explain what behavior supports each technique.
+        </p>
         {socCase.mitreMappings.length === 0 ? (
-          <EmptySection>No analyst-authored ATT&amp;CK mappings recorded.</EmptySection>
+          <EmptySection>No analyst-authored ATT&CK mappings recorded.</EmptySection>
         ) : (
           <ul className="viewer-list">
             {socCase.mitreMappings.map((mapping) => {
-              const findings = (mapping.relatedFindingIds ?? [])
-                .map((id) => findingTitleById.get(id))
-                .filter((title): title is string => Boolean(title))
-              const evidence = (mapping.relatedEvidenceIds ?? [])
-                .map((id) => evidenceTitleById.get(id))
-                .filter((title): title is string => Boolean(title))
+              const findings = joinTitles(mapping.relatedFindingIds, findingTitleById)
+              const evidence = joinTitles(mapping.relatedEvidenceIds, evidenceTitleById)
               return (
                 <li key={mapping.id}>
                   <strong>{mapping.techniqueId} — {mapping.techniqueName}</strong>
@@ -355,8 +327,8 @@ export function ReadOnlyCasePage({
                     {confidenceLabels[mapping.confidence]} confidence
                   </span>
                   <p>{mapping.rationale}</p>
-                  {findings.length > 0 && <span className="viewer-meta">Findings: {findings.join(', ')}</span>}
-                  {evidence.length > 0 && <span className="viewer-meta">Evidence: {evidence.join(', ')}</span>}
+                  {findings && <span className="viewer-meta">Supporting findings: {findings}</span>}
+                  {evidence && <span className="viewer-meta">Supporting evidence: {evidence}</span>}
                 </li>
               )
             })}
@@ -365,24 +337,32 @@ export function ReadOnlyCasePage({
       </section>
 
       <section className="card viewer-section">
-        <h2 className="detail-section__title">Closure rationale</h2>
-        {socCase.closure?.rationale || socCase.closure?.recommendedAction || socCase.closure?.impactSummary ? (
+        <h2 className="detail-section__title">Closure decision and rationale</h2>
+        {closure?.rationale || closure?.recommendedAction || closure?.impactSummary ? (
           <div className="viewer-copy">
-            {socCase.closure.rationale && <p><strong>Rationale:</strong> {socCase.closure.rationale}</p>}
-            {socCase.closure.recommendedAction && (
-              <p><strong>Recommended action:</strong> {socCase.closure.recommendedAction}</p>
+            <div className="viewer-chips">
+              <span className="chip">
+                Classification: {closure?.verdict ? verdictLabels[closure.verdict] : 'Not set'}
+              </span>
+              <span className="chip">
+                Closure: {closure?.closureStatus ? closureStatusLabels[closure.closureStatus] : 'Not set'}
+              </span>
+            </div>
+            {closure?.rationale && <p><strong>Rationale:</strong> {closure.rationale}</p>}
+            {closure?.recommendedAction && (
+              <p><strong>Recommended action:</strong> {closure.recommendedAction}</p>
             )}
-            {socCase.closure.impactSummary && <p><strong>Impact:</strong> {socCase.closure.impactSummary}</p>}
+            {closure?.impactSummary && <p><strong>Impact:</strong> {closure.impactSummary}</p>}
           </div>
         ) : (
-          <EmptySection>No closure rationale recorded.</EmptySection>
+          <EmptySection>No closure rationale recorded. A reviewer cannot yet see why the case was classified.</EmptySection>
         )}
       </section>
 
       <section className="card viewer-section">
         <h2 className="detail-section__title">Recommendations {sectionCount(socCase.recommendations.length)}</h2>
         {socCase.recommendations.length === 0 ? (
-          <EmptySection>No recommendations recorded.</EmptySection>
+          <EmptySection>No recommendations recorded. Add what should happen next.</EmptySection>
         ) : (
           <ul className="viewer-list">
             {socCase.recommendations.map((recommendation) => (
@@ -398,6 +378,67 @@ export function ReadOnlyCasePage({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="card viewer-section">
+        <h2 className="detail-section__title">Case quality / limitations</h2>
+        <div className="viewer-chips">
+          <span className="quality-summary quality-summary--pass">
+            {quality.completion.complete} / {quality.completion.total} checks complete
+          </span>
+          <span className="quality-summary quality-summary--warning">
+            {quality.counts.warning} needs attention
+          </span>
+          <span className="quality-summary quality-summary--missing">
+            {quality.counts.missing} missing
+          </span>
+          <span className="chip">{quality.completion.label}</span>
+        </div>
+        {quality.coachSuggestions.length > 0 ? (
+          <ul className="viewer-list viewer-list--compact">
+            {quality.coachSuggestions.map((suggestion) => (
+              <li key={suggestion}>{suggestion}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="viewer-section-help">
+            No major quality gaps were flagged. Final review should still confirm wording and evidence links.
+          </p>
+        )}
+      </section>
+
+      {socCase.lab?.enabled && (
+        <section className="card viewer-section">
+          <h2 className="detail-section__title">Lab / training disclaimer</h2>
+          <div className="viewer-chips">
+            {socCase.lab.platform && <span className="chip">{socCase.lab.platform}</span>}
+            {socCase.lab.labName && <span className="chip">{socCase.lab.labName}</span>}
+            <span className="chip">
+              Writeup: {labWriteupStatusLabels[socCase.lab.writeupStatus ?? 'not_started']}
+            </span>
+            <span className="chip">
+              Public writeup: {labDisclosureStateLabels[socCase.lab.publicWriteupAllowed ?? 'unknown']}
+            </span>
+            <span className="chip">
+              Spoiler-sensitive: {labDisclosureStateLabels[socCase.lab.spoilerSensitive ?? 'unknown']}
+            </span>
+          </div>
+          {socCase.lab.scenarioSummary && <p className="detail-text">{socCase.lab.scenarioSummary}</p>}
+          {socCase.lab.learningNotes && <p className="viewer-note">Learning notes: {socCase.lab.learningNotes}</p>}
+          <p className="viewer-share-note">
+            Do not publish restricted lab answers, copyrighted material, or spoiler-sensitive content
+            without permission.
+          </p>
+        </section>
+      )}
+
+      <section className="card viewer-section">
+        <h2 className="detail-section__title">Synthetic / sanitized data disclaimer</h2>
+        <p className="detail-text">
+          This read-only view is generated from local browser data. SOC Case Workspace is designed
+          for synthetic, sanitized, or training data only. Do not use this public portfolio demo for
+          real sensitive investigations.
+        </p>
       </section>
     </div>
   )

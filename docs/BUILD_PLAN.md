@@ -39,7 +39,7 @@ and internally consistent.
 
 ## Milestone 1 — Project scaffold + Case list & create  ☑
 **Done:** Vite/React/TS scaffold + layout; core data model
-(`src/types/domain.ts`) and three synthetic sample cases (`src/data/demoCases.ts`);
+(`src/types/domain.ts`) and five synthetic sample cases (`src/data/demoCases.ts`);
 typed `localStorage` helper (`src/utils/storage.ts`) and case store
 (`src/data/casesStore.ts`) seeded from the demo data; `useCases` hook; case list,
 create-case form, and delete. Verified: `npm run build` passes and the dev server
@@ -190,10 +190,11 @@ in-browser; `npm run build` passes.
   state persists on the case (`ChecklistItem` on `SocCase`); `ChecklistSection`
   shows it in the detail workspace.
 - ☑ **Sample case library / guided demo** — `src/pages/SampleCasesPage.tsx` with a
-  "How to explore this demo" walkthrough and three fully-populated synthetic
-  samples (Phishing → PowerShell, Impossible Travel, Malware / EDR Alert). Each can
-  be added to the workspace (duplicate-safe via `useCases().addSampleCase`) and
-  opened. The three samples also seed the workspace on first run.
+  "How to explore this demo" walkthrough and five fully-populated synthetic
+  samples (Phishing → PowerShell, Impossible Travel, Malware / EDR Alert,
+  Suspicious Admin Activity, Data Exfiltration / Cloud Sharing). Each can be
+  added to the workspace (duplicate-safe via `useCases().addSampleCase`) and
+  opened. The five samples also seed the workspace on first run.
 - ☑ **Cross-case workspace pages** — the Evidence, Timeline, Decision Journal, and
   MITRE Mapping sidebar pages are real read-only views across all cases (search +
   filters + an "Open case" action), replacing the old placeholders. Timeline is
@@ -267,10 +268,11 @@ in-browser; `npm run build` passes.
   uses `SocCase` / `updateCase` / localStorage as the source of truth across
   detail, workspace pages, visuals, viewer, reports, and export/import; added a
   regression test and ADR note documenting the contract.
-- ☑ **Improved sample case stories** — the three built-in demo cases now better
-  demonstrate the full alert-to-report workflow with richer synthetic evidence,
-  timeline checkpoints, analyst questions, evidence-backed findings, MITRE
-  rationale, closure reasoning, and response recommendations.
+- ☑ **Improved sample case stories + report-ready review flow** — the five built-in
+  demo cases demonstrate different SOC/DFIR concepts across the full
+  alert-to-report workflow with richer synthetic evidence, timeline checkpoints,
+  analyst questions, evidence-backed findings, MITRE rationale, closure reasoning,
+  response recommendations, read-only review, and polished Markdown report output.
 - ☑ Seed / demo synthetic cases for first-run experience (loadCases seeds demo).
 
 ---

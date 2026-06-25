@@ -113,8 +113,9 @@ README are below; add images under `docs/screenshots/` when captures are ready.
 - Structured case intake with editable metadata, affected entities, and case
   templates.
 - Synthetic sample-case library and investigation checklists for common learning
-  scenarios such as phishing, suspicious PowerShell, impossible travel, malware
-  alerts, and brute-force activity.
+  scenarios such as phishing-to-PowerShell execution, impossible travel,
+  malware / EDR alerts, suspicious admin activity, and cloud data
+  sharing / exfiltration.
 - Editable evidence, chronological timeline events, analyst questions, findings,
   recommendations, and analyst-authored MITRE mappings.
 - Evidence and timeline references that show what supports each conclusion.

@@ -10,6 +10,7 @@ const WALKTHROUGH_STEPS = [
   'Read the Analyst questions / decision journal.',
   'Inspect the Findings and the MITRE ATT&CK mapping.',
   'Check Case Quality Review for unresolved gaps and report readiness.',
+  'Open the read-only viewer to see the case as a reviewer would.',
   'Open the Case Graph, then switch to the Artifact Map.',
   'Export the Markdown investigation report from Reports.',
 ]

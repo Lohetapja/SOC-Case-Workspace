@@ -959,5 +959,609 @@ const malwareEdrAlert: SocCase = {
   updatedAt: '2026-06-20T15:10:00Z',
 }
 
+const suspiciousAdminActivity: SocCase = {
+  id: 'case-suspicious-admin',
+  title: 'Suspicious Admin Activity',
+  summary:
+    'A synthetic cloud audit alert detected a privileged account adding itself to an email-discovery role and starting a sensitive mailbox content search outside the approved change window. The analyst correlated sign-in, role assignment, audit, and change-ticket evidence, found no valid business approval, reverted the role, and escalated the case as suspicious privileged-account misuse.',
+  source: 'cloud',
+  sourceDetail: 'Cloud audit and identity logs',
+  severity: 'high',
+  status: 'investigating',
+  owner: 'nguyen.analyst',
+  affectedEntities: [
+    {
+      id: 'c4-ent-admin',
+      type: 'user',
+      value: 'alex.admin',
+      role: 'Privileged account under review',
+      description: 'Synthetic admin account used for cloud administration.',
+    },
+    {
+      id: 'c4-ent-cloud',
+      type: 'cloud_account',
+      value: 'alex.admin@training.example',
+      role: 'Cloud identity',
+    },
+    {
+      id: 'c4-ent-host',
+      type: 'host',
+      value: 'ADMIN-LAP-07',
+      role: 'Expected admin workstation',
+    },
+    {
+      id: 'c4-ent-ip',
+      type: 'ip_address',
+      value: '198.51.100.88',
+      role: 'Unexpected source IP (synthetic TEST-NET-2)',
+    },
+    {
+      id: 'c4-ent-role',
+      type: 'other',
+      value: 'Mailbox Discovery Administrator',
+      role: 'Temporary privileged role assignment',
+    },
+  ],
+  evidence: [
+    {
+      id: 'c4-ev-signin',
+      type: 'authentication',
+      title: 'Privileged sign-in from unusual source',
+      detail:
+        'alex.admin signed in at 02:11 UTC from 198.51.100.88 using a browser user agent not previously seen for this account.',
+      source: 'Cloud identity sign-in logs',
+      observedAt: '2026-06-21T02:11:00Z',
+      analystNote: 'The timing and source differ from the admin account baseline.',
+      relatedEntityIds: ['c4-ent-admin', 'c4-ent-ip'],
+    },
+    {
+      id: 'c4-ev-role',
+      type: 'log',
+      title: 'Privileged role assignment added',
+      detail:
+        'Audit log shows alex.admin added itself to Mailbox Discovery Administrator for a temporary session.',
+      source: 'Cloud audit log',
+      observedAt: '2026-06-21T02:14:00Z',
+      analystNote: 'Self-assignment to a sensitive discovery role requires explicit approval.',
+      relatedEntityIds: ['c4-ent-admin', 'c4-ent-role'],
+    },
+    {
+      id: 'c4-ev-search',
+      type: 'log',
+      title: 'Sensitive mailbox content search started',
+      detail:
+        'Content search named Finance-Q3-Review created against executive and finance mailboxes. Export action was initiated but did not complete.',
+      source: 'Cloud audit log',
+      observedAt: '2026-06-21T02:18:00Z',
+      analystNote: 'Scope overlaps sensitive mailboxes and happened outside the approved maintenance window.',
+      relatedEntityIds: ['c4-ent-admin'],
+    },
+    {
+      id: 'c4-ev-ticket',
+      type: 'note',
+      title: 'No matching change ticket',
+      detail:
+        'Change calendar and ticket search found no approved maintenance or eDiscovery request for this time window.',
+      source: 'Change-management review note',
+      observedAt: '2026-06-21T03:05:00Z',
+      analystNote: 'Absence of approval makes the admin activity suspicious, not automatically malicious.',
+      relatedEntityIds: ['c4-ent-admin'],
+    },
+    {
+      id: 'c4-ev-revert',
+      type: 'log',
+      title: 'Role removed and sessions revoked',
+      detail:
+        'Security administrator removed the discovery role assignment and revoked active sessions for alex.admin.',
+      source: 'Cloud admin audit log',
+      observedAt: '2026-06-21T03:20:00Z',
+      analystNote: 'Containment was manual and documented; no automated response was performed by this app.',
+      relatedEntityIds: ['c4-ent-admin', 'c4-ent-role'],
+    },
+  ],
+  timeline: [
+    {
+      id: 'c4-tl-1',
+      timestamp: '2026-06-21T02:11:00Z',
+      title: 'Privileged account signed in',
+      description: 'alex.admin signed in from an unusual source outside normal admin hours.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c4-ev-signin'],
+    },
+    {
+      id: 'c4-tl-2',
+      timestamp: '2026-06-21T02:14:00Z',
+      title: 'Sensitive role assigned',
+      description: 'The account added itself to a mailbox discovery administrator role.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c4-ev-role'],
+    },
+    {
+      id: 'c4-tl-3',
+      timestamp: '2026-06-21T02:18:00Z',
+      title: 'Mailbox content search created',
+      description: 'A content search targeting sensitive mailboxes was started.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c4-ev-search'],
+    },
+    {
+      id: 'c4-tl-4',
+      timestamp: '2026-06-21T02:25:00Z',
+      title: 'Privileged activity alert raised',
+      description: 'Cloud audit detection flagged self-assigned discovery role plus sensitive search activity.',
+      phase: 'detection',
+      relatedEvidenceIds: ['c4-ev-role', 'c4-ev-search'],
+    },
+    {
+      id: 'c4-tl-5',
+      timestamp: '2026-06-21T03:05:00Z',
+      title: 'No approval found',
+      description: 'Analyst found no matching change ticket or eDiscovery request.',
+      phase: 'analyst_action',
+      relatedEvidenceIds: ['c4-ev-ticket'],
+    },
+    {
+      id: 'c4-tl-6',
+      timestamp: '2026-06-21T03:20:00Z',
+      title: 'Role removed and sessions revoked',
+      description: 'Security administrator removed the temporary role and revoked sessions.',
+      phase: 'containment',
+      relatedEvidenceIds: ['c4-ev-revert'],
+    },
+  ],
+  analystQuestions: [
+    {
+      id: 'c4-q-1',
+      question: 'Was this privileged action covered by an approved change or eDiscovery request?',
+      status: 'answered',
+      answer: 'No matching approval was found.',
+      rationale: 'Change calendar and ticket search did not identify an approved request for the activity window.',
+      createdAt: '2026-06-21T02:45:00Z',
+      answeredAt: '2026-06-21T03:05:00Z',
+    },
+    {
+      id: 'c4-q-2',
+      question: 'Did the content export complete?',
+      status: 'answered',
+      answer: 'No. The content search was created, but the export action did not complete before containment.',
+      rationale: 'Cloud audit logs show creation and export initiation, but no successful export completion event.',
+      createdAt: '2026-06-21T02:50:00Z',
+      answeredAt: '2026-06-21T03:12:00Z',
+    },
+    {
+      id: 'c4-q-3',
+      question: 'Should the activity be treated as authorized administration?',
+      status: 'answered',
+      answer: 'No. The evidence supports suspicious privileged-account misuse pending management review.',
+      rationale: 'Unusual source, timing, self-assigned role, sensitive search scope, and no approval all argue against routine administration.',
+      createdAt: '2026-06-21T03:15:00Z',
+      answeredAt: '2026-06-21T03:30:00Z',
+    },
+  ],
+  findings: [
+    {
+      id: 'c4-f-1',
+      title: 'Privileged role self-assignment was not approved',
+      description:
+        'A privileged account added itself to a sensitive mailbox discovery role outside normal hours with no matching change ticket.',
+      confidence: 'high',
+      category: 'suspicious_activity',
+      severity: 'high',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c4-ev-signin', 'c4-ev-role', 'c4-ev-ticket'],
+      relatedTimelineEventIds: ['c4-tl-1', 'c4-tl-2', 'c4-tl-5'],
+    },
+    {
+      id: 'c4-f-2',
+      title: 'Sensitive mailbox search was initiated but not completed',
+      description:
+        'Audit logs show a sensitive content search and attempted export, but no successful export completion event before containment.',
+      confidence: 'medium',
+      category: 'suspicious_activity',
+      severity: 'medium',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c4-ev-search', 'c4-ev-revert'],
+      relatedTimelineEventIds: ['c4-tl-3', 'c4-tl-6'],
+    },
+  ],
+  mitreMappings: [
+    {
+      id: 'c4-mt-1',
+      tactic: 'Initial Access',
+      techniqueId: 'T1078',
+      techniqueName: 'Valid Accounts',
+      rationale:
+        'The activity used a valid privileged account. The question is authorization, not credential validity.',
+      confidence: 'medium',
+      relatedFindingIds: ['c4-f-1'],
+      relatedEvidenceIds: ['c4-ev-signin', 'c4-ev-role'],
+    },
+    {
+      id: 'c4-mt-2',
+      tactic: 'Persistence',
+      techniqueId: 'T1098',
+      techniqueName: 'Account Manipulation',
+      rationale:
+        'The account modified its effective privileges by adding a sensitive discovery role.',
+      confidence: 'medium',
+      relatedFindingIds: ['c4-f-1'],
+      relatedEvidenceIds: ['c4-ev-role'],
+    },
+    {
+      id: 'c4-mt-3',
+      tactic: 'Collection',
+      techniqueId: 'T1114',
+      techniqueName: 'Email Collection',
+      rationale:
+        'A mailbox content search targeted sensitive mailboxes and could support email collection.',
+      confidence: 'medium',
+      relatedFindingIds: ['c4-f-2'],
+      relatedEvidenceIds: ['c4-ev-search'],
+    },
+  ],
+  recommendations: [
+    {
+      id: 'c4-rec-1',
+      title: 'Keep privileged session revoked pending review',
+      description: 'Do not restore the discovery role until the account owner and manager validate the activity.',
+      priority: 'high',
+      category: 'containment',
+      status: 'completed',
+    },
+    {
+      id: 'c4-rec-2',
+      title: 'Review privileged access approval workflow',
+      description:
+        'Require explicit change or eDiscovery approval before temporary mailbox discovery role assignment.',
+      priority: 'medium',
+      category: 'prevention',
+      status: 'proposed',
+    },
+    {
+      id: 'c4-rec-3',
+      title: 'Hunt for similar role assignments',
+      description:
+        'Search the previous 30 days for privileged role self-assignment and sensitive content searches outside approved windows.',
+      priority: 'medium',
+      category: 'monitoring',
+      status: 'in_progress',
+    },
+  ],
+  closure: {
+    verdict: 'suspicious',
+    closureStatus: 'escalated',
+    rationale:
+      'Privileged actions were performed from an unusual source and no valid approval was found. Export did not complete, but the behavior requires management and identity-team review.',
+    recommendedAction:
+      'Keep the role removed, review account ownership, and complete a 30-day audit of similar privileged actions.',
+    impactSummary:
+      'Potential exposure of sensitive mailbox content was attempted but not confirmed as completed.',
+  },
+  lab: {
+    enabled: true,
+    platform: 'SOC Case Workspace',
+    labName: 'Privileged Activity Review',
+    scenarioSummary:
+      'Training scenario for distinguishing authorized administration from suspicious privileged-account misuse.',
+    toolsUsed: 'Cloud audit logs, identity sign-in logs, change-ticket review',
+    learningNotes:
+      'Focus on authorization, timing, source context, and evidence-backed closure rather than assuming every admin action is malicious.',
+    writeupStatus: 'draft',
+    publicWriteupAllowed: 'yes',
+    spoilerSensitive: 'no',
+  },
+  createdAt: '2026-06-21T02:30:00Z',
+  updatedAt: '2026-06-21T03:35:00Z',
+}
+
+const dataExfilCloudSharing: SocCase = {
+  id: 'case-cloud-exfil-sharing',
+  title: 'Data Exfiltration / Cloud Sharing',
+  summary:
+    'A synthetic cloud-security alert detected unusually large downloads from a restricted project folder followed by an external sharing link to an unknown recipient. The analyst confirmed abnormal access and sharing behavior, but left the case in monitoring because external download confirmation and business approval evidence remain incomplete.',
+  source: 'cloud',
+  sourceDetail: 'Cloud access security broker alert',
+  severity: 'critical',
+  status: 'investigating',
+  owner: 'patel.analyst',
+  affectedEntities: [
+    {
+      id: 'c5-ent-user',
+      type: 'user',
+      value: 'taylor.reed',
+      role: 'User who created external share',
+    },
+    {
+      id: 'c5-ent-account',
+      type: 'cloud_account',
+      value: 'taylor.reed@training.example',
+      role: 'Cloud storage account',
+    },
+    {
+      id: 'c5-ent-folder',
+      type: 'other',
+      value: 'Restricted Project Atlas folder',
+      role: 'Sensitive project folder (synthetic)',
+    },
+    {
+      id: 'c5-ent-recipient',
+      type: 'email',
+      value: 'external.review@example.test',
+      role: 'External recipient on sharing link',
+    },
+    {
+      id: 'c5-ent-ip',
+      type: 'ip_address',
+      value: '203.0.113.45',
+      role: 'Source IP for bulk download (synthetic TEST-NET-3)',
+    },
+  ],
+  evidence: [
+    {
+      id: 'c5-ev-alert',
+      type: 'log',
+      title: 'Cloud DLP alert for unusual sharing',
+      detail:
+        'Cloud DLP alert: restricted folder shared externally after a spike in downloads by taylor.reed.',
+      source: 'Cloud DLP alert',
+      observedAt: '2026-06-22T16:22:00Z',
+      analystNote: 'Alert links two behaviors: bulk download and external sharing.',
+      relatedEntityIds: ['c5-ent-user', 'c5-ent-folder', 'c5-ent-recipient'],
+    },
+    {
+      id: 'c5-ev-downloads',
+      type: 'log',
+      title: 'Large download volume from restricted folder',
+      detail:
+        'Audit log shows 184 files totaling 2.8 GB downloaded from Restricted Project Atlas within 11 minutes.',
+      source: 'Cloud storage audit logs',
+      observedAt: '2026-06-22T16:05:00Z',
+      analystNote: 'Volume is far above this user baseline for the folder.',
+      relatedEntityIds: ['c5-ent-user', 'c5-ent-folder', 'c5-ent-ip'],
+    },
+    {
+      id: 'c5-ev-share',
+      type: 'log',
+      title: 'External sharing link created',
+      detail:
+        'User created a view/download sharing link for Restricted Project Atlas and added external.review@example.test.',
+      source: 'Cloud sharing audit log',
+      observedAt: '2026-06-22T16:18:00Z',
+      analystNote: 'External recipient is not in the approved collaborator list.',
+      relatedEntityIds: ['c5-ent-user', 'c5-ent-folder', 'c5-ent-recipient'],
+    },
+    {
+      id: 'c5-ev-device',
+      type: 'authentication',
+      title: 'Session from unmanaged device',
+      detail:
+        'Cloud session associated with 203.0.113.45; device compliance was unknown and session risk was medium.',
+      source: 'Cloud identity session details',
+      observedAt: '2026-06-22T16:02:00Z',
+      analystNote: 'Unmanaged or unknown device context increases risk but does not prove exfiltration by itself.',
+      relatedEntityIds: ['c5-ent-user', 'c5-ent-ip'],
+    },
+    {
+      id: 'c5-ev-approval',
+      type: 'note',
+      title: 'No approved external sharing request found',
+      detail:
+        'Project owner and ticket search did not identify an approved external sharing request for external.review@example.test.',
+      source: 'Analyst review note',
+      observedAt: '2026-06-22T17:05:00Z',
+      analystNote: 'Business justification is still missing.',
+      relatedEntityIds: ['c5-ent-folder', 'c5-ent-recipient'],
+    },
+    {
+      id: 'c5-ev-link-disabled',
+      type: 'log',
+      title: 'External sharing link disabled',
+      detail:
+        'Cloud admin disabled the external sharing link and removed the external recipient pending data-owner review.',
+      source: 'Cloud admin audit log',
+      observedAt: '2026-06-22T17:20:00Z',
+      analystNote: 'Manual containment; external download confirmation is still pending.',
+      relatedEntityIds: ['c5-ent-folder', 'c5-ent-recipient'],
+    },
+  ],
+  timeline: [
+    {
+      id: 'c5-tl-1',
+      timestamp: '2026-06-22T16:02:00Z',
+      title: 'Cloud session began from unmanaged context',
+      description: 'User session started from 203.0.113.45 with unknown device compliance.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c5-ev-device'],
+    },
+    {
+      id: 'c5-tl-2',
+      timestamp: '2026-06-22T16:05:00Z',
+      title: 'Bulk file downloads started',
+      description: '184 files were downloaded from the restricted folder in a short time window.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c5-ev-downloads'],
+    },
+    {
+      id: 'c5-tl-3',
+      timestamp: '2026-06-22T16:18:00Z',
+      title: 'External sharing link created',
+      description: 'The same user created an external link for the restricted folder.',
+      phase: 'attacker_activity',
+      relatedEvidenceIds: ['c5-ev-share'],
+    },
+    {
+      id: 'c5-tl-4',
+      timestamp: '2026-06-22T16:22:00Z',
+      title: 'DLP alert generated',
+      description: 'Cloud DLP raised an alert for unusual download plus external sharing behavior.',
+      phase: 'detection',
+      relatedEvidenceIds: ['c5-ev-alert'],
+    },
+    {
+      id: 'c5-tl-5',
+      timestamp: '2026-06-22T17:05:00Z',
+      title: 'Approval review found no request',
+      description: 'Analyst found no approved external sharing request for the recipient.',
+      phase: 'analyst_action',
+      relatedEvidenceIds: ['c5-ev-approval'],
+    },
+    {
+      id: 'c5-tl-6',
+      timestamp: '2026-06-22T17:20:00Z',
+      title: 'External link disabled',
+      description: 'Cloud admin disabled the sharing link and removed the external recipient.',
+      phase: 'containment',
+      relatedEvidenceIds: ['c5-ev-link-disabled'],
+    },
+  ],
+  analystQuestions: [
+    {
+      id: 'c5-q-1',
+      question: 'Was the external recipient approved for Project Atlas data?',
+      status: 'answered',
+      answer: 'No approval was found during initial review.',
+      rationale: 'Project owner and ticket search did not identify an approved request.',
+      createdAt: '2026-06-22T16:35:00Z',
+      answeredAt: '2026-06-22T17:05:00Z',
+    },
+    {
+      id: 'c5-q-2',
+      question: 'Did the external recipient download any shared files?',
+      status: 'open',
+      rationale:
+        'Sharing link was disabled, but external recipient access logs have not yet been imported into this case.',
+      createdAt: '2026-06-22T16:40:00Z',
+    },
+    {
+      id: 'c5-q-3',
+      question: 'Was the bulk download aligned with expected user behavior?',
+      status: 'answered',
+      answer: 'No. The volume and folder sensitivity were outside the user baseline.',
+      rationale: 'Cloud audit baseline shows this user rarely downloads more than a few files from the folder.',
+      createdAt: '2026-06-22T16:42:00Z',
+      answeredAt: '2026-06-22T17:10:00Z',
+    },
+  ],
+  findings: [
+    {
+      id: 'c5-f-1',
+      title: 'Unusual bulk access to restricted project data',
+      description:
+        'The user downloaded a large volume of restricted project files from an unmanaged or unknown device context.',
+      confidence: 'high',
+      category: 'suspicious_activity',
+      severity: 'high',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c5-ev-downloads', 'c5-ev-device'],
+      relatedTimelineEventIds: ['c5-tl-1', 'c5-tl-2'],
+    },
+    {
+      id: 'c5-f-2',
+      title: 'External sharing created without approval',
+      description:
+        'The user created an external sharing link for restricted data and no approved business request was found.',
+      confidence: 'high',
+      category: 'policy_violation',
+      severity: 'high',
+      status: 'confirmed',
+      relatedEvidenceIds: ['c5-ev-share', 'c5-ev-approval', 'c5-ev-link-disabled'],
+      relatedTimelineEventIds: ['c5-tl-3', 'c5-tl-5', 'c5-tl-6'],
+    },
+    {
+      id: 'c5-f-3',
+      title: 'External exfiltration remains unconfirmed',
+      description:
+        'Evidence confirms suspicious downloads and external sharing, but recipient download evidence is still missing.',
+      confidence: 'medium',
+      category: 'suspicious_activity',
+      severity: 'medium',
+      status: 'draft',
+      relatedEvidenceIds: ['c5-ev-alert', 'c5-ev-share'],
+      relatedTimelineEventIds: ['c5-tl-4'],
+    },
+  ],
+  mitreMappings: [
+    {
+      id: 'c5-mt-1',
+      tactic: 'Collection',
+      techniqueId: 'T1530',
+      techniqueName: 'Data from Cloud Storage',
+      rationale:
+        'The user accessed and downloaded a large volume of files from a restricted cloud storage folder.',
+      confidence: 'high',
+      relatedFindingIds: ['c5-f-1'],
+      relatedEvidenceIds: ['c5-ev-downloads'],
+    },
+    {
+      id: 'c5-mt-2',
+      tactic: 'Exfiltration',
+      techniqueId: 'T1567.002',
+      techniqueName: 'Exfiltration to Cloud Storage',
+      rationale:
+        'External cloud sharing created a potential exfiltration path, but actual external download remains unconfirmed.',
+      confidence: 'medium',
+      relatedFindingIds: ['c5-f-2', 'c5-f-3'],
+      relatedEvidenceIds: ['c5-ev-share', 'c5-ev-approval'],
+    },
+  ],
+  recommendations: [
+    {
+      id: 'c5-rec-1',
+      title: 'Keep external share disabled',
+      description: 'Maintain the disabled external sharing link until the data owner approves or rejects access.',
+      priority: 'high',
+      category: 'containment',
+      status: 'completed',
+    },
+    {
+      id: 'c5-rec-2',
+      title: 'Collect external recipient access logs',
+      description: 'Import cloud audit evidence showing whether external.review@example.test downloaded files.',
+      priority: 'high',
+      category: 'monitoring',
+      status: 'proposed',
+    },
+    {
+      id: 'c5-rec-3',
+      title: 'Review sharing policy for restricted folders',
+      description: 'Require approval workflow and alerting for external shares on restricted project folders.',
+      priority: 'medium',
+      category: 'prevention',
+      status: 'proposed',
+    },
+  ],
+  closure: {
+    verdict: 'suspicious',
+    closureStatus: 'monitoring',
+    rationale:
+      'Evidence confirms unusual restricted-data downloads and unapproved external sharing. External exfiltration is plausible but not confirmed without recipient access logs.',
+    recommendedAction:
+      'Keep the external link disabled, collect recipient access logs, and obtain a data-owner decision before closure.',
+    impactSummary:
+      'Restricted project data may have been exposed externally; confirmed external download is still unknown.',
+  },
+  lab: {
+    enabled: true,
+    platform: 'SOC Case Workspace',
+    labName: 'Cloud Sharing Exfiltration Review',
+    scenarioSummary:
+      'Training scenario for separating confirmed suspicious activity from unconfirmed exfiltration.',
+    toolsUsed: 'Cloud DLP alert, cloud storage audit logs, identity session details',
+    learningNotes:
+      'Practice writing limitations clearly: confirmed access and sharing are not the same as confirmed external exfiltration.',
+    writeupStatus: 'draft',
+    publicWriteupAllowed: 'yes',
+    spoilerSensitive: 'no',
+  },
+  createdAt: '2026-06-22T16:30:00Z',
+  updatedAt: '2026-06-22T17:30:00Z',
+}
+
 /** The synthetic demo cases shipped with the app (also the sample case library). */
-export const demoCases: SocCase[] = [suspiciousPowerShell, impossibleTravel, malwareEdrAlert]
+export const demoCases: SocCase[] = [
+  suspiciousPowerShell,
+  impossibleTravel,
+  malwareEdrAlert,
+  suspiciousAdminActivity,
+  dataExfilCloudSharing,
+]

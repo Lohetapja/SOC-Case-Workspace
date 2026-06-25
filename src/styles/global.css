@@ -2108,6 +2108,15 @@ body {
   letter-spacing: -0.02em;
 }
 
+.viewer-section-label {
+  margin: 18px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
 .viewer-chips,
 .viewer-actions {
   display: flex;
@@ -2132,6 +2141,29 @@ body {
   font-size: 13px;
 }
 
+.viewer-section-help,
+.viewer-note {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.viewer-note {
+  margin-top: 10px;
+}
+
+.viewer-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.viewer-metadata-grid strong {
+  color: var(--text);
+}
+
 .viewer-list,
 .viewer-timeline {
   display: flex;
@@ -2140,6 +2172,13 @@ body {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.viewer-list--compact {
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .viewer-list li,

@@ -12,4 +12,6 @@ export const sampleLibrary: SampleEntry[] = [
   { caseId: 'case-ps-outlook', name: 'Phishing to PowerShell Execution' },
   { caseId: 'case-impossible-travel', name: 'Impossible Travel / Suspicious Login' },
   { caseId: 'case-malware-edr', name: 'Malware / EDR Alert' },
+  { caseId: 'case-suspicious-admin', name: 'Suspicious Admin Activity' },
+  { caseId: 'case-cloud-exfil-sharing', name: 'Data Exfiltration / Cloud Sharing' },
 ]
