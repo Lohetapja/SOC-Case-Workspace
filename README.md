@@ -100,8 +100,9 @@ A focused walkthrough for a recruiter, hiring manager, or security reviewer:
 5. Review **Decision Journal** to see analyst questions, answers, and rationale.
 6. Review **Findings** and **MITRE Mapping** to see evidence-backed conclusions
    and analyst-authored technique mapping.
-7. Open **Artifact Map** to inspect the structured investigation-flow view.
-8. Open **Case Graph** to inspect the relationship graph for the same case.
+7. Open **Investigation Visuals** and start with **Artifact Map** for the structured
+   investigation-flow view.
+8. Switch to **Case Graph** to inspect the relationship graph for the same case.
 9. Open the **read-only viewer** for a clean case review format.
 10. Open **Reports** and export the Markdown investigation report.
 

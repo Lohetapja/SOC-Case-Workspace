@@ -109,7 +109,7 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
         <div className="empty-state">
           <p className="cases-note">
             No cases to visualize yet. Create a case or load a guided sample case first, then come
-            back to inspect its Case Graph or Artifact Map.
+            back to inspect its Artifact Map or Case Graph.
           </p>
           <button type="button" className="btn" onClick={() => onOpenCase(null)}>
             Go to Cases

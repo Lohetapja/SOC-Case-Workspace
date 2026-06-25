@@ -24,13 +24,8 @@ const ARTIFACT_META: Record<ArtifactType, { label: string; color: string }> = {
   response: { label: 'Response', color: '#38bdf8' },
 }
 
-const FALLBACK_GAPS = [
-  'Full email headers still needed',
-  'Decoded payload still needed',
-  'Endpoint script-block logs still needed',
-  'DNS / proxy follow-up still needed',
-  'Containment confirmation still needed',
-]
+const NO_GAPS_MESSAGE =
+  'No major investigation gaps flagged. Confirm evidence limits before final closure.'
 
 // Deterministic layout constants (no DOM measurement needed).
 const CARD_W = 170
@@ -155,7 +150,7 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
       .filter((guidance) => !openQuestions.includes(guidance))
       .slice(0, 4)
     const combinedGaps = [...openQuestions, ...qualitySignals]
-    return combinedGaps.length > 0 ? combinedGaps : FALLBACK_GAPS
+    return combinedGaps.length > 0 ? combinedGaps : [NO_GAPS_MESSAGE]
   }, [socCase])
 
   const center = (id: string) => {

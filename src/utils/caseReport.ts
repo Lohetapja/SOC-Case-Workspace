@@ -239,9 +239,6 @@ function closureRationale(socCase: SocCase): string {
     return `${head}\n\n_No closure rationale, impact summary, or next action has been recorded._`
   }
   const lines: string[] = []
-  lines.push(
-    'Closure should explain what happened, what supports the conclusion, what remains uncertain, and what should happen next.',
-  )
   if (closure.rationale) lines.push(`**Rationale:** ${closure.rationale}`)
   if (closure.recommendedAction) lines.push(`**Recommended action:** ${closure.recommendedAction}`)
   if (closure.impactSummary) lines.push(`**Impact:** ${closure.impactSummary}`)

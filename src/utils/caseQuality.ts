@@ -508,7 +508,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     guidance:
       isClosed && openQuestions.length > 0
         ? 'This case is marked closed but still has open analyst questions. Resolve or mark them not applicable.'
-        : 'Closed or near-closure cases should not leave unresolved questions unexplained.',
+        : 'If this case is closed later, make sure any open questions are answered or explicitly accepted as limitations.',
   })
 
   const hasNextAction = Boolean(closure?.recommendedAction?.trim() || socCase.recommendations.length)
