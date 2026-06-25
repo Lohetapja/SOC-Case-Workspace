@@ -3,6 +3,7 @@ import { AppHeader } from './components/AppHeader'
 import { AppFooter } from './components/AppFooter'
 import { Sidebar } from './components/Sidebar'
 import { OverviewPage } from './pages/OverviewPage'
+import { SearchPage } from './pages/SearchPage'
 import { SampleCasesPage } from './pages/SampleCasesPage'
 import { AnalystGuidePage } from './pages/AnalystGuidePage'
 import { CasesPage } from './pages/CasesPage'
@@ -61,6 +62,8 @@ export default function App() {
     switch (section) {
       case 'overview':
         return <OverviewPage onNavigate={navigate} />
+      case 'search':
+        return <SearchPage onOpenCase={openCaseDetail} />
       case 'samples':
         return <SampleCasesPage onOpenCase={openCaseDetail} />
       case 'guide':
