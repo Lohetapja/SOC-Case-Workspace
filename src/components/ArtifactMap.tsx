@@ -3,12 +3,11 @@ import type { SocCase } from '../types'
 import {
   ARTIFACT_LANES,
   buildArtifactMap,
-  type ArtifactEdge,
-  type ArtifactNode,
   type ArtifactType,
 } from '../utils/artifactMap'
 import { reviewCaseQuality } from '../utils/caseQuality'
 import { formatDateTime } from '../utils/format'
+import { ArtifactMapQuickEditForm } from './ArtifactMapQuickEditForm'
 
 /** Colour + label per artifact type (drives card accent and details panel). */
 const ARTIFACT_META: Record<ArtifactType, { label: string; color: string }> = {
@@ -22,6 +21,7 @@ const ARTIFACT_META: Record<ArtifactType, { label: string; color: string }> = {
   finding: { label: 'Finding', color: '#f9a8d4' },
   mitre: { label: 'ATT&CK', color: '#fb7185' },
   response: { label: 'Response', color: '#38bdf8' },
+  question: { label: 'Question', color: '#facc15' },
 }
 
 const NO_GAPS_MESSAGE =
@@ -36,8 +36,8 @@ const TOP_PAD = 10
 const LANE_COL_W = CARD_W + LANE_GAP
 
 type Selection =
-  | { kind: 'node'; node: ArtifactNode }
-  | { kind: 'edge'; edge: ArtifactEdge }
+  | { kind: 'node'; nodeId: string }
+  | { kind: 'edge'; edgeId: string }
   | null
 
 function truncate(value: string, max: number): string {
@@ -46,30 +46,37 @@ function truncate(value: string, max: number): string {
 
 interface ArtifactMapProps {
   socCase: SocCase
+  onUpdateCase?: (updater: (socCase: SocCase) => SocCase) => void
 }
 
-/** Structured, read-only investigation-flow map for one case. */
-export function ArtifactMap({ socCase }: ArtifactMapProps) {
+/** Structured investigation-flow map for one case. Source-backed cards can be quick-edited. */
+export function ArtifactMap({ socCase, onUpdateCase }: ArtifactMapProps) {
   const map = useMemo(() => buildArtifactMap(socCase), [socCase])
   const [selection, setSelection] = useState<Selection>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null)
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null)
 
   function clearSelection() {
     setSelection(null)
     setHoveredNodeId(null)
     setHoveredEdgeId(null)
+    setEditingNodeId(null)
   }
 
-  // Escape clears a locked selection (complements the Clear button and an
-  // empty-space click/tap).
+  // Escape cancels edit mode first, then clears a locked selection.
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') setSelection(null)
+      if (event.key !== 'Escape') return
+      if (editingNodeId) {
+        setEditingNodeId(null)
+        return
+      }
+      setSelection(null)
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [])
+  }, [editingNodeId])
 
   const evidenceTitleById = useMemo(
     () => new Map(socCase.evidence.map((item) => [item.id, item.title])),
@@ -79,14 +86,21 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
   const edgeById = useMemo(() => new Map(map.edges.map((edge) => [edge.id, edge])), [map])
 
   const inspected = useMemo<Selection>(() => {
-    if (selection) return selection
+    if (selection?.kind === 'edge') {
+      const edge = edgeById.get(selection.edgeId)
+      if (edge) return { kind: 'edge', edgeId: edge.id }
+    }
+    if (selection?.kind === 'node') {
+      const node = nodeById.get(selection.nodeId)
+      if (node) return { kind: 'node', nodeId: node.id }
+    }
     if (hoveredEdgeId) {
       const edge = edgeById.get(hoveredEdgeId)
-      if (edge) return { kind: 'edge', edge }
+      if (edge) return { kind: 'edge', edgeId: edge.id }
     }
     if (hoveredNodeId) {
       const node = nodeById.get(hoveredNodeId)
-      if (node) return { kind: 'node', node }
+      if (node) return { kind: 'node', nodeId: node.id }
     }
     return null
   }, [edgeById, hoveredEdgeId, hoveredNodeId, nodeById, selection])
@@ -96,15 +110,18 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
     const edgeIds = new Set<string>()
 
     if (inspected?.kind === 'edge') {
-      nodeIds.add(inspected.edge.source)
-      nodeIds.add(inspected.edge.target)
-      edgeIds.add(inspected.edge.id)
+      const edge = edgeById.get(inspected.edgeId)
+      if (edge) {
+        nodeIds.add(edge.source)
+        nodeIds.add(edge.target)
+        edgeIds.add(edge.id)
+      }
     }
 
     if (inspected?.kind === 'node') {
-      nodeIds.add(inspected.node.id)
+      nodeIds.add(inspected.nodeId)
       for (const edge of map.edges) {
-        if (edge.source === inspected.node.id || edge.target === inspected.node.id) {
+        if (edge.source === inspected.nodeId || edge.target === inspected.nodeId) {
           edgeIds.add(edge.id)
           nodeIds.add(edge.source)
           nodeIds.add(edge.target)
@@ -117,9 +134,9 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
       nodeIds,
       edgeIds,
     }
-  }, [inspected, map.edges])
+  }, [edgeById, inspected, map.edges])
 
-  // Deterministic positions: lane index → column, order-in-lane → row.
+  // Deterministic positions: lane index -> column, order-in-lane -> row.
   const { positions, width, height } = useMemo(() => {
     const pos = new Map<string, { x: number; y: number }>()
     let maxRows = 1
@@ -161,6 +178,10 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
   const resolveEvidence = (ids?: string[]) =>
     (ids ?? []).map((id) => evidenceTitleById.get(id)).filter((title): title is string => Boolean(title))
 
+  const inspectedNode = inspected?.kind === 'node' ? nodeById.get(inspected.nodeId) ?? null : null
+  const inspectedEdge = inspected?.kind === 'edge' ? edgeById.get(inspected.edgeId) ?? null : null
+  const selectedNode = selection?.kind === 'node' ? nodeById.get(selection.nodeId) ?? null : null
+
   if (map.nodes.length === 0) {
     return (
       <div className="amap">
@@ -174,8 +195,8 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
 
         <aside className="amap__panel">
           <p className="graph-hint">
-            Artifact Map is read-only. It reflects the selected case once investigation records
-            exist.
+            Artifact Map reflects the selected case. Once artifacts exist, select a card
+            to inspect or quick-edit source-backed items.
           </p>
           <div className="amap__gaps">
             <div className="amap__gaps-title">Investigation gaps</div>
@@ -220,7 +241,8 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
                     onMouseLeave={() => setHoveredEdgeId((current) => (current === edge.id ? null : current))}
                     onClick={(event) => {
                       event.stopPropagation()
-                      setSelection({ kind: 'edge', edge })
+                      setEditingNodeId(null)
+                      setSelection({ kind: 'edge', edgeId: edge.id })
                     }}
                   />
                   <path
@@ -236,8 +258,8 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
             const p = positions.get(node.id)
             if (!p) return null
             const meta = ARTIFACT_META[node.type]
-            const selected = selection?.kind === 'node' && selection.node.id === node.id
-            const active = inspected?.kind === 'node' && inspected.node.id === node.id
+            const selected = selection?.kind === 'node' && selection.nodeId === node.id
+            const active = inspected?.kind === 'node' && inspected.nodeId === node.id
             const related = highlighted.nodeIds.has(node.id) && !active
             const dimmed = highlighted.hasFocus && !highlighted.nodeIds.has(node.id)
             return (
@@ -250,7 +272,10 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
                 onMouseLeave={() => setHoveredNodeId((current) => (current === node.id ? null : current))}
                 onClick={(event) => {
                   event.stopPropagation()
-                  setSelection({ kind: 'node', node })
+                  if (selection?.kind !== 'node' || selection.nodeId !== node.id) {
+                    setEditingNodeId(null)
+                  }
+                  setSelection({ kind: 'node', nodeId: node.id })
                 }}
               >
                 <span className="amap__card-type" style={{ color: meta.color }}>
@@ -265,57 +290,91 @@ export function ArtifactMap({ socCase }: ArtifactMapProps) {
 
       <aside className="amap__panel">
         <div className="amap__panel-detail">
+          <p className="amap__sync-note">
+            Artifact Map edits update the selected case and are reflected across reports,
+            read-only view, and workspace pages.
+          </p>
+
           {selection && (
             <div className="amap__detail-actions">
+              {selectedNode && !editingNodeId && (
+                <button
+                  type="button"
+                  className="btn btn--secondary btn--sm"
+                  onClick={() => setEditingNodeId(selectedNode.id)}
+                >
+                  Edit
+                </button>
+              )}
               <button type="button" className="btn-link" onClick={() => clearSelection()}>
                 Clear selection
               </button>
             </div>
           )}
-          {inspected?.kind === 'node' ? (
-          <div className="amap__detail">
-            <span className="amap__detail-type">
-              <span className="graph-dot" style={{ background: ARTIFACT_META[inspected.node.type].color }} />
-              {ARTIFACT_META[inspected.node.type].label}
-            </span>
-            <h3 className="amap__detail-title">{inspected.node.title}</h3>
-            <p className="amap__detail-text">{inspected.node.description}</p>
-            {inspected.node.timestamp && (
-              <p className="amap__detail-meta">When: {formatDateTime(inspected.node.timestamp)}</p>
-            )}
-            {resolveEvidence(inspected.node.relatedEvidenceIds).length > 0 && (
+
+          {editingNodeId && selectedNode && onUpdateCase ? (
+            <ArtifactMapQuickEditForm
+              key={selectedNode.id}
+              socCase={socCase}
+              node={selectedNode}
+              onUpdateCase={onUpdateCase}
+              onCancel={() => setEditingNodeId(null)}
+              onSaved={() => setEditingNodeId(null)}
+            />
+          ) : inspectedNode ? (
+            <div className="amap__detail">
+              <span className="amap__detail-type">
+                <span className="graph-dot" style={{ background: ARTIFACT_META[inspectedNode.type].color }} />
+                {ARTIFACT_META[inspectedNode.type].label}
+              </span>
+              <h3 className="amap__detail-title">{inspectedNode.title}</h3>
+              <p className="amap__detail-text">{inspectedNode.description}</p>
+              {inspectedNode.timestamp && (
+                <p className="amap__detail-meta">When: {formatDateTime(inspectedNode.timestamp)}</p>
+              )}
+              {resolveEvidence(inspectedNode.relatedEvidenceIds).length > 0 && (
+                <p className="amap__detail-meta">
+                  Evidence: {resolveEvidence(inspectedNode.relatedEvidenceIds).join(', ')}
+                </p>
+              )}
               <p className="amap__detail-meta">
-                Evidence: {resolveEvidence(inspected.node.relatedEvidenceIds).join(', ')}
+                {inspectedNode.degree ?? 0}{' '}
+                {(inspectedNode.degree ?? 0) === 1 ? 'connection' : 'connections'}
               </p>
-            )}
-            <p className="amap__detail-meta">
-              {inspected.node.degree ?? 0}{' '}
-              {(inspected.node.degree ?? 0) === 1 ? 'connection' : 'connections'}
-            </p>
-          </div>
-        ) : inspected?.kind === 'edge' ? (
-          <div className="amap__detail">
-            <span className="amap__detail-type">Relationship</span>
-            <h3 className="amap__detail-title">{inspected.edge.label}</h3>
-            <p className="amap__detail-text">
-              <strong>{nodeById.get(inspected.edge.source)?.title ?? inspected.edge.source}</strong>
-              {' → '}
-              <strong>{nodeById.get(inspected.edge.target)?.title ?? inspected.edge.target}</strong>
-            </p>
-            {resolveEvidence(inspected.edge.supportingEvidenceIds).length > 0 && (
-              <p className="amap__detail-meta">
-                Supporting evidence: {resolveEvidence(inspected.edge.supportingEvidenceIds).join(', ')}
+              {selection?.kind === 'node' && selection.nodeId === inspectedNode.id && (
+                <p className="amap__detail-meta">
+                  Edit here or open the full case for detailed changes.
+                </p>
+              )}
+              {!inspectedNode.source && selection?.kind === 'node' && selection.nodeId === inspectedNode.id && (
+                <p className="amap__detail-meta">
+                  This item is generated from case data. Open the case to edit the source section.
+                </p>
+              )}
+            </div>
+          ) : inspectedEdge ? (
+            <div className="amap__detail">
+              <span className="amap__detail-type">Relationship</span>
+              <h3 className="amap__detail-title">{inspectedEdge.label}</h3>
+              <p className="amap__detail-text">
+                <strong>{nodeById.get(inspectedEdge.source)?.title ?? inspectedEdge.source}</strong>
+                {' → '}
+                <strong>{nodeById.get(inspectedEdge.target)?.title ?? inspectedEdge.target}</strong>
               </p>
-            )}
-          </div>
-        ) : (
-          <p className="graph-hint">
-            Hover or tap an artifact card (or a connection line) to highlight what it
-            relates to — related artifacts stay clear while unrelated ones dim. Tap an
-            artifact to lock the selection; clear it with the button above, by tapping
-            empty space, or with Escape.
-          </p>
-        )}
+              {resolveEvidence(inspectedEdge.supportingEvidenceIds).length > 0 && (
+                <p className="amap__detail-meta">
+                  Supporting evidence: {resolveEvidence(inspectedEdge.supportingEvidenceIds).join(', ')}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="graph-hint">
+              Hover or tap an artifact card (or a connection line) to highlight what it
+              relates to — related artifacts stay clear while unrelated ones dim. Tap an
+              artifact to lock the selection; clear it with the button above, by tapping
+              empty space, or with Escape.
+            </p>
+          )}
         </div>
 
         <div className="amap__gaps">

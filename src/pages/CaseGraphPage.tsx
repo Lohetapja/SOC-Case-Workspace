@@ -35,7 +35,7 @@ interface CaseGraphPageProps {
  * (the shared active case, or the first stored case). No editing.
  */
 export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGraphPageProps) {
-  const { cases } = useCases()
+  const { cases, updateCase } = useCases()
   const [viz, setViz] = useState<VizMode>('map')
   const [selectedNode, setSelectedNode] = useState<CaseGraphNode | null>(null)
   // Bumped by "Reset layout" to rebuild the graph with cleared positions.
@@ -186,7 +186,12 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
       </div>
 
       {viz === 'map' ? (
-        activeCase && <ArtifactMap socCase={activeCase} />
+        activeCase && (
+          <ArtifactMap
+            socCase={activeCase}
+            onUpdateCase={(updater) => updateCase(activeCase.id, updater)}
+          />
+        )
       ) : (
       <div className="graph-body">
         <div className="graph-canvas" ref={containerRef}>

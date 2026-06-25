@@ -1046,7 +1046,17 @@ body {
 }
 
 .amap__detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 10px;
+}
+
+.amap__sync-note {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #94a3b8;
 }
 
 .amap__detail-type {
@@ -1106,6 +1116,72 @@ body {
 
 .amap__gaps-list li {
   margin-bottom: 5px;
+}
+
+.amap-edit {
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.amap-edit__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amap-edit__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+}
+
+.amap-edit__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #94a3b8;
+}
+
+.amap-edit .form__label,
+.amap-edit .form__checks legend {
+  color: #cbd5e1;
+}
+
+.amap-edit .form__input,
+.amap-edit .form__textarea,
+.amap-edit .form__select {
+  border-color: #243244;
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+.amap-edit .form__input:focus,
+.amap-edit .form__textarea:focus,
+.amap-edit .form__select:focus {
+  outline-color: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+}
+
+.amap-edit .form__check {
+  color: #cbd5e1;
+}
+
+.amap-edit .form__error {
+  color: #fca5a5;
+}
+
+.amap-edit__checks {
+  max-height: 140px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.amap-edit--readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 @keyframes amap-flow {

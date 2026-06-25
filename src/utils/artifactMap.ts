@@ -34,6 +34,16 @@ export type ArtifactType =
   | 'finding'
   | 'mitre'
   | 'response'
+  | 'question'
+
+export type ArtifactNodeSource =
+  | { kind: 'entity'; id: string }
+  | { kind: 'evidence'; id: string }
+  | { kind: 'timeline'; id: string }
+  | { kind: 'finding'; id: string }
+  | { kind: 'mitre'; id: string }
+  | { kind: 'recommendation'; id: string }
+  | { kind: 'question'; id: string }
 
 export interface ArtifactNode {
   id: string
@@ -43,6 +53,8 @@ export interface ArtifactNode {
   description: string
   timestamp?: string
   relatedEvidenceIds?: string[]
+  /** The underlying case record that can be quick-edited, when unambiguous. */
+  source?: ArtifactNodeSource
   /** Number of relationships touching this artifact (precomputed). */
   degree?: number
 }
@@ -102,11 +114,19 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         type: 'user',
         title: entity.value,
         description: entity.role ?? entityTypeLabels[entity.type],
+        source: { kind: 'entity', id: entity.id },
       })
       userIds.push(id)
     } else if (entity.type === 'host') {
       const id = artifactId(entity.id)
-      nodes.push({ id, lane: 'identity', type: 'host', title: entity.value, description: entity.role ?? 'Host' })
+      nodes.push({
+        id,
+        lane: 'identity',
+        type: 'host',
+        title: entity.value,
+        description: entity.role ?? 'Host',
+        source: { kind: 'entity', id: entity.id },
+      })
       hostIds.push(id)
     }
   }
@@ -124,6 +144,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         description: item.detail,
         timestamp: item.observedAt,
         relatedEvidenceIds: [item.id],
+        source: { kind: 'evidence', id: item.id },
       })
       emailArtifacts.push({ id, evidenceId: item.id, relatedEntityIds: item.relatedEntityIds ?? [] })
     }
@@ -137,6 +158,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         type: 'email',
         title: entity.value,
         description: entity.description ?? entity.role ?? entityTypeLabels[entity.type],
+        source: { kind: 'entity', id: entity.id },
       })
       emailArtifacts.push({ id, relatedEntityIds: [] })
     }
@@ -145,7 +167,14 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
   for (const entity of socCase.affectedEntities) {
     if (entity.type === 'file' || entity.type === 'file_hash') {
       const id = artifactId(entity.id)
-      nodes.push({ id, lane: 'delivery', type: 'file', title: entity.value, description: entity.role ?? 'File' })
+      nodes.push({
+        id,
+        lane: 'delivery',
+        type: 'file',
+        title: entity.value,
+        description: entity.role ?? 'File',
+        source: { kind: 'entity', id: entity.id },
+      })
       fileIds.push(id)
     }
   }
@@ -155,7 +184,14 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
   for (const entity of socCase.affectedEntities) {
     if (entity.type === 'process') {
       const id = artifactId(entity.id)
-      nodes.push({ id, lane: 'execution', type: 'process', title: entity.value, description: entity.role ?? 'Process' })
+      nodes.push({
+        id,
+        lane: 'execution',
+        type: 'process',
+        title: entity.value,
+        description: entity.role ?? 'Process',
+        source: { kind: 'entity', id: entity.id },
+      })
       processIds.push(id)
     }
   }
@@ -171,6 +207,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         type: 'destination',
         title: entity.value,
         description: entity.role ?? entityTypeLabels[entity.type],
+        source: { kind: 'entity', id: entity.id },
       })
       destinationIds.push(id)
     }
@@ -192,8 +229,28 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
       description: alertEvent ? alertEvent.description : socCase.summary,
       timestamp: alertEvent?.timestamp,
       relatedEvidenceIds: alertEvent?.relatedEvidenceIds,
+      source: alertEvent ? { kind: 'timeline', id: alertEvent.id } : undefined,
     })
   }
+
+  const questionArtifacts: { id: string }[] = []
+  for (const question of socCase.analystQuestions) {
+    const id = artifactId(question.id)
+    nodes.push({
+      id,
+      lane: 'detection',
+      type: 'question',
+      title: question.question,
+      description: [
+        `Status: ${question.status.replace('_', ' ')}`,
+        question.answer && `Answer: ${question.answer}`,
+        question.rationale && `Rationale: ${question.rationale}`,
+      ].filter(Boolean).join(' · '),
+      source: { kind: 'question', id: question.id },
+    })
+    questionArtifacts.push({ id })
+  }
+
   const findingArtifacts: { id: string; evidenceIds: string[] }[] = []
   for (const finding of socCase.findings) {
     const id = artifactId(finding.id)
@@ -204,6 +261,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
       title: finding.title,
       description: `${confidenceLabels[finding.confidence]} confidence · ${finding.description}`,
       relatedEvidenceIds: finding.relatedEvidenceIds,
+      source: { kind: 'finding', id: finding.id },
     })
     findingArtifacts.push({ id, evidenceIds: finding.relatedEvidenceIds ?? [] })
   }
@@ -217,6 +275,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
       title: `${mapping.techniqueId} ${mapping.techniqueName}`,
       description: `${mapping.tactic} · ${mapping.rationale}`,
       relatedEvidenceIds: mapping.relatedEvidenceIds,
+      source: { kind: 'mitre', id: mapping.id },
     })
     mitreArtifacts.push({ id, evidenceIds: mapping.relatedEvidenceIds ?? [] })
   }
@@ -236,6 +295,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
         rec.status && recommendationStatusLabels[rec.status],
         rec.description,
       ].filter(Boolean).join(' · '),
+      source: { kind: 'recommendation', id: rec.id },
     })
     responseIds.push(id)
   }
@@ -273,6 +333,7 @@ export function buildArtifactMap(socCase: SocCase): ArtifactMapData {
           ? emailArtifacts.map((email) => email.id)
           : userIds
     for (const lead of leadSources) addEdge(lead, detectionId, 'raised alert')
+    for (const question of questionArtifacts) addEdge(detectionId, question.id, 'raises question')
     for (const finding of findingArtifacts) addEdge(detectionId, finding.id, 'concluded')
   }
 
