@@ -109,30 +109,77 @@ A focused walkthrough for a recruiter, hiring manager, or security reviewer:
 Tip: the app is local-first. You can freely edit a sample case and use
 **Settings → Reset demo data** to return to a clean synthetic workspace.
 
-## Screenshots
+## Visual walkthrough
 
-Screenshots are not committed yet. Recommended placeholders for the portfolio
-README are below; add images under `docs/screenshots/` when captures are ready.
+SOC Case Workspace is designed to make investigation structure visible:
+evidence, timeline, questions, findings, MITRE rationale, closure, and
+reporting.
 
-| View | Purpose | Placeholder |
-| --- | --- | --- |
-| Overview | Show the workspace landing/overview and analyst workflow framing. | `docs/screenshots/overview.png` |
-| Sample Cases | Show the synthetic demo-case library. | `docs/screenshots/sample-cases.png` |
-| Case Detail | Show evidence, timeline, decisions, findings, and closure in one case. | `docs/screenshots/case-detail.png` |
-| Artifact Map | Show the default visual investigation flow with bottom details panel. | `docs/screenshots/artifact-map.png` |
-| Case Graph | Show the relationship graph with bottom details/legend panel. | `docs/screenshots/case-graph.png` |
-| Report Export | Show the live Markdown report preview/export page. | `docs/screenshots/report-export.png` |
-| Settings / Export | Show JSON backup/export/import controls. | `docs/screenshots/settings-export.png` |
+### 1. Overview
 
-<!--
-![Overview](docs/screenshots/overview.png)
-![Sample Cases](docs/screenshots/sample-cases.png)
-![Case Detail](docs/screenshots/case-detail.png)
-![Artifact Map](docs/screenshots/artifact-map.png)
-![Case Graph](docs/screenshots/case-graph.png)
-![Report Export](docs/screenshots/report-export.png)
-![Settings / Export](docs/screenshots/settings-export.png)
--->
+![Overview: Local-first SOC case workspace overview.](assets/screenshots/Overview.jpg)
+
+_Local-first SOC case workspace overview._
+
+### 2. Sample Case
+
+![Sample Case: Synthetic sample cases show the full investigation workflow.](assets/screenshots/Sample_Case.jpg)
+
+_Synthetic sample cases show the full investigation workflow._
+
+### 3. Cases
+
+![Cases: Case list for opening, reviewing, and managing local cases.](assets/screenshots/Cases.jpg)
+
+_Case list for opening, reviewing, and managing local cases._
+
+### 4. Evidence
+
+![Evidence: Evidence tracking keeps observations tied to the investigation.](assets/screenshots/Evidence.jpg)
+
+_Evidence tracking keeps observations tied to the investigation._
+
+### 5. Timeline
+
+![Timeline: Timeline view reconstructs the sequence of activity.](assets/screenshots/Timeline.jpg)
+
+_Timeline view reconstructs the sequence of activity._
+
+### 6. Decision Journal
+
+![Decision Journal: Analyst questions and decisions keep reasoning visible.](assets/screenshots/Decision_Journal.jpg)
+
+_Analyst questions and decisions keep reasoning visible._
+
+### 7. MITRE ATT&CK Mapping
+
+![MITRE ATT&CK Mapping: MITRE mappings include rationale instead of unsupported labels.](assets/screenshots/MITRE_ATT%26CK_Mapping.jpg)
+
+_MITRE mappings include rationale instead of unsupported labels._
+
+### 8. Artifact Map
+
+![Artifact Map: Artifact relationships and investigation gaps help reviewers see what connects and what is missing.](assets/screenshots/Artifact_Map.jpg)
+
+_Artifact relationships and investigation gaps help reviewers see what connects and what is missing._
+
+### 9. Analyst Guide
+
+![Analyst Guide: Local guidance helps junior analysts understand what each section is for.](assets/screenshots/Analyst_Guide.jpg)
+
+_Local guidance helps junior analysts understand what each section is for._
+
+### 10. Reports
+
+![Reports: Markdown report export turns the case into a portable review artifact.](assets/screenshots/Reports.jpg)
+
+_Markdown report export turns the case into a portable review artifact._
+
+### 11. Settings
+
+![Settings: Import/export and local data controls keep the workflow browser-first.](assets/screenshots/Settings.jpg)
+
+_Import/export and local data controls keep the workflow browser-first._
 
 ## Key features
 
