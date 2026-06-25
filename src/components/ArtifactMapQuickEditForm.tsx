@@ -38,7 +38,7 @@ type QuickEditDraft =
       timestamp: string
       phase: TimelinePhase
       description: string
-      relatedEvidenceId: string
+      relatedEvidenceIds: string[]
     }
   | {
       kind: 'finding'
@@ -81,7 +81,7 @@ export function ArtifactMapQuickEditForm({
   const [error, setError] = useState<string | null>(null)
 
   function toggleEvidence(id: string) {
-    if (draft.kind !== 'finding' && draft.kind !== 'mitre') return
+    if (draft.kind !== 'finding' && draft.kind !== 'mitre' && draft.kind !== 'timeline') return
     const current = draft.relatedEvidenceIds
     setDraft({
       ...draft,
@@ -160,8 +160,8 @@ export function ArtifactMapQuickEditForm({
                     timestamp: normalizeDateTimeLocal(draft.timestamp) ?? event.timestamp,
                     phase: draft.phase,
                     description: draft.description.trim(),
-                    relatedEvidenceIds: draft.relatedEvidenceId
-                      ? [draft.relatedEvidenceId]
+                    relatedEvidenceIds: draft.relatedEvidenceIds.length
+                      ? draft.relatedEvidenceIds
                       : undefined,
                   }
                 : event,
@@ -404,26 +404,11 @@ export function ArtifactMapQuickEditForm({
             />
           </div>
           {socCase.evidence.length > 0 && (
-            <div className="form__field">
-              <label className="form__label" htmlFor="amap-timeline-evidence">
-                Related evidence
-              </label>
-              <select
-                id="amap-timeline-evidence"
-                className="form__select"
-                value={draft.relatedEvidenceId}
-                onChange={(event) =>
-                  setDraft({ ...draft, relatedEvidenceId: event.target.value })
-                }
-              >
-                <option value="">None</option>
-                {socCase.evidence.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <EvidenceChecks
+              evidence={socCase.evidence}
+              selectedIds={draft.relatedEvidenceIds}
+              onToggle={toggleEvidence}
+            />
           )}
         </>
       )}
@@ -758,7 +743,7 @@ function buildDraft(socCase: SocCase, node: ArtifactNode): QuickEditDraft {
         timestamp: toDateTimeLocal(event.timestamp),
         phase: event.phase ?? 'other',
         description: event.description,
-        relatedEvidenceId: event.relatedEvidenceIds?.[0] ?? '',
+        relatedEvidenceIds: event.relatedEvidenceIds ?? [],
       }
     }
 

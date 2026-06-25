@@ -107,7 +107,7 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
     return (
       <div className="page">
         <header className="page__header">
-          <h1 className="page__title">Report Center</h1>
+          <h1 className="page__title">Reports</h1>
           <p className="page__subtitle">
             Generate Markdown investigation reports from local, synthetic case data.
           </p>
@@ -128,7 +128,7 @@ export function ReportsPage({ activeCaseId, onSelectCase, onOpenCase }: ReportsP
     <div className="page">
       <header className="page__header page__header--row">
         <div>
-          <h1 className="page__title">Report Center</h1>
+          <h1 className="page__title">Reports</h1>
           <p className="page__subtitle">
             Review report readiness across all local cases, then preview, copy, or download a
             Markdown investigation report. Reports are generated from synthetic browser data only.

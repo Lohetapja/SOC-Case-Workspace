@@ -124,11 +124,11 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
     <div className="graph-page">
       <header className="graph-page__head">
         <div>
-          <h1 className="page__title">{viz === 'map' ? 'Artifact Map' : 'Case Graph'}</h1>
+          <h1 className="page__title">Investigation Visuals</h1>
           <p className="page__subtitle">
             {viz === 'graph'
-              ? `Read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
-              : 'Investigation-flow view: artifacts grouped into lanes. Select a card to inspect or quick-edit.'}
+              ? `Case Graph · read-only relationship view · ${graph.nodes.length} nodes · ${graph.links.length} links.`
+              : 'Artifact Map · investigation-flow view: artifacts grouped into lanes. Select a card to inspect or quick-edit.'}
           </p>
           {(activeCase?.closure?.verdict || activeCase?.closure?.closureStatus) && (
             <p className="graph-classification">

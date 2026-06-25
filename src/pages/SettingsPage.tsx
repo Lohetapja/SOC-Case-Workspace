@@ -214,8 +214,10 @@ export function SettingsPage() {
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">Settings / Data Management</h1>
-        <p className="page__subtitle">Back up, restore, and reset your workspace safely.</p>
+        <h1 className="page__title">Settings</h1>
+        <p className="page__subtitle">
+          Data management — back up, restore, and reset your workspace safely.
+        </p>
       </header>
 
       <section className="card data-management">

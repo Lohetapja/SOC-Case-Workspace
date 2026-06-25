@@ -10,17 +10,29 @@ Legend: ☐ not started · ◐ in progress · ☑ done
 
 ## Current status — completed
 
-The MVP and an extensive post-MVP layer are shipped, built, and deployed. Done:
+A focused MVP plus a substantial post-MVP polish layer are shipped, built, and
+deployed. It remains a local-first, browser-only educational tool — no backend,
+accounts, database, cloud sync, or live integrations. Done:
 
 - **Core case workflow** — case list/create, case detail workspace, editable case context.
 - **Investigation sections** (all editable) — Evidence, Timeline, Decision Journal,
-  Findings, MITRE Mapping, Closure classification.
-- **Markdown report export** — live preview, copy, and download.
-- **Visual investigation** — Artifact Map (default) and Case Graph.
+  Findings, MITRE Mapping, Closure classification, Recommendations.
+- **Guided Analyst Mode** — optional local, static tips across the editable sections.
+- **Case Quality Review** — advisory pass/warning/missing checks that never block export,
+  with a completion score, a **Missing Data Coach**, and a **Senior Review snapshot**.
+- **Lab / Training Mode** — optional per-case training metadata and disclosure flags,
+  surfaced in the read-only viewer and report.
+- **Analyst Guide** — short local guidance for writing SOC cases ethically.
+- **Agent Contributions** — optional, human-reviewed external analysis kept separate from
+  evidence (never auto-promoted into findings, mappings, closure, or reports).
+- **Visual investigation** — Artifact Map (default) with relationship highlighting,
+  Investigation Gaps, and safe selected-item quick editing, plus a read-only Case Graph.
+- **Markdown report export** — live preview, copy, and download, with an embedded quality summary.
+- **Read-only case viewer** — clean, mobile-friendly review view with a quality summary.
 - **Workspace-level pages** — cross-case Evidence, Timeline, Decision Journal, MITRE.
-- **Read-only case viewer** — clean, shareable, mobile-friendly case view.
-- **Sample cases + templates/checklists** — guided demo library and starter content.
+- **Sample cases + templates/checklists** — five fully populated synthetic cases and starter content.
 - **Selective export / import + workspace snapshots** — versioned backups, per-case selection.
+- **README screenshot walkthrough**, responsive mobile navigation drawer, and lazy-loaded graph view.
 - **GitHub Pages deployment** — GitHub Actions build + deploy.
 
 The detailed milestone and post-MVP entries below remain the source of truth.
@@ -281,14 +293,12 @@ in-browser; `npm run build` passes.
 
 These refine already-shipped features; do them in order, one at a time.
 
-1. ☐ **Artifact Map mobile layout & relationship highlighting polish** — refine the
-   Artifact Map on small screens (lane readability, touch interaction) and sharpen
-   hover/selection highlighting so a selected artifact plus its related artifacts and
-   connectors stand out while unrelated context is dimmed.
-2. ☐ **Mobile sidebar / responsive app shell** — polish the responsive shell: the
-   sidebar drawer behaviour, header/menu, and overall breakpoints on phones/tablets.
-3. ☐ **Capture and commit README screenshots** — add the recommended screenshot
-   set under `docs/screenshots/` once final portfolio captures are ready.
+1. ☐ **Artifact Map small-screen polish** — lane readability and touch interaction on
+   phones. (Relationship highlighting and connector styling have already shipped.)
+2. ☑ **Mobile sidebar / responsive app shell** — shipped: full-height drawer,
+   header/menu, and breakpoints on phones/tablets.
+3. ☑ **README screenshots & demo walkthrough** — shipped: screenshot walkthrough
+   committed under `assets/screenshots/` and embedded in the README.
 
 ### Parking lot (not scheduled)
 - Search & filter across cases.
