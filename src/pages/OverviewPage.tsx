@@ -6,16 +6,18 @@ interface OverviewPageProps {
   onNavigate: (id: SectionId) => void
 }
 
-/** Landing view: the About panel plus quick links into each section. */
+/** Landing view: product framing plus quick links into each section. */
 export function OverviewPage({ onNavigate }: OverviewPageProps) {
   const sections = navItems.filter((item) => item.id !== 'overview')
 
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">Overview</h1>
+        <h1 className="page__title">Turn an alert into a defensible SOC case</h1>
         <p className="page__subtitle">
-          Turn a messy alert into a structured, evidence-backed SOC investigation report.
+          A local-first workspace for organizing selected or sanitized evidence into a
+          timeline, analyst decisions, findings, ATT&amp;CK rationale, closure reasoning, and
+          a portable Markdown report.
         </p>
       </header>
 
@@ -25,7 +27,7 @@ export function OverviewPage({ onNavigate }: OverviewPageProps) {
         <h2 className="demo-walkthrough__title">Start here: follow one alert to a report</h2>
         <p className="detail-text">
           Best first click: open a populated synthetic sample and follow the analyst workflow in
-          about 60 seconds—no setup or case creation required.
+          about 60 seconds. No setup, account, backend, or case creation required.
         </p>
         <ol className="demo-walkthrough__steps">
           <li>Open Sample Cases and load a populated investigation.</li>
@@ -35,7 +37,7 @@ export function OverviewPage({ onNavigate }: OverviewPageProps) {
           <li>Review the Decision Journal and unresolved questions.</li>
           <li>Connect findings to evidence and analyst-authored ATT&amp;CK mappings.</li>
           <li>Use Case Quality Review to identify gaps before closure.</li>
-          <li>Explore relationships in the Case Graph and Artifact Map.</li>
+          <li>Explore relationships in the Artifact Map and Case Graph.</li>
           <li>Export the investigation as a clean Markdown report.</li>
         </ol>
         <div className="form__actions">
@@ -49,6 +51,16 @@ export function OverviewPage({ onNavigate }: OverviewPageProps) {
             Open Reports
           </button>
         </div>
+      </section>
+
+      <section className="card">
+        <h2 className="about__title">Why local-first matters</h2>
+        <p className="overview-hint">
+          This project intentionally avoids live SIEM, EDR, XDR, SOAR, ticketing, upload,
+          and cloud-sync integrations. Keeping the workflow in the browser reduces attack
+          surface and makes it safe for synthetic demos, sanitized notes, labs, mentoring,
+          portfolio review, and local practice.
+        </p>
       </section>
 
       <section className="card">

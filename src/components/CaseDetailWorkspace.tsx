@@ -226,7 +226,7 @@ export function CaseDetailWorkspace({
       <section className="card detail-graph-cta">
         <div>
           <h2 className="detail-section__title">Investigation visuals</h2>
-          <p className="detail-text">Explore this case in the Case Graph or structured Artifact Map.</p>
+          <p className="detail-text">Explore this case in the structured Artifact Map or free-form Case Graph.</p>
         </div>
         <button type="button" className="btn" onClick={onOpenGraph}>Open visuals →</button>
       </section>

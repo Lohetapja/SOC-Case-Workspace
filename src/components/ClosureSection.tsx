@@ -86,7 +86,7 @@ export function ClosureSection({ closure, onSave, guidedMode = false }: ClosureS
 
       {guidedMode && (
         <GuidedTip>
-          Closure should explain why the case is true positive, benign, false positive, suspicious, or undetermined.
+          Closure should explain the classification, evidence, uncertainty, impact, and next action.
         </GuidedTip>
       )}
 

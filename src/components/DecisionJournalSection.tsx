@@ -60,7 +60,7 @@ export function DecisionJournalSection({
 
       {guidedMode && (
         <GuidedTip>
-          Use this section to record analyst reasoning: what you asked, what you concluded, and what still needs confirmation.
+          Record what you asked, what you decided, and what still needs confirmation.
         </GuidedTip>
       )}
 

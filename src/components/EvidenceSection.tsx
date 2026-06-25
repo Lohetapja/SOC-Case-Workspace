@@ -47,7 +47,7 @@ export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove, guidedMod
 
       {guidedMode && (
         <GuidedTip>
-          Evidence should answer what was observed, where it came from, and why it matters. Findings should not rely on unsupported claims.
+          Evidence records observations. Findings explain what those observations mean.
         </GuidedTip>
       )}
 

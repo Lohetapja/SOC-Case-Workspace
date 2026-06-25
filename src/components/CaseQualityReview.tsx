@@ -55,7 +55,8 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
         <div>
           <h2 id="quality-review-title" className="detail-section__title">Case Quality Review</h2>
           <p className="quality-review__intro">
-            Advisory readiness checks for a defensible closure and report. Export remains available.
+            Advisory checks for evidence, reasoning, closure, and report readiness. They guide
+            review but never block export.
           </p>
         </div>
         <button type="button" className="btn btn--secondary btn--sm" onClick={onOpenReport}>
@@ -77,8 +78,8 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
       </div>
 
       <p className="quality-review__note">
-        Only information saved to the case counts. External suggestions should be reviewed and
-        linked to evidence before they are treated as conclusions.
+        Only reviewed information saved to the case counts. External suggestions are not evidence
+        until a human analyst validates and links them.
       </p>
 
       <div className="quality-review__coach">
@@ -99,6 +100,9 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
 
         <section className="quality-coach">
           <h3 className="quality-group__title">Senior review snapshot</h3>
+          <p className="quality-review__intro">
+            A quick review aid for mentors or senior analysts. It is not collaboration or approval workflow.
+          </p>
           <ul className="quality-coach__list">
             <li>
               Unsupported findings:{' '}
@@ -111,6 +115,9 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
               {review.seniorReview.openQuestions.length > 0
                 ? review.seniorReview.openQuestions.join(', ')
                 : 'none'}
+            </li>
+            <li>
+              Evidence: {review.seniorReview.missingEvidence ? 'missing' : 'recorded'}
             </li>
             <li>
               Closure rationale:{' '}

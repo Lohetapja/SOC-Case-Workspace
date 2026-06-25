@@ -16,7 +16,7 @@ export const navItems: NavItem[] = [
   { id: 'samples', label: 'Sample Cases', description: 'Load a guided synthetic demo case to explore.' },
   { id: 'guide', label: 'Analyst Guide', description: 'Short practical guidance for SOC case writing.' },
   { id: 'cases', label: 'Cases', description: 'Build and assess structured investigations.' },
-  { id: 'graph', label: 'Case Graph', description: 'Explore relationships in Case Graph or Artifact Map.' },
+  { id: 'graph', label: 'Investigation Visuals', description: 'Explore flow in Artifact Map or relationships in Case Graph.' },
   { id: 'evidence', label: 'Evidence', description: 'Review collected evidence across all cases.' },
   { id: 'timeline', label: 'Timeline', description: 'Review investigation events chronologically.' },
   { id: 'journal', label: 'Decision Journal', description: 'Review analyst questions and decisions.' },

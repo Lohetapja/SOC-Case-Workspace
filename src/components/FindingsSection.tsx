@@ -73,7 +73,7 @@ export function FindingsSection({
 
       {guidedMode && (
         <GuidedTip>
-          A finding should be supported by evidence. Include confidence and avoid conclusions that cannot be traced back to observations.
+          Findings should be traceable to evidence and include analyst confidence.
         </GuidedTip>
       )}
 

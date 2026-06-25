@@ -31,6 +31,7 @@ export interface CaseQualityReview {
   seniorReview: {
     unsupportedFindings: string[]
     openQuestions: string[]
+    missingEvidence: boolean
     missingClosureRationale: boolean
     missingMitreRationale: string[]
     missingRecommendations: boolean
@@ -503,7 +504,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
     title:
       isClosed && openQuestions.length > 0
         ? 'Case is closed with unresolved analyst questions'
-        : 'Closed-case question state is acceptable',
+        : 'Open-question state is acceptable for closure review',
     guidance:
       isClosed && openQuestions.length > 0
         ? 'This case is marked closed but still has open analyst questions. Resolve or mark them not applicable.'
@@ -563,6 +564,7 @@ export function reviewCaseQuality(socCase: SocCase): CaseQualityReview {
   const seniorReview = {
     unsupportedFindings: unsupportedFindings.map((finding) => finding.title),
     openQuestions: openQuestions.map((question) => question.question),
+    missingEvidence: socCase.evidence.length === 0,
     missingClosureRationale: !closure?.rationale?.trim(),
     missingMitreRationale: mappingsWithoutRationale.map(
       (mapping) => `${mapping.techniqueId} ${mapping.techniqueName}`,

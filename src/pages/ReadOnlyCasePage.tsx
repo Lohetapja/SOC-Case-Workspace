@@ -151,7 +151,8 @@ export function ReadOnlyCasePage({
         <h2 className="viewer-section-label">Executive summary</h2>
         <p className="viewer-summary">{socCase.summary || 'No executive summary has been recorded.'}</p>
         <p className="viewer-share-note">
-          Read-only view is generated from local browser data. Export Markdown or JSON to share
+          Read-only view is generated from local browser data for review by a mentor, senior
+          analyst, hiring manager, or non-technical stakeholder. Export Markdown or JSON to share
           outside this browser.
         </p>
         <div className="viewer-actions">
@@ -382,6 +383,10 @@ export function ReadOnlyCasePage({
 
       <section className="card viewer-section">
         <h2 className="detail-section__title">Case quality / limitations</h2>
+        <p className="viewer-section-help">
+          Advisory review summary only. Use it to spot weak evidence, unresolved questions,
+          and report-readiness gaps before handoff.
+        </p>
         <div className="viewer-chips">
           <span className="quality-summary quality-summary--pass">
             {quality.completion.complete} / {quality.completion.total} checks complete

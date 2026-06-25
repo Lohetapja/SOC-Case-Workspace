@@ -80,8 +80,9 @@ export function LabTrainingSection({ lab, onSave }: LabTrainingSectionProps) {
       </div>
 
       <p className="lab-section__safety">
-        Lab mode is for training and personal learning. Do not publish restricted lab answers,
-        copyrighted lab material, or spoiler-sensitive content without permission.
+        Lab mode is optional and meant for training or personal learning. Normal SOC cases do
+        not need it. Do not publish restricted answers, copyrighted lab material, or
+        spoiler-sensitive content without permission.
       </p>
 
       {editing ? (
@@ -224,7 +225,7 @@ export function LabTrainingSection({ lab, onSave }: LabTrainingSectionProps) {
       ) : (
         <p className="detail-empty">
           Not marked as a lab case. Enable this only for sanctioned training, personal learning,
-          or sanitized practice investigations.
+          sanitized practice investigations, or portfolio lab writeups.
         </p>
       )}
     </section>

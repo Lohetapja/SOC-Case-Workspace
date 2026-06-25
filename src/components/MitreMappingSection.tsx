@@ -59,7 +59,7 @@ export function MitreMappingSection({
 
       {guidedMode && (
         <GuidedTip>
-          MITRE mappings should include rationale. Do not map a technique only because it sounds similar; explain what behavior supports it.
+          Map ATT&CK only when observed behavior supports the technique; explain the rationale.
         </GuidedTip>
       )}
 

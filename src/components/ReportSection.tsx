@@ -57,7 +57,7 @@ export function ReportSection({ socCase, guidedMode = false }: ReportSectionProp
     <div className="report">
       {guidedMode && (
         <GuidedTip>
-          A good report should explain what happened, what supports the conclusion, what remains uncertain, and what should happen next.
+          A good report explains what happened, what supports it, what is uncertain, and what happens next.
         </GuidedTip>
       )}
       <div className="report__actions">

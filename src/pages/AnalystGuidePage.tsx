@@ -2,37 +2,52 @@ const guideCards = [
   {
     title: 'How to structure a SOC case',
     body:
-      'Start with the alert, affected subject, severity, owner, and a short summary. Then collect evidence, build a timeline, record decisions, write findings, map ATT&CK, classify closure, and export the report.',
+      'Start with the alert, affected subject, severity, owner, and short summary. Then connect evidence, timeline, decisions, findings, ATT&CK mapping, closure, and report output.',
   },
   {
     title: 'How to write evidence notes',
     body:
-      'Evidence should be factual: what was observed, where it came from, when it was observed, and why it matters. Avoid putting unsupported conclusions in evidence notes.',
+      'Keep evidence factual: what was observed, where it came from, when it was observed, and why it matters. Save conclusions for Findings.',
   },
   {
     title: 'How to build a timeline',
     body:
-      'Put events in chronological order. Include detection, suspected activity, analyst actions, containment, and closure checkpoints so a reviewer can follow the sequence.',
+      'Use the timeline to explain sequence. Include detection, suspected activity, analyst actions, containment, and closure checkpoints.',
+  },
+  {
+    title: 'How to use the Decision Journal',
+    body:
+      'Record the questions you asked, the answer or decision, and the rationale. Leave unresolved questions visible instead of hiding uncertainty.',
   },
   {
     title: 'How to write findings',
     body:
-      'A finding is a conclusion, not a raw log. Link it to supporting evidence, include confidence, and explain what the evidence means.',
+      'A finding is a conclusion backed by evidence. Link supporting artifacts, set confidence, and explain what the observations mean.',
   },
   {
-    title: 'How to map MITRE ATT&CK',
+    title: 'How to map MITRE ATT&CK with rationale',
     body:
-      'Map only behavior you can explain. Include technique ID, technique name, tactic, confidence, and rationale tied to the observed evidence or finding.',
+      'Map behavior you can explain. Include technique ID, tactic, confidence, and a rationale tied to evidence or a finding.',
   },
   {
     title: 'How to write closure rationale',
     body:
-      'Closure should explain the final classification, what evidence supports it, what remains uncertain, and what action should happen next.',
+      'Closure should state the classification, supporting evidence, remaining uncertainty, impact, and recommended next action.',
   },
   {
     title: 'How to use this for labs ethically',
     body:
-      'Use lab mode for sanctioned training and personal learning. Do not publish restricted answers, copyrighted lab material, real sensitive data, or spoiler-sensitive content without permission.',
+      'Use lab mode for sanctioned training and personal learning. Do not publish restricted answers, copyrighted material, or spoiler-sensitive content without permission.',
+  },
+  {
+    title: 'Why local-first matters',
+    body:
+      'The app stores data in your browser and avoids live integrations. That keeps the demo simple, offline-friendly, and lower risk for synthetic or sanitized practice data.',
+  },
+  {
+    title: 'What this tool is not',
+    body:
+      'It is not a SIEM, EDR, SOAR, ticketing system, live connector, or production incident platform. It is a human-led case structuring and reporting workspace.',
   },
 ]
 
@@ -49,8 +64,8 @@ export function AnalystGuidePage() {
       <section className="card guide-intro">
         <h2 className="guide-intro__title">Use this as a checklist, not a script.</h2>
         <p className="detail-text">
-          SOC Case Workspace is designed for synthetic, sanitized, or training data. Do not import
-          real sensitive investigation data into a public or shared browser environment.
+          SOC Case Workspace is designed for synthetic, sanitized, or training data. It
+          helps structure analyst reasoning; it does not replace analyst judgment.
         </p>
       </section>
 

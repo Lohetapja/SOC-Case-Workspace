@@ -101,8 +101,10 @@ export function CaseGraphPage({ activeCaseId, onSelectCase, onOpenCase }: CaseGr
     return (
       <div className="page">
         <header className="page__header">
-          <h1 className="page__title">Case Graph</h1>
-          <p className="page__subtitle">Visualize the relationships inside one case.</p>
+          <h1 className="page__title">Investigation Visuals</h1>
+          <p className="page__subtitle">
+            Visualize one case with Artifact Map or Case Graph after a case is created or loaded.
+          </p>
         </header>
         <div className="empty-state">
           <p className="cases-note">

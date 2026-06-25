@@ -28,6 +28,29 @@ only.
   closure rationale, and report output can stay connected inside one case.
 - A safe educational tool using only synthetic data.
 
+## Who this helps
+
+- **Junior analysts** practising how to move from alert notes to evidence-backed
+  findings.
+- **Senior analysts and mentors** reviewing whether a case has enough support to
+  close or report.
+- **Hiring managers and portfolio reviewers** looking for clear SOC / Blue Team
+  reasoning, not just UI polish.
+- **Lab learners** structuring sanitized BTLO / TryHackMe / CyberDefenders /
+  LetsDefend-style investigations without publishing restricted answers.
+- **Non-technical reviewers** who need a clean read-only case summary and
+  Markdown report.
+
+## Why local-first matters
+
+SOC Case Workspace intentionally avoids direct SIEM, EDR, XDR, SOAR, ticketing,
+cloud-sync, upload, OAuth, API-key, and automated-response integrations. The
+project is about analyst reasoning and case structure, so the safer default is a
+browser-only workflow with localStorage persistence.
+
+This keeps the demo lower risk, easy to run, and suitable for synthetic data,
+sanitized notes, labs, mentoring, portfolio review, and local practice.
+
 ## What this demonstrates
 
 - **SOC case structuring** — moving from an alert summary to a case with context,
@@ -56,6 +79,8 @@ only.
 - **Not a SIEM.** It does not ingest logs, run detections, or query live data.
 - **Not an EDR.** It does not inspect endpoints, contain hosts, or automate
   response.
+- **Not a SOAR or ticketing system.** It does not orchestrate response actions,
+  assign production work, or integrate with enterprise queues.
 - **Not a production incident response platform.** There is no multi-user
   workflow, authentication, backend, database, or server-side recovery.
 - **Not using real incident data.** The bundled examples are synthetic and should
@@ -137,6 +162,22 @@ README are below; add images under `docs/screenshots/` when captures are ready.
 - Responsive layout with a mobile navigation drawer.
 - Browser `localStorage` persistence with no accounts or server.
 
+## Sample cases
+
+The bundled sample cases are fully synthetic and designed to teach different
+SOC / DFIR concepts:
+
+- **Phishing to PowerShell Execution** - email delivery, Office-spawned
+  PowerShell, payload uncertainty, containment.
+- **Impossible Travel / Suspicious Login** - identity triage, VPN false-positive
+  analysis, MFA and audit-log review.
+- **Malware / EDR Alert** - endpoint execution, persistence, beaconing, scoping,
+  and reimage decision.
+- **Suspicious Admin Activity** - privileged-account misuse, change approval,
+  mailbox discovery, and escalation.
+- **Data Exfiltration / Cloud Sharing** - cloud DLP, external sharing, uncertain
+  exfiltration, and limitation wording.
+
 ## Core workflow
 
 A case moves through a structured investigation path:
@@ -157,6 +198,19 @@ reasoning visible, reviewable, and exportable.
   evidence or an automatic conclusion.
 - This is an educational portfolio project, not a production
   incident-management system.
+
+## Architecture and security boundaries
+
+- The persisted `SocCase` object is the source of truth for evidence, timeline,
+  decisions, findings, MITRE mappings, closure, recommendations, and report
+  export.
+- Data stays in browser `localStorage`; JSON export/import is file-based and
+  user-controlled.
+- Visuals, workspace pages, the read-only viewer, and Markdown reports are
+  projections of the same local case data.
+- The app does not collect telemetry or send investigation data to a server.
+- External agent/tool text can be pasted for human review, but it is not evidence
+  and never auto-closes a case.
 
 ## Roadmap
 

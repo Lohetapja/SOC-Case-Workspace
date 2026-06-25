@@ -59,7 +59,7 @@ export function TimelineSection({
 
       {guidedMode && (
         <GuidedTip>
-          Timeline events help reconstruct the sequence of activity: initial access, execution, network activity, detection, response, and closure.
+          Timeline events show sequence: alert, activity, analyst action, response, and closure.
         </GuidedTip>
       )}
 
