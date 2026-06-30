@@ -7,6 +7,7 @@ import { AddEvidenceForm } from './AddEvidenceForm'
 import { GuidedTip } from './GuidedTip'
 
 interface EvidenceSectionProps {
+  id?: string
   evidence: EvidenceItem[]
   onAdd: (input: NewEvidenceInput) => void
   onUpdate: (evidenceId: string, input: NewEvidenceInput) => void
@@ -15,7 +16,7 @@ interface EvidenceSectionProps {
 }
 
 /** Editable Evidence section: list existing items, add new ones, remove items. */
-export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove, guidedMode = false }: EvidenceSectionProps) {
+export function EvidenceSection({ id, evidence, onAdd, onUpdate, onRemove, guidedMode = false }: EvidenceSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -28,7 +29,7 @@ export function EvidenceSection({ evidence, onAdd, onUpdate, onRemove, guidedMod
   }
 
   return (
-    <section className="card detail-section">
+    <section id={id} className="card detail-section">
       <div className="detail-section__head">
         <h2 className="detail-section__title">
           Evidence

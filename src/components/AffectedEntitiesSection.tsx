@@ -3,6 +3,7 @@ import type { Entity } from '../types'
 import type { NewEntityInput } from '../data/casesStore'
 import { entityTypeLabels } from '../data/labels'
 import { AddEntityForm } from './AddEntityForm'
+import { CopyButton } from './CopyButton'
 
 interface AffectedEntitiesSectionProps {
   entities: Entity[]
@@ -37,6 +38,7 @@ export function AffectedEntitiesSection({ entities, onAdd, onRemove }: AffectedE
               <div className="detail-item__head">
                 <span className="chip">{entityTypeLabels[entity.type]}</span>
                 <span className="detail-mono">{entity.value}</span>
+                <CopyButton value={entity.value} label={`Copy ${entityTypeLabels[entity.type]} value`} />
                 <button type="button" className="btn-link-danger detail-item__remove" onClick={() => handleRemove(entity)}>Remove</button>
               </div>
               {entity.role && <p className="detail-item__sub">{entity.role}</p>}

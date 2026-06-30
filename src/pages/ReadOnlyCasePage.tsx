@@ -21,6 +21,7 @@ import {
   verdictLabels,
 } from '../data/labels'
 import { buildCaseReport, reportFilename } from '../utils/caseReport'
+import { buildCaseHtmlDocument, caseHtmlFilename } from '../utils/caseHtml'
 import { reviewCaseQuality } from '../utils/caseQuality'
 import { formatDateTime } from '../utils/format'
 
@@ -98,6 +99,22 @@ export function ReadOnlyCasePage({
     window.setTimeout(() => setFeedback(null), 3000)
   }
 
+  function handleDownloadHtml(caseToExport: SocCase) {
+    const html = buildCaseHtmlDocument(caseToExport)
+    const filename = caseHtmlFilename(caseToExport)
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = filename
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+    URL.revokeObjectURL(url)
+    setFeedback(`Download started: ${filename}`)
+    window.setTimeout(() => setFeedback(null), 3000)
+  }
+
   if (!socCase) {
     return (
       <div className="page viewer-page">
@@ -162,7 +179,14 @@ export function ReadOnlyCasePage({
           <button type="button" className="btn btn--secondary" onClick={() => handleDownloadReport(socCase)}>
             Download .md
           </button>
+          <button type="button" className="btn btn--secondary" onClick={() => handleDownloadHtml(socCase)}>
+            Download HTML
+          </button>
         </div>
+        <p className="viewer-share-note">
+          “Download HTML” saves a standalone, static read-only copy of this case. It contains no
+          scripts and makes no network calls.
+        </p>
         {feedback && <p className="action-feedback" role="status">{feedback}</p>}
         <textarea
           ref={textareaRef}

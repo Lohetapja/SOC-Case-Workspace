@@ -3,9 +3,11 @@ import type { EvidenceItem, Finding, MitreMapping } from '../types'
 import type { NewMitreInput } from '../data/casesStore'
 import { confidenceLabels } from '../data/labels'
 import { AddMitreMappingForm } from './AddMitreMappingForm'
+import { CopyButton } from './CopyButton'
 import { GuidedTip } from './GuidedTip'
 
 interface MitreMappingSectionProps {
+  id?: string
   mappings: MitreMapping[]
   findings: Finding[]
   evidence: EvidenceItem[]
@@ -20,6 +22,7 @@ interface MitreMappingSectionProps {
  * List with rationale, add, and remove.
  */
 export function MitreMappingSection({
+  id,
   mappings,
   findings,
   evidence,
@@ -40,7 +43,7 @@ export function MitreMappingSection({
   }
 
   return (
-    <section className="card detail-section">
+    <section id={id} className="card detail-section">
       <div className="detail-section__head">
         <h2 className="detail-section__title">
           MITRE ATT&amp;CK mappings
@@ -94,6 +97,7 @@ export function MitreMappingSection({
                   <strong>
                     {mapping.techniqueId} — {mapping.techniqueName}
                   </strong>
+                  <CopyButton value={mapping.techniqueId} label="Copy technique ID" />
                   {mapping.tactic && <span className="chip">{mapping.tactic}</span>}
                   <span className="chip">{confidenceLabels[mapping.confidence]} confidence</span>
                   <div className="detail-item__actions">

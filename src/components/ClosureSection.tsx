@@ -22,6 +22,7 @@ function statusChipClass(status: ClosureStatus): string {
 }
 
 interface ClosureSectionProps {
+  id?: string
   closure?: CaseClosure
   onSave: (input: ClosureInput) => void
   guidedMode?: boolean
@@ -31,7 +32,7 @@ interface ClosureSectionProps {
  * Editable classification & closure assessment. Can be filled progressively —
  * the case does not need to be closed to classify it.
  */
-export function ClosureSection({ closure, onSave, guidedMode = false }: ClosureSectionProps) {
+export function ClosureSection({ id, closure, onSave, guidedMode = false }: ClosureSectionProps) {
   const [editing, setEditing] = useState(false)
   const [verdict, setVerdict] = useState<ClassificationVerdict | ''>(closure?.verdict ?? '')
   const [status, setStatus] = useState<ClosureStatus | ''>(closure?.closureStatus ?? '')
@@ -74,7 +75,7 @@ export function ClosureSection({ closure, onSave, guidedMode = false }: ClosureS
   }
 
   return (
-    <section className="card detail-section">
+    <section id={id} className="card detail-section">
       <div className="detail-section__head">
         <h2 className="detail-section__title">Classification &amp; closure</h2>
         {!editing && (

@@ -5,6 +5,7 @@ import { severityLabels, sourceLabels, statusLabels } from '../data/labels'
 import { isAllowedValue } from '../utils/formValidation'
 
 interface CaseMetadataSectionProps {
+  id?: string
   socCase: SocCase
   onSave: (input: CaseMetadataInput) => void
 }
@@ -14,7 +15,7 @@ const severities = Object.keys(severityLabels) as SocCase['severity'][]
 const statuses = Object.keys(statusLabels) as SocCase['status'][]
 
 /** Small edit-in-place form for the active case's core context. */
-export function CaseMetadataSection({ socCase, onSave }: CaseMetadataSectionProps) {
+export function CaseMetadataSection({ id, socCase, onSave }: CaseMetadataSectionProps) {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(socCase.title)
   const [summary, setSummary] = useState(socCase.summary)
@@ -53,7 +54,7 @@ export function CaseMetadataSection({ socCase, onSave }: CaseMetadataSectionProp
   }
 
   return (
-    <section className="card detail-section">
+    <section id={id} className="card detail-section">
       <div className="detail-section__head">
         <h2 className="detail-section__title">Case context</h2>
         {!editing && (

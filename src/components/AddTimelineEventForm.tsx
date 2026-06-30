@@ -27,8 +27,16 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }
   const [timestamp, setTimestamp] = useState(initialValue?.timestamp ?? nowDateTimeLocal())
   const [phase, setPhase] = useState<TimelinePhase>(initialValue?.phase ?? 'attacker_activity')
   const [description, setDescription] = useState(initialValue?.description ?? '')
-  const [relatedEvidenceId, setRelatedEvidenceId] = useState(initialValue?.relatedEvidenceId ?? '')
+  const [relatedEvidenceIds, setRelatedEvidenceIds] = useState<string[]>(
+    initialValue?.relatedEvidenceIds ?? [],
+  )
   const [error, setError] = useState<string | null>(null)
+
+  function toggleEvidence(id: string) {
+    setRelatedEvidenceIds((current) =>
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
+    )
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,7 +57,7 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }
       return
     }
     setError(null)
-    onAdd({ title, timestamp, phase, description, relatedEvidenceId })
+    onAdd({ title, timestamp, phase, description, relatedEvidenceIds })
   }
 
   return (
@@ -107,22 +115,19 @@ export function AddTimelineEventForm({ evidence, onAdd, onCancel, initialValue }
       </div>
 
       {evidence.length > 0 && (
-        <div className="form__field">
-          <label className="form__label" htmlFor="tl-evidence">Related evidence (optional)</label>
-          <select
-            id="tl-evidence"
-            className="form__select"
-            value={relatedEvidenceId}
-            onChange={(event) => setRelatedEvidenceId(event.target.value)}
-          >
-            <option value="">None</option>
-            {evidence.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
-        </div>
+        <fieldset className="form__checks">
+          <legend>Related evidence (optional)</legend>
+          {evidence.map((item) => (
+            <label key={item.id} className="form__check">
+              <input
+                type="checkbox"
+                checked={relatedEvidenceIds.includes(item.id)}
+                onChange={() => toggleEvidence(item.id)}
+              />
+              <span>{item.title}</span>
+            </label>
+          ))}
+        </fieldset>
       )}
 
       {error && <p className="form__error" role="alert">{error}</p>}

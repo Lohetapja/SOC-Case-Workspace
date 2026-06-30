@@ -136,7 +136,10 @@ export function CaseDetailWorkspace({
         </div>
         <div className="detail-header__dates">
           <span>Created {formatDateTime(socCase.createdAt)}</span>
-          <span>Updated {formatDateTime(socCase.updatedAt)}</span>
+          <span className="save-indicator" title="Saved locally in this browser.">
+            <span className="save-indicator__dot" aria-hidden="true" />
+            Saved locally · last saved {formatDateTime(socCase.updatedAt)}
+          </span>
         </div>
         <div className="detail-header__actions">
           <GuidedModeToggle enabled={guidedMode} onChange={setGuidedMode} />
@@ -146,7 +149,7 @@ export function CaseDetailWorkspace({
         </div>
       </header>
 
-      <CaseMetadataSection socCase={socCase} onSave={onSaveMetadata} />
+      <CaseMetadataSection id="case-anchor-metadata" socCase={socCase} onSave={onSaveMetadata} />
 
       <CaseQualityReview socCase={socCase} onOpenReport={onOpenReport} />
 
@@ -154,7 +157,7 @@ export function CaseDetailWorkspace({
         <ChecklistSection checklist={socCase.checklist} onToggle={onToggleChecklistItem} />
       )}
 
-      <ClosureSection closure={socCase.closure} onSave={onSaveClosure} guidedMode={guidedMode} />
+      <ClosureSection id="case-anchor-closure" closure={socCase.closure} onSave={onSaveClosure} guidedMode={guidedMode} />
 
       <LabTrainingSection lab={socCase.lab} onSave={onSaveLabMetadata} />
 
@@ -165,6 +168,7 @@ export function CaseDetailWorkspace({
       />
 
       <EvidenceSection
+        id="case-anchor-evidence"
         evidence={socCase.evidence}
         onAdd={onAddEvidence}
         onUpdate={onUpdateEvidence}
@@ -198,6 +202,7 @@ export function CaseDetailWorkspace({
       />
 
       <FindingsSection
+        id="case-anchor-findings"
         findings={socCase.findings}
         evidence={socCase.evidence}
         timeline={socCase.timeline}
@@ -208,6 +213,7 @@ export function CaseDetailWorkspace({
       />
 
       <MitreMappingSection
+        id="case-anchor-mitre"
         mappings={socCase.mitreMappings}
         findings={socCase.findings}
         evidence={socCase.evidence}

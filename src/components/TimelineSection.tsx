@@ -105,7 +105,7 @@ export function TimelineSection({
                         timestamp: event.timestamp.replace(/Z$/, '').slice(0, 16),
                         phase: event.phase ?? 'other',
                         description: event.description,
-                        relatedEvidenceId: event.relatedEvidenceIds?.[0] ?? '',
+                        relatedEvidenceIds: event.relatedEvidenceIds ?? [],
                       }}
                       onAdd={(input) => { onUpdate(event.id, input); setEditingId(null) }}
                       onCancel={() => setEditingId(null)}

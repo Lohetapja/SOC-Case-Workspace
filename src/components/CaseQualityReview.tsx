@@ -21,6 +21,23 @@ const STATUS_META: Record<QualityCheckStatus, { label: string; symbol: string }>
   missing: { label: 'Missing', symbol: '×' },
 }
 
+/**
+ * Maps each check group to the case-detail section that fixes it. Used for the
+ * "Review …" jump links. Groups without a single clear target (e.g. agents) are
+ * omitted and simply show no jump link.
+ */
+const GROUP_TARGET: Partial<Record<QualityCheckGroup, { anchorId: string; label: string }>> = {
+  context: { anchorId: 'case-anchor-metadata', label: 'case context' },
+  evidence: { anchorId: 'case-anchor-evidence', label: 'Evidence' },
+  reasoning: { anchorId: 'case-anchor-findings', label: 'Findings & Decision Journal' },
+  mitre: { anchorId: 'case-anchor-mitre', label: 'MITRE Mapping' },
+  closure: { anchorId: 'case-anchor-closure', label: 'Closure & Recommendations' },
+}
+
+function scrollToAnchor(anchorId: string) {
+  document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function QualityCheck({ check }: { check: CaseQualityCheck }) {
   const meta = STATUS_META[check.status]
   return (
@@ -143,9 +160,22 @@ export function CaseQualityReview({ socCase, onOpenReport }: CaseQualityReviewPr
       <div className="quality-review__groups">
         {GROUPS.map((group) => {
           const checks = review.checks.filter((check) => check.group === group.id)
+          const target = GROUP_TARGET[group.id]
+          const hasIssues = checks.some((check) => check.status !== 'pass')
           return (
             <section key={group.id} className="quality-group">
-              <h3 className="quality-group__title">{group.title}</h3>
+              <div className="quality-group__head">
+                <h3 className="quality-group__title">{group.title}</h3>
+                {target && hasIssues && (
+                  <button
+                    type="button"
+                    className="btn-link quality-group__jump"
+                    onClick={() => scrollToAnchor(target.anchorId)}
+                  >
+                    Review {target.label} →
+                  </button>
+                )}
+              </div>
               <ul className="quality-group__list">
                 {checks.map((check) => <QualityCheck key={check.id} check={check} />)}
               </ul>

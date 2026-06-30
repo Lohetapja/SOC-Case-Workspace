@@ -11,6 +11,7 @@ import { AddFindingForm } from './AddFindingForm'
 import { GuidedTip } from './GuidedTip'
 
 interface FindingsSectionProps {
+  id?: string
   findings: Finding[]
   evidence: EvidenceItem[]
   timeline: TimelineEvent[]
@@ -32,6 +33,7 @@ function statusChipClass(status: NonNullable<Finding['status']>): string {
  * timeline events), and remove.
  */
 export function FindingsSection({
+  id,
   findings,
   evidence,
   timeline,
@@ -54,7 +56,7 @@ export function FindingsSection({
   }
 
   return (
-    <section className="card detail-section">
+    <section id={id} className="card detail-section">
       <div className="detail-section__head">
         <h2 className="detail-section__title">
           Findings

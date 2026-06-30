@@ -343,8 +343,8 @@ export interface NewTimelineEventInput {
   timestamp: string
   phase: TimelinePhase
   description: string
-  /** A single related evidence id, or empty for none. */
-  relatedEvidenceId: string
+  /** Related evidence ids (multi-select; empty for none). */
+  relatedEvidenceIds: string[]
 }
 
 /** Build a timeline event from form input. */
@@ -355,7 +355,7 @@ export function createTimelineEvent(input: NewTimelineEventInput): TimelineEvent
     title: input.title.trim(),
     description: input.description.trim(),
     phase: input.phase,
-    relatedEvidenceIds: input.relatedEvidenceId ? [input.relatedEvidenceId] : undefined,
+    relatedEvidenceIds: input.relatedEvidenceIds.length ? input.relatedEvidenceIds : undefined,
   }
 }
 
