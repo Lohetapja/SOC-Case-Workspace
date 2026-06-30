@@ -15,6 +15,7 @@ import { MitreMappingPage } from './pages/MitreMappingPage'
 import { ReportsPage } from './pages/ReportsPage'
 import { ReadOnlyCasePage } from './pages/ReadOnlyCasePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { useAppearanceSettings } from './hooks/useAppearanceSettings'
 import type { SectionId } from './types'
 
 /**
@@ -26,6 +27,7 @@ export default function App() {
   const [section, setSection] = useState<SectionId>('overview')
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const appearance = useAppearanceSettings()
 
   function navigate(target: SectionId) {
     // Selecting "Cases" from the nav always returns to the list.
@@ -112,7 +114,7 @@ export default function App() {
           />
         )
       case 'settings':
-        return <SettingsPage />
+        return <SettingsPage appearance={appearance} />
       default:
         return null
     }

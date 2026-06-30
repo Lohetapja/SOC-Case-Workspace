@@ -2689,3 +2689,231 @@ body {
     padding: 14px;
   }
 }
+
+/* =====================================================================
+   Appearance preferences (browser-local; applied as data-attributes on
+   <html>). Light is the default :root; the rules below layer on top.
+   ===================================================================== */
+
+/* ---- Theme: Dark (variable flip) ---- */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-sidebar: #070b14;
+  --bg-main: #0b1120;
+  --surface: #131c2e;
+  --border: #27344c;
+
+  --text: #e6edf6;
+  --text-muted: #9fb0c7;
+  --text-invert: #e2e8f0;
+
+  --accent: #60a5fa;
+  --accent-soft: #1e3354;
+
+  --warn-bg: #3a2e0a;
+  --warn-text: #fcd34d;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Dark overrides for surfaces that use hard-coded light colours. */
+:root[data-theme='dark'] .form__input,
+:root[data-theme='dark'] .form__textarea,
+:root[data-theme='dark'] .form__select,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] .header__menu,
+:root[data-theme='dark'] .copy-btn {
+  background: #0f1a2c;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .chip {
+  background: #1d293d;
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .search-group__count {
+  background: #1d2b45;
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .sev--informational {
+  background: #1d293d;
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .graph-hint {
+  color: var(--text-muted);
+}
+
+/* ---- Density: Compact (tighter cards/lists/forms) ---- */
+:root[data-density='compact'] .card {
+  padding: 13px 16px;
+}
+
+:root[data-density='compact'] .card + .card {
+  margin-top: 11px;
+}
+
+:root[data-density='compact'] .search-result {
+  padding: 9px 12px;
+}
+
+:root[data-density='compact'] .detail-item,
+:root[data-density='compact'] .detail-timeline__item {
+  padding-bottom: 6px;
+}
+
+/* ---- Dashboard density: Compact (Overview cards) ---- */
+:root[data-dashboard-density='compact'] .section-grid {
+  gap: 8px;
+}
+
+:root[data-dashboard-density='compact'] .section-card {
+  padding: 11px 12px;
+}
+
+:root[data-dashboard-density='compact'] .demo-walkthrough__steps li {
+  margin: 2px 0;
+}
+
+/* ---- Text size (uniform content scaling; layout-safe) ---- */
+:root[data-text-size='small'] .app__main {
+  zoom: 0.92;
+}
+
+:root[data-text-size='large'] .app__main {
+  zoom: 1.12;
+}
+
+/* ---- Workspace width ---- */
+:root[data-workspace-width='wide'] .page,
+:root[data-workspace-width='wide'] .detail,
+:root[data-workspace-width='wide'] .viewer-page {
+  max-width: 1140px;
+}
+
+:root[data-workspace-width='full'] .page,
+:root[data-workspace-width='full'] .detail,
+:root[data-workspace-width='full'] .viewer-page {
+  max-width: none;
+}
+
+/* ---- High contrast ---- */
+:root[data-contrast='high'] {
+  --text-muted: #334155;
+  --border: #8a98ab;
+}
+
+:root[data-contrast='high'][data-theme='dark'] {
+  --text-muted: #cdd8e6;
+  --border: #61718c;
+}
+
+:root[data-contrast='high'] .chip,
+:root[data-contrast='high'] .copy-btn,
+:root[data-contrast='high'] .search-result {
+  border-width: 1.5px;
+}
+
+:root[data-contrast='high'] *:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Brighten muted text on the dark visual panels for readability. */
+:root[data-contrast='high'] .amap__detail-meta,
+:root[data-contrast='high'] .amap__sync-note,
+:root[data-contrast='high'] .graph-detail__meta,
+:root[data-contrast='high'] .amap__card-title {
+  color: #e2e8f0;
+}
+
+/* ---- Appearance settings card controls ---- */
+.appearance-subtitle {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.appearance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 22px;
+  margin: 16px 0 6px;
+}
+
+.appearance-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.appearance-group__label {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.appearance-group__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.appearance-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.appearance-option {
+  position: relative;
+  display: inline-flex;
+}
+
+.appearance-option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.appearance-option span {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.appearance-option:hover span {
+  color: var(--text);
+}
+
+.appearance-option--active span {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.appearance-option:focus-within span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.appearance-actions {
+  margin-top: 6px;
+}
+

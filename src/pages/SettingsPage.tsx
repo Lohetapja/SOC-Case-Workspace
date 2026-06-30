@@ -19,12 +19,19 @@ import {
   workspaceSnapshotFilename,
   type WorkspaceSnapshotExportType,
 } from '../data/workspaceSnapshot'
+import { AppearanceSettingsCard } from '../components/AppearanceSettingsCard'
+import type { UseAppearanceSettings } from '../hooks/useAppearanceSettings'
+
+interface SettingsPageProps {
+  appearance: UseAppearanceSettings
+}
 
 /**
  * Data management: back up, restore, reset, and clear locally stored cases.
  * All data lives in browser localStorage; nothing is sent to a server.
+ * Also hosts browser-local appearance preferences (kept out of workspace data).
  */
-export function SettingsPage() {
+export function SettingsPage({ appearance }: SettingsPageProps) {
   const { cases } = useCases()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
@@ -216,9 +223,12 @@ export function SettingsPage() {
       <header className="page__header">
         <h1 className="page__title">Settings</h1>
         <p className="page__subtitle">
-          Data management — back up, restore, and reset your workspace safely.
+          Appearance preferences and data management — back up, restore, and reset your workspace
+          safely.
         </p>
       </header>
+
+      <AppearanceSettingsCard {...appearance} />
 
       <section className="card data-management">
         <div className="data-management__intro">
